@@ -1,0 +1,16 @@
+{
+  "name": "sunoapp",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.flora.sunoapp",
+    "win": {
+      "target": "nsis",
+      "icon": "icone_flora.ico"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, nativeImage, session } = require('electron');
+const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -27,6 +27,45 @@ app.on('ready', () => {
     });
 
     mainWindow.loadURL('https://suno.com');
+
+    // Menu contextuel avec options copier/coller
+    mainWindow.webContents.on('context-menu', (params) => {
+        const template = [
+            {
+                label: 'Copier',
+                accelerator: 'CmdOrCtrl+C',
+                visible: params.selectionText.length > 0,
+                click: () => {
+                    mainWindow.webContents.copy();
+                }
+            },
+            {
+                label: 'Coller',
+                accelerator: 'CmdOrCtrl+V',
+                click: () => {
+                    mainWindow.webContents.paste();
+                }
+            },
+            {
+                label: 'Couper',
+                accelerator: 'CmdOrCtrl+X',
+                visible: params.selectionText.length > 0,
+                click: () => {
+                    mainWindow.webContents.cut();
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Inspecter',
+                click: () => {
+                    mainWindow.webContents.openDevTools();
+                }
+            }
+        ];
+        
+        const menu = Menu.buildFromTemplate(template);
+        menu.popup({ window: mainWindow });
+    });
 
     const iconLike = nativeImage.createFromPath(path.join(__dirname, 'like.png')).resize({width: 32, height: 32});
     const iconPrev = nativeImage.createFromPath(path.join(__dirname, 'prec.png')).resize({width: 32, height: 32});

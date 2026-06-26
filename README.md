@@ -51,6 +51,7 @@ cd SunoApp
 2. Installez les dépendances :
 ```bash
 npm install
+npm install electron-builder --save-dev
 ```
 
 3. Lancez l'application :
@@ -153,6 +154,7 @@ cd SunoApp
 2. Install dependencies:
 ```bash
 npm install
+npm install electron-builder --save-dev
 ```
 
 3. Launch the application:

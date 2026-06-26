@@ -1,6 +1,8 @@
 {
   "name": "sunoapp",
   "version": "1.0.1",
+  "description": "Application Electron pour accéder à Suno.com avec contrôles multimédias",
+  "author": "Flora Cherry",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -8,6 +10,7 @@
   },
   "build": {
     "appId": "com.flora.sunoapp",
+    "productName": "SunoApp",
     "win": {
       "target": "nsis",
       "icon": "icone_flora.ico"

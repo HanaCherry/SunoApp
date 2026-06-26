@@ -2,7 +2,6 @@ const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu } = requi
 const path = require('path');
 const fs = require('fs');
 
-// Désactive la sécurité qui bloque le son automatique au démarrage
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
 let mainWindow;
@@ -28,34 +27,26 @@ app.on('ready', () => {
 
     mainWindow.loadURL('https://suno.com');
 
-    // Menu contextuel avec options copier/coller
-    mainWindow.webContents.on('context-menu', (params) => {
+    mainWindow.webContents.on('context-menu', (event, params) => {
         const template = [
             {
                 label: 'Copier',
                 accelerator: 'CmdOrCtrl+C',
-                visible: params.selectionText.length > 0,
-                click: () => {
-                    mainWindow.webContents.copy();
-                }
+                visible: (params.selectionText && params.selectionText.length > 0),
+                click: () => { mainWindow.webContents.copy(); }
             },
             {
                 label: 'Coller',
                 accelerator: 'CmdOrCtrl+V',
-                click: () => {
-                    mainWindow.webContents.paste();
-                }
+                click: () => { mainWindow.webContents.paste(); }
             },
             {
                 label: 'Couper',
                 accelerator: 'CmdOrCtrl+X',
-                visible: params.selectionText.length > 0,
-                click: () => {
-                    mainWindow.webContents.cut();
-                }
+                visible: (params.selectionText && params.selectionText.length > 0),
+                click: () => { mainWindow.webContents.cut(); }
             }
         ];
-        
         const menu = Menu.buildFromTemplate(template);
         menu.popup({ window: mainWindow });
     });
@@ -122,7 +113,6 @@ app.on('ready', () => {
             try {
                 let audios = document.querySelectorAll('audio, video');
                 let btns;
-                
                 if ('${action}' === 'playpause') {
                     let audioTrouve = false;
                     for (let i = 0; i < audios.length; i++) {
@@ -166,13 +156,12 @@ app.on('ready', () => {
         mainWindow.show();
         updateThumbar(); 
         
-        // LA MAGIE DU SON EST ICI !
         const soundPath = path.join(__dirname, 'startup.mp3');
         if (fs.existsSync(soundPath)) {
             const soundBase64 = fs.readFileSync(soundPath).toString('base64');
             mainWindow.webContents.executeJavaScript(`
                 let startupSound = new Audio("data:audio/mp3;base64,${soundBase64}");
-                startupSound.volume = 0.6; // Volume à 60%
+                startupSound.volume = 0.6;
                 startupSound.play().catch(e => console.log("Son bloqué", e));
             `);
         }

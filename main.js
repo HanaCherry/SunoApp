@@ -53,13 +53,6 @@ app.on('ready', () => {
                 click: () => {
                     mainWindow.webContents.cut();
                 }
-            },
-            { type: 'separator' },
-            {
-                label: 'Inspecter',
-                click: () => {
-                    mainWindow.webContents.openDevTools();
-                }
             }
         ];
         

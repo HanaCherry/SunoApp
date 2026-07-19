@@ -1,12 +1,12 @@
-const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu, shell, clipboard } = require('electron');
+const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu, shell, clipboard, ipcMain, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
 let mainWindow;
+let miniWindow;
 let isPlaying = false;
-let isMiniPlayer = false;
 
 const sanitizeSelection = (text = '') => text.replace(/\s+/g, ' ').trim();
 
@@ -195,6 +195,9 @@ app.whenReady().then(() => {
     mainWindow = new BrowserWindow({
         width: 1280,
         height: 800,
+        minWidth: 900,
+        minHeight: 600,
+        frame: false,
         autoHideMenuBar: true,
         icon: path.join(__dirname, 'icone_flora.ico'),
         backgroundColor: '#121212',
@@ -220,6 +223,44 @@ app.whenReady().then(() => {
     });
 
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        if (url === 'sunoapp://mini') {
+            toggleMiniPlayer();
+            return { action: 'deny' };
+        }
+        if (url === 'sunoapp://fullscreen') {
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.setFullScreen(!mainWindow.isFullScreen());
+            }
+            return { action: 'deny' };
+        }
+        if (url === 'sunoapp://window-minimize') {
+            mainWindow.minimize();
+            return { action: 'deny' };
+        }
+        if (url === 'sunoapp://window-maximize') {
+            if (mainWindow.isMaximized()) mainWindow.unmaximize();
+            else mainWindow.maximize();
+            return { action: 'deny' };
+        }
+        if (url === 'sunoapp://window-close') {
+            mainWindow.close();
+            return { action: 'deny' };
+        }
+        if (url.startsWith('sunoapp://native-click')) {
+            try {
+                const target = new URL(url);
+                const x = Number(target.searchParams.get('x'));
+                const y = Number(target.searchParams.get('y'));
+                if (Number.isFinite(x) && Number.isFinite(y) && x >= 0 && y >= 0) {
+                    mainWindow.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(x), y: Math.round(y) });
+                    mainWindow.webContents.sendInputEvent({ type: 'mouseDown', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
+                    mainWindow.webContents.sendInputEvent({ type: 'mouseUp', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
+                }
+            } catch (error) {
+                console.error('Erreur raccourci Suno:', error);
+            }
+            return { action: 'deny' };
+        }
         openExternalSearch(url);
         return { action: 'deny' };
     });
@@ -244,44 +285,225 @@ app.whenReady().then(() => {
         ]);
     };
 
+    const placeMiniPlayerBottomRight = (width, height) => {
+        if (!miniWindow || miniWindow.isDestroyed()) return;
+        const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+        const { x, y, width: workWidth, height: workHeight } = display.workArea;
+        const margin = 18;
+        miniWindow.setBounds({
+            x: x + workWidth - width - margin,
+            y: y + workHeight - height - margin,
+            width,
+            height
+        }, true);
+        miniWindow.moveTop();
+    };
+
     const toggleMiniPlayer = () => {
+        if (miniWindow && !miniWindow.isDestroyed()) {
+            miniWindow.close();
+            return;
+        }
+
+        miniWindow = new BrowserWindow({
+            width: 400,
+            height: 540,
+            minWidth: 360,
+            minHeight: 460,
+            maxWidth: 560,
+            maxHeight: 760,
+            frame: false,
+            transparent: true,
+            hasShadow: false,
+            resizable: true,
+            maximizable: false,
+            fullscreenable: false,
+            alwaysOnTop: true,
+            skipTaskbar: false,
+            backgroundColor: '#00000000',
+            icon: path.join(__dirname, 'icone_flora.ico'),
+            webPreferences: {
+                preload: path.join(__dirname, 'mini-preload.js'),
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true
+            }
+        });
+
+        miniWindow.loadFile(path.join(__dirname, 'mini-player.html'));
+        placeMiniPlayerBottomRight(400, 540);
+        miniWindow.setAlwaysOnTop(true, 'screen-saver');
+        miniWindow.moveTop();
+        miniWindow.on('closed', () => { miniWindow = null; });
+    };
+
+    const installMiniPlayerButton = () => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
 
-        if (isMiniPlayer) {
-            mainWindow.setAlwaysOnTop(false);
-            mainWindow.setResizable(true);
-            mainWindow.setSize(1280, 800);
-            mainWindow.center();
-            mainWindow.webContents.executeJavaScript(`
-                let style = document.getElementById('flora-mini-player');
-                if(style) style.remove();
-            `).catch(() => {});
-            isMiniPlayer = false;
-        } else {
-            mainWindow.setAlwaysOnTop(true);
-            mainWindow.setSize(1000, 120);
-            mainWindow.setResizable(false);
-            mainWindow.webContents.executeJavaScript(`
-                if(!document.getElementById('flora-mini-player')) {
-                    let style = document.createElement('style');
-                    style.id = 'flora-mini-player';
-                    style.innerHTML = \`
-                        body { overflow: hidden !important; }
-                        footer {
-                            position: fixed !important;
-                            bottom: 0 !important;
-                            left: 0 !important;
-                            width: 100vw !important;
-                            z-index: 9999999 !important;
-                            background-color: #121212 !important;
+        mainWindow.webContents.executeJavaScript(`
+            (function() {
+                const ensureMiniButton = () => {
+                    if (document.getElementById('sunoapp-mini-launcher')) return;
+
+                    const volumeButton = Array.from(document.querySelectorAll('button')).find((candidate) => {
+                        const label = [candidate.getAttribute('aria-label'), candidate.title, candidate.textContent]
+                            .filter(Boolean).join(' ');
+                        return /volume/i.test(label);
+                    });
+                    const detailsButton = Array.from(document.querySelectorAll('button')).find((candidate) => {
+                        const label = [candidate.getAttribute('aria-label'), candidate.title, candidate.textContent]
+                            .filter(Boolean).join(' ');
+                        return /song details|détails du morceau/i.test(label);
+                    });
+                    const anchorButton = detailsButton || volumeButton;
+                    if (!anchorButton?.parentElement) return;
+
+                    let playbar = anchorButton.parentElement;
+                    for (let depth = 0; playbar && depth < 7; depth++) {
+                        const rect = playbar.getBoundingClientRect();
+                        if (rect.width >= window.innerWidth * 0.82 && rect.height >= 58 && rect.height <= 150) break;
+                        playbar = playbar.parentElement;
+                    }
+                    if (playbar) playbar.classList.add('sunoapp-glass-playbar');
+
+                    const button = document.createElement('button');
+                    button.id = 'sunoapp-mini-launcher';
+                    button.type = 'button';
+                    button.title = 'Ouvrir le mini-lecteur';
+                    button.setAttribute('aria-label', 'Ouvrir le mini-lecteur');
+                    button.innerHTML = \`
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="4" width="15" height="12" rx="2.2"></rect>
+                            <rect x="12" y="12" width="9" height="8" rx="2"></rect>
+                        </svg>
+                    \`;
+                    button.addEventListener('click', () => window.open('sunoapp://mini', '_blank'));
+                    anchorButton.parentElement.insertBefore(button, anchorButton);
+
+                    const fullscreenButton = document.createElement('button');
+                    fullscreenButton.id = 'sunoapp-fullscreen-launcher';
+                    fullscreenButton.type = 'button';
+                    fullscreenButton.title = 'Plein écran';
+                    fullscreenButton.setAttribute('aria-label', 'Plein écran');
+                    fullscreenButton.innerHTML = \`
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M9 4H4v5M15 4h5v5M4 15v5h5M20 15v5h-5"></path>
+                        </svg>
+                    \`;
+                    fullscreenButton.addEventListener('click', () => window.open('sunoapp://fullscreen', '_blank'));
+                    anchorButton.parentElement.insertBefore(fullscreenButton, anchorButton);
+                };
+
+                if (!document.getElementById('sunoapp-mini-launcher-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'sunoapp-mini-launcher-style';
+                    style.textContent = \`
+                        #sunoapp-mini-launcher,
+                        #sunoapp-fullscreen-launcher {
+                            display: inline-grid !important;
+                            place-items: center !important;
+                            flex: 0 0 auto !important;
+                            width: 32px !important;
+                            height: 32px !important;
+                            margin: 0 3px !important;
+                            padding: 6px !important;
+                            border: 0 !important;
+                            border-radius: 50% !important;
+                            color: rgba(255,255,255,.78) !important;
+                            background: transparent !important;
+                            cursor: pointer !important;
+                        }
+                        #sunoapp-mini-launcher:hover,
+                        #sunoapp-fullscreen-launcher:hover {
+                            color: #fff !important;
+                            background: rgba(255,255,255,.1) !important;
+                        }
+                        #sunoapp-mini-launcher svg,
+                        #sunoapp-fullscreen-launcher svg {
+                            width: 20px !important;
+                            height: 20px !important;
+                            fill: none !important;
+                            stroke: currentColor !important;
+                            stroke-width: 1.8 !important;
+                            pointer-events: none !important;
+                        }
+                        .sunoapp-glass-playbar {
+                            background: linear-gradient(180deg, rgba(31,31,36,.56), rgba(13,13,17,.48)) !important;
+                            border-top: 1px solid rgba(255,255,255,.12) !important;
+                            box-shadow: inset 0 1px rgba(255,255,255,.045), 0 -12px 32px rgba(0,0,0,.16) !important;
+                            backdrop-filter: blur(28px) saturate(175%) !important;
+                            -webkit-backdrop-filter: blur(28px) saturate(175%) !important;
                         }
                     \`;
                     document.head.appendChild(style);
                 }
-            `).catch(() => {});
-            isMiniPlayer = true;
-        }
+
+                ensureMiniButton();
+                if (!window.__sunoMiniButtonObserver) {
+                    window.__sunoMiniButtonObserver = new MutationObserver(ensureMiniButton);
+                    window.__sunoMiniButtonObserver.observe(document.body, { childList: true, subtree: true });
+                }
+            })();
+        `).catch(() => {});
     };
+
+    mainWindow.webContents.on('did-finish-load', installMiniPlayerButton);
+
+    const installSunoAppEnhancements = () => {
+        if (!mainWindow || mainWindow.isDestroyed()) return;
+        const enhancementScript = fs.readFileSync(path.join(__dirname, 'main-enhancements.js'), 'utf8');
+        mainWindow.webContents.executeJavaScript(enhancementScript).catch((error) => {
+            console.error('Erreur interface SunoApp:', error);
+        });
+    };
+
+    mainWindow.webContents.on('did-finish-load', installSunoAppEnhancements);
+
+    ipcMain.removeHandler('mini-control');
+    ipcMain.handle('mini-control', (_event, action, value) => {
+        if (action === 'close-mini') {
+            if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close();
+            return;
+        }
+        if (action === 'show-main') {
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.show();
+                mainWindow.focus();
+            }
+            return;
+        }
+        if (action === 'toggle-mini-size') {
+            if (miniWindow && !miniWindow.isDestroyed()) {
+                const [width] = miniWindow.getSize();
+                miniWindow.setSize(width < 480 ? 520 : 400, width < 480 ? 700 : 540, true);
+            }
+            return;
+        }
+        if (action === 'always-on-top') {
+            if (miniWindow && !miniWindow.isDestroyed()) {
+                miniWindow.setAlwaysOnTop(Boolean(value), 'floating');
+            }
+            return;
+        }
+        if (action === 'resize-to-artwork') {
+            if (miniWindow && !miniWindow.isDestroyed() && value?.width > 0 && value?.height > 0) {
+                const ratio = Math.max(0.55, Math.min(2.2, value.width / value.height));
+                let windowWidth = 400;
+                if (ratio >= 1.35) windowWidth = 520;
+                if (ratio <= 0.75) windowWidth = 380;
+
+                const artworkWidth = windowWidth - 64;
+                const artworkHeight = Math.max(220, Math.min(520, artworkWidth / ratio));
+                const windowHeight = Math.round(Math.max(430, Math.min(760, artworkHeight + 204)));
+                placeMiniPlayerBottomRight(windowWidth, windowHeight);
+                miniWindow.setAlwaysOnTop(true, 'screen-saver');
+            }
+            return;
+        }
+        if (['playpause', 'prev', 'next', 'stop', 'like'].includes(action)) {
+            controlSuno(action);
+        }
+    });
 
     const controlSuno = (action) => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -300,7 +522,7 @@ app.whenReady().then(() => {
                         }
                     }
                     if (!audioTrouve) {
-                        btns = document.querySelectorAll('button[aria-label="Play"], button[aria-label="Pause"], button[data-testid="play-button"]');
+                        btns = document.querySelectorAll('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i], button[aria-label="Play"], button[aria-label="Pause"], button[data-testid="play-button"]');
                         if (btns.length > 0) btns[btns.length - 1].click();
                     }
                 }
@@ -348,17 +570,53 @@ app.whenReady().then(() => {
                 mainWindow.webContents.executeJavaScript(`
                     (function() {
                         let audios = document.querySelectorAll('audio, video');
+                        let playing = false;
                         for (let i = 0; i < audios.length; i++) {
                             if (audios[i].src || audios[i].currentSrc) {
-                                return !audios[i].paused;
+                                playing = !audios[i].paused;
+                                break;
                             }
                         }
-                        return false;
+
+                        const playbarButton = document.querySelector('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i]');
+                        let playerRoot = playbarButton?.parentElement || null;
+                        for (let depth = 0; playerRoot && depth < 7; depth++) {
+                            const hasCover = !!playerRoot.querySelector('img');
+                            const hasLinks = playerRoot.querySelectorAll('a').length >= 2;
+                            const hasControls = playerRoot.querySelectorAll('button').length >= 5;
+                            if (hasCover && hasLinks && hasControls) break;
+                            playerRoot = playerRoot.parentElement;
+                        }
+
+                        const playerLinks = playerRoot
+                            ? Array.from(playerRoot.querySelectorAll('a')).filter((link) => link.textContent?.trim())
+                            : [];
+                        const titleLink = document.querySelector('[aria-label*="Playbar: Title" i]') || playerLinks[0];
+                        const artistLink = document.querySelector('[aria-label*="Playbar: Artist" i]') || playerLinks[1];
+                        const coverImage = playerRoot?.querySelector('img') || document.querySelector('img[aria-label*="Playbar: Cover" i], img[alt*="cover" i]');
+
+                        const mediaMetadata = navigator.mediaSession?.metadata;
+                        const mediaArtwork = mediaMetadata?.artwork;
+                        const mediaCover = Array.isArray(mediaArtwork) && mediaArtwork.length
+                            ? mediaArtwork[mediaArtwork.length - 1]?.src
+                            : '';
+
+                        const resolvedTitle = mediaMetadata?.title || titleLink?.textContent?.trim() || '';
+
+                        return {
+                            playing: navigator.mediaSession?.playbackState === 'playing' || playing,
+                            title: /suno\s*\|\s*ai music/i.test(resolvedTitle) ? '' : resolvedTitle,
+                            artist: mediaMetadata?.artist || artistLink?.textContent?.trim() || 'SunoApp',
+                            cover: mediaCover || coverImage?.src || ''
+                        };
                     })()
-                `).then((playing) => {
-                    if (playing !== isPlaying) {
-                        isPlaying = playing;
+                `).then((playerState) => {
+                    if (playerState.playing !== isPlaying) {
+                        isPlaying = playerState.playing;
                         updateThumbar();
+                    }
+                    if (miniWindow && !miniWindow.isDestroyed()) {
+                        miniWindow.webContents.send('player-state', playerState);
                     }
                 }).catch(() => {});
             }
@@ -366,6 +624,7 @@ app.whenReady().then(() => {
     });
 
     globalShortcut.register('CommandOrControl+Space', () => { controlSuno('playpause'); });
+    globalShortcut.register('CommandOrControl+Shift+M', () => { toggleMiniPlayer(); });
 });
 
 app.on('window-all-closed', () => {

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SunoApp Mini</title>
+    <style>
+        :root { --tint: 255, 78, 112; --glass-opacity: .86; }
+        * { box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+        body {
+            color: #fff;
+            background: transparent;
+            font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
+            user-select: none;
+            padding: 4px;
+        }
+        button, input { font: inherit; }
+        .shell {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border: 1px solid transparent;
+            border-radius: 26px;
+            background:
+                radial-gradient(circle at 12% -8%, rgba(var(--tint), .19), transparent 42%) padding-box,
+                linear-gradient(145deg, rgba(27,27,32,var(--glass-opacity)), rgba(8,8,12,calc(var(--glass-opacity) - .08))) padding-box,
+                linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,.045) 48%, rgba(var(--tint), .16)) border-box;
+            box-shadow:
+                inset 0 1px rgba(255,255,255,.15),
+                inset 0 -1px rgba(0,0,0,.14);
+            backdrop-filter: blur(32px) saturate(165%);
+        }
+        .shell::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(255,255,255,.065), transparent 28%, transparent 72%, rgba(var(--tint), .045));
+        }
+        .topbar {
+            position: relative;
+            z-index: 5;
+            display: grid;
+            grid-template-columns: 44px 1fr 40px;
+            align-items: center;
+            height: 48px;
+            padding: 0 10px;
+            -webkit-app-region: drag;
+        }
+        .drag-dots { justify-self: center; color: rgba(255,255,255,.52); font-size: 15px; letter-spacing: 2px; }
+        .window-actions { display: flex; justify-self: end; gap: 4px; }
+        .icon-btn {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 0;
+            border-radius: 12px;
+            color: rgba(255,255,255,.82);
+            background: rgba(255,255,255,.07);
+            cursor: pointer;
+            -webkit-app-region: no-drag;
+        }
+        .icon-btn:hover { color: #fff; background: rgba(255,255,255,.15); }
+        .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+        .content { position: relative; z-index: 2; display: flex; flex-direction: column; height: calc(100% - 48px); padding: 0 16px 16px; }
+        .art-wrap {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 230px;
+            overflow: hidden;
+            border: 0;
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(var(--tint), .23), rgba(255,255,255,.025));
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.085), inset 0 1px rgba(255,255,255,.09), 0 14px 34px rgba(0,0,0,.28);
+        }
+        .art-blur { position: absolute; inset: -28px; width: calc(100% + 56px); height: calc(100% + 56px); object-fit: cover; filter: blur(38px) saturate(135%) brightness(.54); opacity: .86; }
+        .cover { position: absolute; inset: 16px; width: calc(100% - 32px); height: calc(100% - 32px); border-radius: 18px; object-fit: contain; box-shadow: 0 16px 38px rgba(0,0,0,.34); }
+        .song-row { display: grid; grid-template-columns: minmax(0,1fr) 38px; gap: 10px; align-items: center; padding: 15px 4px 7px; }
+        .title { overflow: hidden; font-size: 21px; font-weight: 760; letter-spacing: -.025em; text-overflow: ellipsis; white-space: nowrap; }
+        .artist { overflow: hidden; margin-top: 3px; color: rgba(255,255,255,.63); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+        .like.active { color: rgb(var(--tint)); background: rgba(var(--tint), .16); }
+        .controls { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 7px 0 3px; }
+        .control {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 50%;
+            color: rgba(255,255,255,.88);
+            background: rgba(255,255,255,.08);
+            cursor: pointer;
+        }
+        .control:hover { color: #fff; background: rgba(255,255,255,.16); transform: scale(1.04); }
+        .control svg, .like svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+        .play { width: 50px; height: 50px; color: #141414; background: rgba(255,255,255,.94); font-size: 20px; box-shadow: 0 7px 22px rgba(0,0,0,.35); }
+        .play:hover { color: #111; background: #fff; }
+        .play svg { width: 22px; height: 22px; fill: currentColor; stroke: none; }
+        .settings {
+            position: absolute;
+            z-index: 20;
+            inset: 48px 10px 10px;
+            display: none;
+            flex-direction: column;
+            padding: 22px;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 18px;
+            background: rgba(12,12,15,.82);
+            box-shadow: 0 20px 55px rgba(0,0,0,.55);
+            backdrop-filter: blur(34px) saturate(160%);
+        }
+        .settings.open { display: flex; }
+        .settings h2 { margin: 3px 0 22px; font-size: 20px; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; min-height: 54px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .setting-row span { font-size: 14px; font-weight: 650; }
+        .color { width: 42px; height: 28px; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.3); border-radius: 10px; background: transparent; cursor: pointer; }
+        .color::-webkit-color-swatch-wrapper { padding: 0; }
+        .color::-webkit-color-swatch { border: 0; }
+        .range-wrap { display: flex; align-items: center; gap: 10px; }
+        .range { width: 104px; accent-color: rgb(var(--tint)); cursor: pointer; }
+        .range-value { width: 38px; color: rgba(255,255,255,.65); font-size: 12px; text-align: right; }
+        .switch { position: relative; width: 45px; height: 26px; }
+        .switch input { position: absolute; opacity: 0; }
+        .switch i { position: absolute; inset: 0; border-radius: 20px; background: rgba(255,255,255,.22); transition: .2s; cursor: pointer; }
+        .switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: .2s; }
+        .switch input:checked + i { background: rgb(var(--tint)); }
+        .switch input:checked + i::after { transform: translateX(19px); }
+        .done { align-self: center; margin-top: auto; min-width: 118px; padding: 11px 18px; border: 0; border-radius: 999px; color: #151515; background: #fff; font-weight: 760; cursor: pointer; }
+        .queue {
+            position: absolute;
+            z-index: 15;
+            right: 14px;
+            bottom: 100px;
+            display: none;
+            width: calc(100% - 28px);
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,.16);
+            border-radius: 16px;
+            color: rgba(255,255,255,.72);
+            background: rgba(12,12,15,.75);
+            backdrop-filter: blur(26px);
+            font-size: 13px;
+        }
+        .queue.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <button class="icon-btn" id="settingsButton" title="Paramètres du mini-lecteur" aria-label="Paramètres du mini-lecteur">
+                <svg viewBox="0 0 24 24"><path d="M4 6h7M15 6h5M11 3v6M4 12h3M11 12h9M7 9v6M4 18h10M18 18h2M14 15v6"/></svg>
+            </button>
+            <div class="drag-dots">••••</div>
+            <div class="window-actions">
+                <button class="icon-btn" data-action="close-mini" title="Fermer">
+                    <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="art-wrap">
+                <img class="art-blur" id="artBlur" alt="">
+                <img class="cover" id="cover" alt="Pochette du morceau">
+            </div>
+            <div class="song-row">
+                <div>
+                    <div class="title" id="title"></div>
+                    <div class="artist" id="artist">SunoApp</div>
+                </div>
+                <button class="icon-btn like" data-action="like" title="J’aime" aria-label="J’aime">
+                    <svg viewBox="0 0 24 24"><path d="M20.8 5.8a5.4 5.4 0 0 0-7.7 0L12 6.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 22l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"/></svg>
+                </button>
+            </div>
+            <div class="controls">
+                <button class="control" data-action="prev" title="Précédent" aria-label="Précédent">
+                    <svg viewBox="0 0 24 24"><path d="M6 5v14M18 6l-9 6 9 6V6Z"/></svg>
+                </button>
+                <button class="control play" id="play" data-action="playpause" title="Lecture / Pause" aria-label="Lecture">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.8v12.4c0 .8.9 1.3 1.6.8l8.2-6.2a1 1 0 0 0 0-1.6L9.6 5c-.7-.5-1.6 0-1.6.8Z"/></svg>
+                </button>
+                <button class="control" data-action="next" title="Suivant" aria-label="Suivant">
+                    <svg viewBox="0 0 24 24"><path d="M18 5v14M6 6l9 6-9 6V6Z"/></svg>
+                </button>
+                <button class="control" data-action="stop" title="Arrêter" aria-label="Arrêter">
+                    <svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.8"/></svg>
+                </button>
+            </div>
+        </main>
+
+        <aside class="queue" id="queue">La file d’attente reste synchronisée avec la fenêtre principale de Suno.</aside>
+        <section class="settings" id="settings">
+            <h2>Paramètres du mini-lecteur</h2>
+            <label class="setting-row">
+                <span>Couleur du verre</span>
+                <input class="color" id="tint" type="color" value="#ff4e70">
+            </label>
+            <label class="setting-row">
+                <span>Opacité du verre</span>
+                <span class="range-wrap">
+                    <input class="range" id="opacity" type="range" min="58" max="96" value="86">
+                    <output class="range-value" id="opacityValue">86 %</output>
+                </span>
+            </label>
+            <label class="setting-row">
+                <span>Toujours au premier plan</span>
+                <span class="switch"><input id="alwaysOnTop" type="checkbox" checked><i></i></span>
+            </label>
+            <label class="setting-row">
+                <span>File d’attente</span>
+                <span class="switch"><input id="showQueue" type="checkbox"><i></i></span>
+            </label>
+            <button class="done" id="done">Terminé</button>
+        </section>
+    </div>
+
+    <script>
+        const root = document.documentElement;
+        const settings = document.getElementById('settings');
+        const queue = document.getElementById('queue');
+        const tint = document.getElementById('tint');
+        const savedTint = localStorage.getItem('suno-mini-tint') || '#ff4e70';
+        const opacity = document.getElementById('opacity');
+        const opacityValue = document.getElementById('opacityValue');
+        const savedOpacity = Number(localStorage.getItem('suno-mini-opacity') || 86);
+
+        const applyTint = (hex) => {
+            const value = hex.replace('#', '');
+            const rgb = [0, 2, 4].map((index) => parseInt(value.slice(index, index + 2), 16));
+            root.style.setProperty('--tint', rgb.join(', '));
+            tint.value = hex;
+            localStorage.setItem('suno-mini-tint', hex);
+        };
+        applyTint(savedTint);
+        const applyOpacity = (percent) => {
+            const safePercent = Math.max(58, Math.min(96, Number(percent)));
+            root.style.setProperty('--glass-opacity', String(safePercent / 100));
+            opacity.value = String(safePercent);
+            opacityValue.textContent = safePercent + ' %';
+            localStorage.setItem('suno-mini-opacity', String(safePercent));
+        };
+        applyOpacity(savedOpacity);
+
+        document.querySelectorAll('[data-action]').forEach((button) => {
+            button.addEventListener('click', () => window.sunoMini.control(button.dataset.action));
+        });
+        document.getElementById('settingsButton').addEventListener('click', () => settings.classList.add('open'));
+        document.getElementById('done').addEventListener('click', () => settings.classList.remove('open'));
+        tint.addEventListener('input', () => applyTint(tint.value));
+        opacity.addEventListener('input', () => applyOpacity(opacity.value));
+        document.getElementById('alwaysOnTop').addEventListener('change', (event) => window.sunoMini.control('always-on-top', event.target.checked));
+        document.getElementById('showQueue').addEventListener('change', (event) => queue.classList.toggle('show', event.target.checked));
+
+        window.sunoMini.onPlayerState((state) => {
+            document.getElementById('title').textContent = state.title || '';
+            document.getElementById('artist').textContent = state.artist || 'SunoApp';
+            const playButton = document.getElementById('play');
+            playButton.setAttribute('aria-label', state.playing ? 'Pause' : 'Lecture');
+            playButton.innerHTML = state.playing
+                ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.3" y="5" width="4.2" height="14" rx="1.2"/></svg>'
+                : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.8v12.4c0 .8.9 1.3 1.6.8l8.2-6.2a1 1 0 0 0 0-1.6L9.6 5c-.7-.5-1.6 0-1.6.8Z"/></svg>';
+            if (state.cover && document.getElementById('cover').src !== state.cover) {
+                const cover = document.getElementById('cover');
+                cover.onload = () => {
+                    window.sunoMini.control('resize-to-artwork', {
+                        width: cover.naturalWidth,
+                        height: cover.naturalHeight
+                    });
+                };
+                cover.src = state.cover;
+                document.getElementById('artBlur').src = state.cover;
+            }
+        });
+    </script>
+</body>
+</html>

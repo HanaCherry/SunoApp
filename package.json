@@ -1,8 +1,9 @@
 {
   "name": "sunoapp",
   "version": "1.0.2",
-  "description": "Application Electron pour accéder à Suno.com avec contrôles multimédias",
+  "description": "Application Windows non officielle pour utiliser Suno avec un lecteur personnalisé, un mini-lecteur et des contrôles multimédias",
   "author": "Flora Cherry",
+  "homepage": "https://github.com/HanaCherry/SunoApp",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -30,6 +31,9 @@
     },
     "files": [
       "main.js",
+      "mini-preload.js",
+      "mini-player.html",
+      "main-enhancements.js",
       "package.json",
       "icone_flora.ico",
       "like.png",

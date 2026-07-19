@@ -1,41 +1,41 @@
-# Changelog
+# Historique des versions
 
-## [1.0.1] - 2026-06-26
+## 1.0.2 — 19 juillet 2026
 
-### 🐛 Bugs Fixes
-- **Menu Contextuel Copier/Coller** : Ajout d'un menu contextuel natif qui permet de copier, coller et couper facilement via clic droit
-  - Copier (Ctrl+C) - apparaît si du texte est sélectionné
-  - Coller (Ctrl+V) - toujours disponible
-  - Couper (Ctrl+X) - apparaît si du texte est sélectionné
+### Nouveautés
 
-### ✨ Améliorations
-- Interface utilisateur améliorée avec les options de presse-papiers accessibles via menu contextuel
-- Meilleure accessibilité pour les actions de copie/colle
+- Nouveau lecteur personnalisé intégré aux pistes Suno
+- Forme d’onde avec progression et couleurs issues de la pochette
+- Mini-lecteur externe inspiré des lecteurs musicaux modernes
+- Interface effet verre avec transparence réglable
+- Égaliseur et profils audio configurables
+- Menu de paramètres intégré à la barre supérieure
+- Contrôles multimédias Windows et icônes actualisées
 
-### 📝 Commits associés
-- `f465bbf` - Ajouter le menu contextuel avec options copier/coller/couper
-- `b0494ba` - Supprimer l'option Inspecter du menu contextuel
+### Améliorations
 
----
+- Barre de titre personnalisée intégrée à l’application
+- Placement automatique du mini-lecteur en bas à droite
+- Adaptation du mini-lecteur à la pochette du morceau
+- Menu contextuel enrichi : annuler, rétablir, copier, coller, correction, traduction et recherche
+- Meilleure gestion des liens externes et des médias
+- Synchronisation améliorée lors du changement de piste
 
-## [1.0.0] - 2026-06-24
+### Sécurité et stabilité
 
-### ✨ Features
-- Application Electron pour accéder à Suno.com
-- Interface avec boutons de contrôle dans la barre des tâches (Windows)
-  - ❤️ J'aime
-  - ⏮️ Précédent
-  - ▶️ Play/Pause
-  - ⏹️ Stop
-  - ⏭️ Suivant
-  - 🎬 Mini Lecteur
-- Support bilingue (Français/Anglais)
-- Raccourci clavier : Ctrl+Espace pour Play/Pause
-- Mini lecteur mode
-- Son de démarrage personnalisé
-- Gestion automatique de la session utilisateur
+- Isolation du contexte Electron activée
+- Bac à sable Electron activé
+- Vérifications des fenêtres détruites
+- Gestion plus sûre de la fermeture et des liens externes
 
-### 🎨 Design
-- Interface sombre (#121212)
-- Icône personnalisée Flora
-- Support des contrôles multimédias
+## 1.0.1 — 26 juin 2026
+
+- Ajout du menu contextuel copier, coller et couper
+- Amélioration de l’accessibilité des commandes de presse-papiers
+
+## 1.0.0 — 24 juin 2026
+
+- Première version publique de SunoApp
+- Intégration de Suno dans Electron
+- Contrôles multimédias Windows
+- Mini-lecteur initial

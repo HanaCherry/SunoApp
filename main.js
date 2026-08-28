@@ -447,17 +447,50 @@ app.whenReady().then(() => {
         `).catch(() => {});
     };
 
-    mainWindow.webContents.on('did-finish-load', installMiniPlayerButton);
-
     const installSunoAppEnhancements = () => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
         const enhancementScript = fs.readFileSync(path.join(__dirname, 'main-enhancements.js'), 'utf8');
-        mainWindow.webContents.executeJavaScript(enhancementScript).catch((error) => {
-            console.error('Erreur interface SunoApp:', error);
+        const diagnosticScript = `
+            (() => {
+                try {
+                    ${enhancementScript}
+                    return { ok: true };
+                } catch (error) {
+                    return {
+                        ok: false,
+                        name: error?.name || 'Error',
+                        message: error?.message || String(error),
+                        stack: error?.stack || ''
+                    };
+                }
+            })()
+        `;
+        mainWindow.webContents.executeJavaScript(diagnosticScript).then((result) => {
+            if (!result?.ok) {
+                console.error('Erreur interface SunoApp:', `${result.name}: ${result.message}\n${result.stack}`);
+            }
+        }).catch((error) => {
+            console.error('Erreur injection interface SunoApp:', error);
         });
     };
 
-    mainWindow.webContents.on('did-finish-load', installSunoAppEnhancements);
+    // Suno now performs several navigations while booting. Injecting during one
+    // of those transitions destroys the JavaScript context and used to leave the
+    // custom UI missing. Wait for the final DOM and retry once the page settles.
+    let integrationTimer = null;
+    const installSunoIntegration = () => {
+        clearTimeout(integrationTimer);
+        integrationTimer = setTimeout(() => {
+            if (!mainWindow || mainWindow.isDestroyed()) return;
+            const currentUrl = mainWindow.webContents.getURL();
+            if (!/^https:\/\/(?:www\.)?suno\.com(?:\/|$)/i.test(currentUrl)) return;
+            installMiniPlayerButton();
+            installSunoAppEnhancements();
+        }, 900);
+    };
+
+    mainWindow.webContents.on('dom-ready', installSunoIntegration);
+    mainWindow.webContents.on('did-navigate-in-page', installSunoIntegration);
 
     ipcMain.removeHandler('mini-control');
     ipcMain.handle('mini-control', (_event, action, value) => {
@@ -522,7 +555,7 @@ app.whenReady().then(() => {
                         }
                     }
                     if (!audioTrouve) {
-                        btns = document.querySelectorAll('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i], button[aria-label="Play"], button[aria-label="Pause"], button[data-testid="play-button"]');
+                        btns = document.querySelectorAll('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i], button[aria-label="Play" i], button[aria-label="Pause" i], button[aria-label="Lecture" i], button[data-testid*="play" i], button[data-testid*="pause" i]');
                         if (btns.length > 0) btns[btns.length - 1].click();
                     }
                 }
@@ -536,15 +569,15 @@ app.whenReady().then(() => {
                     }
                 }
                 else if ('${action}' === 'prev') {
-                    btns = document.querySelectorAll('button[aria-label*="Previous"], button[aria-label*="Précédent"]');
+                    btns = document.querySelectorAll('button[aria-label*="Previous" i], button[aria-label*="Précédent" i], button[aria-label*="Back" i], button[data-testid*="previous" i], button[data-testid*="prev" i]');
                     if (btns.length > 0) btns[btns.length - 1].click();
                 }
                 else if ('${action}' === 'next') {
-                    btns = document.querySelectorAll('button[aria-label*="Next"], button[aria-label*="Suivant"]');
+                    btns = document.querySelectorAll('button[aria-label*="Next" i], button[aria-label*="Suivant" i], button[data-testid*="next" i]');
                     if (btns.length > 0) btns[btns.length - 1].click();
                 }
                 else if ('${action}' === 'like') {
-                    btns = document.querySelectorAll('button[aria-label*="Like"], button[aria-label*="Favorite"], button[aria-label*="aime"]');
+                    btns = document.querySelectorAll('button[aria-label*="Like" i], button[aria-label*="Favorite" i], button[aria-label*="aime" i], button[data-testid*="like" i]');
                     if (btns.length > 0) btns[btns.length - 1].click();
                 }
             } catch(e) {}

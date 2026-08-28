@@ -44,6 +44,13 @@
     style.id = 'sunoapp-enhancements-style';
     style.textContent = `
         body.sunoapp-frameless { box-sizing: border-box !important; padding-top: 38px !important; }
+        body.sunoapp-frameless.sunoapp-studio { height: 100vh !important; min-height: 0 !important; overflow: hidden !important; }
+        body.sunoapp-studio > .sunoapp-studio-root {
+            height: calc(100vh - 38px) !important;
+            min-height: 0 !important;
+            max-height: calc(100vh - 38px) !important;
+            overflow: hidden !important;
+        }
         #sunoapp-titlebar {
             position: fixed; inset: 0 0 auto 0; z-index: 2147483647;
             display: grid; grid-template-columns: 220px 1fr 138px; align-items: center; height: 38px;
@@ -213,6 +220,19 @@
         button.addEventListener('click', () => window.open(`sunoapp://${button.dataset.windowAction}`, '_blank'));
     });
     document.body.appendChild(titlebar);
+
+    const refreshPageMode = () => {
+        const isStudio = /^\/studio(?:\/|$)/i.test(location.pathname);
+        document.body.classList.toggle('sunoapp-studio', isStudio);
+        Array.from(document.body.children)
+            .filter((element) => !element.id?.startsWith('sunoapp-') && element.tagName !== 'SCRIPT' && element.tagName !== 'STYLE')
+            .forEach((element) => element.classList.toggle('sunoapp-studio-root', isStudio));
+        const title = document.querySelector('.sa-title-center');
+        if (title) title.textContent = isStudio ? 'Suno • Studio' : 'Suno • Lecteur musical';
+    };
+
+    refreshPageMode();
+    window.__sunoAppPageModeTimer = setInterval(refreshPageMode, 700);
 
     const menu = document.createElement('div');
     menu.id = 'sunoapp-top-menu';

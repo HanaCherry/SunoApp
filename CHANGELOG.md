@@ -1,5 +1,14 @@
 # Historique des versions
 
+## 1.0.4 — 28 août 2026
+
+### Corrections
+
+- Mise en page dédiée à Suno Studio
+- Hauteur de la zone de travail ajustée à la barre de titre SunoApp
+- Fin de la timeline et commandes inférieures de Studio désormais entièrement visibles
+- Titre de fenêtre adapté automatiquement entre le lecteur et Studio
+
 ## 1.0.3 — 28 août 2026
 
 ### Corrections

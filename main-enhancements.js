@@ -24,7 +24,7 @@
         profileSource: null,
         mode: localStorage.getItem('sunoapp-sound-mode') || 'flat',
         waveformEnabled: localStorage.getItem('sunoapp-waveform-enabled') !== 'false',
-        customPlayerEnabled: localStorage.getItem('sunoapp-custom-player-enabled') !== 'false'
+        customPlayerEnabled: false
     };
 
     const frequencies = [60, 230, 910, 3600, 14000];
@@ -294,8 +294,8 @@
                 <label class="sa-switch" title="Afficher la forme d'onde"><input id="sunoapp-waveform-toggle" type="checkbox" ${state.waveformEnabled ? 'checked' : ''}><span></span></label>
             </div>
             <div class="sa-option-row" style="margin-top:8px">
-                <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Active la carte colorée avec pochette, ondes et commandes Suno.</span></div>
-                <label class="sa-switch" title="Activer le lecteur personnalisé"><input id="sunoapp-custom-player-toggle" type="checkbox" ${state.customPlayerEnabled ? 'checked' : ''}><span></span></label>
+                <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Temporairement désactivé pour rester compatible avec la nouvelle liste Suno.</span></div>
+                <label class="sa-switch" title="Fonction temporairement indisponible"><input id="sunoapp-custom-player-toggle" type="checkbox" disabled><span></span></label>
             </div>
             <div id="sunoapp-audio-status">Sélectionnez un mode pour activer le traitement audio.</div>
         </section>
@@ -480,6 +480,10 @@
     }));
 
     const attachWaveformToLoadedSong = () => {
+        // Suno's current list layout is virtualized and reuses row nodes. Replacing
+        // one of those rows corrupts the grid, so keep the native player until the
+        // custom card can be rebuilt against a stable integration point.
+        state.customPlayerEnabled = false;
         if (!state.waveformEnabled || !state.customPlayerEnabled) {
             state.activeTrackRow?.classList.remove('sunoapp-source-row-hidden');
             nowCard.remove();

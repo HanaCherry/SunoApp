@@ -4,7 +4,7 @@ SunoApp est une application Windows basée sur Electron qui intègre Suno dans u
 
 ## Version actuelle
 
-**SunoApp 1.0.5**
+**SunoApp 1.0.6**
 
 ## Fonctionnalités
 
@@ -23,7 +23,7 @@ SunoApp est une application Windows basée sur Electron qui intègre Suno dans u
 ## Installation Windows
 
 1. Ouvrez la page **Releases** du dépôt.
-2. Téléchargez `SunoApp Setup 1.0.5.exe`.
+2. Téléchargez `SunoApp Setup 1.0.6.exe`.
 3. Lancez l’installateur.
 
 Windows peut afficher un avertissement SmartScreen puisque l’application n’utilise pas encore de certificat commercial.

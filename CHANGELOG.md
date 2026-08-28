@@ -1,5 +1,13 @@
 # Historique des versions
 
+## 1.0.6 — 28 août 2026
+
+### Corrections
+
+- Suppression du lecteur personnalisé incompatible avec la nouvelle liste virtuelle de Suno
+- Fin des lignes de morceaux déformées, superposées ou anormalement agrandies
+- Conservation du lecteur natif, du mini-lecteur et des commandes multimédias Windows
+
 ## 1.0.5 — 28 août 2026
 
 ### Corrections

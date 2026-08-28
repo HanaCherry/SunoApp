@@ -1,5 +1,14 @@
 # Historique des versions
 
+## 1.0.3 — 28 août 2026
+
+### Corrections
+
+- Compatibilité avec le nouveau chargement et les navigations internes de Suno
+- Réinjection fiable de l’interface personnalisée après un changement de page
+- Sélecteurs plus tolérants pour lecture, pause, précédent, suivant et J’aime
+- Diagnostic détaillé lorsqu’un changement du site empêche l’intégration
+
 ## 1.0.2 — 19 juillet 2026
 
 ### Nouveautés

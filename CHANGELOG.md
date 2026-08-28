@@ -1,5 +1,14 @@
 # Historique des versions
 
+## 1.0.5 — 28 août 2026
+
+### Corrections
+
+- Affichage complet de la barre inférieure de Suno Studio
+- Ajustement vertical de toutes les couches Studio autour de la barre SunoApp
+- Conservation de la largeur et suppression de la bande vide sous l’éditeur
+- Maximisation automatique de la fenêtre à l’entrée dans Studio
+
 ## 1.0.4 — 28 août 2026
 
 ### Corrections

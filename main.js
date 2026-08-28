@@ -478,8 +478,29 @@ app.whenReady().then(() => {
     // of those transitions destroys the JavaScript context and used to leave the
     // custom UI missing. Wait for the final DOM and retry once the page settles.
     let integrationTimer = null;
+    let studioMode = false;
+    let windowBoundsBeforeStudio = null;
+    const syncStudioWindow = () => {
+        if (!mainWindow || mainWindow.isDestroyed()) return;
+        const isStudio = /^https:\/\/(?:www\.)?suno\.com\/studio(?:\/|$)/i.test(mainWindow.webContents.getURL());
+        if (isStudio && !studioMode) {
+            studioMode = true;
+            if (!mainWindow.isMaximized() && !mainWindow.isFullScreen()) {
+                windowBoundsBeforeStudio = mainWindow.getBounds();
+                mainWindow.maximize();
+            }
+        } else if (!isStudio && studioMode) {
+            studioMode = false;
+            if (windowBoundsBeforeStudio && !mainWindow.isFullScreen()) {
+                mainWindow.unmaximize();
+                mainWindow.setBounds(windowBoundsBeforeStudio, true);
+            }
+            windowBoundsBeforeStudio = null;
+        }
+    };
     const installSunoIntegration = () => {
         clearTimeout(integrationTimer);
+        syncStudioWindow();
         integrationTimer = setTimeout(() => {
             if (!mainWindow || mainWindow.isDestroyed()) return;
             const currentUrl = mainWindow.webContents.getURL();

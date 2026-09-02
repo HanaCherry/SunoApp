@@ -1,5 +1,16 @@
 # Historique des versions
 
+## 1.0.8 — 2 septembre 2026
+
+### Corrections
+
+- Mode Studio / Création : le bas de page (timeline et commandes) n’est plus coupé par la barre de titre
+- La zone de travail s’ajuste à la hauteur réelle sous Chrome SunoApp, sans scaleY
+
+### Nouveautés
+
+- 4 thèmes d’interface persistants : Nuit, Clair, Cherry et Aurore (menu Paramètres)
+
 ## 1.0.7 — 1er septembre 2026
 
 ### Corrections

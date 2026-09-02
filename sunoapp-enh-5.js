@@ -1,3 +1,36 @@
+        const labelOf = (button) => `${button.getAttribute('aria-label') || ''} ${button.title || ''} ${button.textContent || ''}`.trim();
+        const rowRect = activeRow.getBoundingClientRect();
+        const rowCenterY = rowRect.top + rowRect.height / 2;
+        const remixButton = sourceButtons
+            .filter((button) => /remix/i.test(labelOf(button)))
+            .sort((first, second) => Math.abs((first.getBoundingClientRect().top + first.getBoundingClientRect().bottom) / 2 - rowCenterY) - Math.abs((second.getBoundingClientRect().top + second.getBoundingClientRect().bottom) / 2 - rowCenterY))[0];
+        const menuCandidates = sourceButtons.filter((button) => {
+            const label = labelOf(button);
+            const hasDotsIcon = button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '');
+            const isContextTrigger = button.hasAttribute('data-context-menu-trigger') || button.hasAttribute('data-context-menu');
+            return /more|plus|options/i.test(label) || hasDotsIcon || isContextTrigger;
+        });
+        const moreButton = menuCandidates.sort((first, second) => second.getBoundingClientRect().right - first.getBoundingClientRect().right)[0] || null;
+        const remixRect = remixButton?.getBoundingClientRect();
+        const iconButtons = sourceButtons.filter((button) => {
+            const rect = button.getBoundingClientRect();
+            const hasNoText = !(button.textContent || '').trim();
+            const isCompact = rect.width >= 20 && rect.width <= 64 && rect.height >= 20 && rect.height <= 64;
+            const isOnTrackLine = Math.abs((rect.top + rect.bottom) / 2 - rowCenterY) < Math.max(38, rowRect.height * .45);
+            return hasNoText && isCompact && isOnTrackLine && button !== moreButton;
+        });
+        const regularButtons = iconButtons
+            .filter((button) => !remixRect || button.getBoundingClientRect().right <= remixRect.left + 4)
+            .sort((first, second) => first.getBoundingClientRect().left - second.getBoundingClientRect().left)
+            .slice(-4);
+        state.sourceActions = {
+            like: sourceButtons.find((button) => /like|j'aime|thumbs up/i.test(labelOf(button))) || regularButtons[0] || state.sourceActions.like,
+            dislike: sourceButtons.find((button) => /dislike|je n'aime pas|thumbs down/i.test(labelOf(button))) || regularButtons[1] || state.sourceActions.dislike,
+            pin: sourceButtons.find((button) => /pin|éping/i.test(labelOf(button))) || regularButtons[2] || state.sourceActions.pin,
+            share: sourceButtons.find((button) => /share|partag/i.test(labelOf(button))) || regularButtons[3] || state.sourceActions.share,
+            remix: remixButton || state.sourceActions.remix,
+            more: moreButton || state.sourceActions.more
+        };
         const shortcutMarkup = {
             like: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5 11 4.8c.8-1.3 2.8-.7 2.8.8v4h4.1c1.6 0 2.7 1.5 2.2 3l-1.7 5.1c-.3.9-1.2 1.5-2.2 1.5H7.5m0-8.7v8.7H4.8c-.8 0-1.4-.6-1.4-1.4v-5.9c0-.8.6-1.4 1.4-1.4z"/></svg>',
             dislike: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 13.5 11 19.2c.8 1.3 2.8.7 2.8-.8v-4h4.1c1.6 0 2.7-1.5 2.2-3l-1.7-5.1c-.3-.9-1.2-1.5-2.2-1.5H7.5m0 8.7V4.8H4.8c-.8 0-1.4.6-1.4 1.4v5.9c0 .8.6 1.4 1.4 1.4z"/></svg>',
@@ -227,50 +260,3 @@
         if (media) analyseWholeTrack(media);
         attachWaveformToLoadedSong();
     };
-    document.addEventListener('play', watchMedia, true);
-    window.addEventListener('scroll', () => { if (state.customPlayerEnabled) attachWaveformToLoadedSong(); }, true);
-    window.addEventListener('resize', () => { if (state.customPlayerEnabled) attachWaveformToLoadedSong(); });
-    window.__sunoAppWaveformTimer = setInterval(watchMedia, 1400);
-
-    const setGains = async (gains, mode = 'custom') => {
-        try {
-            await connectAudio();
-            gains.forEach((gain, index) => {
-                if (state.filters[index]) state.filters[index].gain.setTargetAtTime(gain, state.audioContext.currentTime, 0.035);
-                document.querySelectorAll(`.sa-band input[data-band="${index}"]`).forEach((input) => {
-                    input.value = String(gain);
-                });
-                const label = `${gain > 0 ? '+' : ''}${gain} dB`;
-                const legacy = document.getElementById(`sa-gain-${index}`);
-                if (legacy) legacy.textContent = label;
-                document.querySelectorAll(`[data-sa-gain="${index}"]`).forEach((output) => {
-                    output.textContent = label;
-                });
-            });
-            state.wetGain.gain.setTargetAtTime(spatialMix[mode] ?? spatialMix.custom, state.audioContext.currentTime, .05);
-            document.querySelectorAll('.sa-mode').forEach((button) => button.classList.toggle('active', button.dataset.mode === mode));
-            if (mode !== 'custom') localStorage.setItem('sunoapp-sound-mode', mode);
-            const modeLabel = document.querySelector(`[data-mode="${mode}"]`)?.textContent || mode;
-            status.textContent = mode === 'custom'
-                ? 'Égaliseur personnalisé actif.'
-                : `Mode ${modeLabel} actif${['cinema51', 'surround71', 'atmos'].includes(mode) ? ' — spatialisation stéréo simulée.' : '.'}`;
-        } catch (error) {
-            status.textContent = error.message || 'Traitement audio indisponible pour ce morceau.';
-        }
-    };
-
-    window.__sunoAppSetGains = setGains;
-    document.querySelectorAll('.sa-mode').forEach((button) => {
-        button.classList.toggle('active', button.dataset.mode === state.mode);
-    });
-    document.addEventListener('click', (event) => {
-        const modeButton = event.target.closest('.sa-mode[data-mode]');
-        if (!modeButton) return;
-        const preset = presets[modeButton.dataset.mode];
-        if (preset) setGains(preset, modeButton.dataset.mode);
-    });
-    document.addEventListener('input', (event) => {
-        const slider = event.target.closest && event.target.closest('.sa-band input[data-band]');
-        if (!slider) return;
-        const root = slider.closest('.sa-eq');
-        const inputs = root ? Array.from(root.querySelectorAll('input[data-band]')) : sliders;

@@ -28,18 +28,37 @@
         uiTheme: localStorage.getItem('sunoapp-ui-theme') || 'nuit'
     };
 
-    const frequencies = [60, 230, 910, 3600, 14000];
+    const i18n = window.__SUNO_I18N || { dict: { en: {}, fr: {} }, resolve: () => 'en', t: (k) => k };
+    const t = (key, vars) => i18n.t(key, vars);
+    window.__sunoT = t;
+
+    const frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
     const presets = {
-        flat: [0, 0, 0, 0, 0],
-        bass: [7, 4, 1, -1, 0],
-        vocal: [-2, 0, 3, 5, 2],
-        clarity: [-2, -1, 1, 4, 6],
-        immersive: [4, 1, -1, 2, 5],
-        cinema51: [5, 2, -2, 3, 4],
-        surround71: [3, 0, -2, 4, 6],
-        atmos: [2, -1, 0, 5, 7]
+        flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        bass: [7, 6, 4, 2, 0, -1, -1, 0, 0, 0],
+        vocal: [-2, -1, 0, 1, 2, 4, 5, 3, 1, -1],
+        clarity: [-1, -1, 0, 0, 1, 2, 3, 5, 6, 4],
+        immersive: [3, 2, 1, 0, -1, 1, 2, 3, 4, 5],
+        cinema51: [5, 4, 2, 0, -2, 1, 3, 4, 3, 2],
+        surround71: [4, 2, 0, -1, -1, 2, 3, 5, 6, 5],
+        atmos: [3, 1, -1, -2, 0, 2, 3, 5, 6, 7],
+        studio: [0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+        warm: [3, 3, 2, 1, 0, 0, -1, -2, -3, -2],
+        punch: [4, 5, 3, 0, -1, 0, 2, 3, 1, 0],
+        air: [-1, 0, 0, 0, 0, 1, 2, 3, 6, 7],
+        lofi: [4, 2, 0, -2, -3, -2, 0, 3, -4, -8],
+        vinyl: [2, 1, 0, -1, 0, 1, 0, -1, 2, -3],
+        club: [6, 5, 3, 0, -2, 0, 1, 2, 1, 0],
+        acoustic: [1, 0, -1, 0, 2, 3, 2, 1, 3, 2],
+        electronic: [5, 3, 1, -1, 0, 1, 2, 4, 5, 4],
+        orchestral: [2, 1, 0, 1, 2, 3, 2, 3, 4, 3],
+        night: [1, 1, 0, 0, -1, -1, -2, -3, -4, -3],
+        wide: [1, 0, 0, 0, 0, 1, 2, 3, 3, 2],
+        radio: [-6, -2, 1, 3, 4, 4, 3, 2, 0, -4],
+        presence: [-1, 0, 0, 0, 1, 3, 5, 4, 2, 0]
     };
-    const spatialMix = { flat: 0, bass: .02, vocal: .015, clarity: .025, immersive: .1, cinema51: .14, surround71: .19, atmos: .24, custom: .04 };
+    const spatialMix = { flat: 0, bass: .02, vocal: .02, clarity: .03, immersive: .12, cinema51: .16, surround71: .2, atmos: .26, custom: .04, studio: 0, warm: .03, punch: .04, air: .05, lofi: .08, vinyl: .1, club: .08, acoustic: .06, electronic: .1, orchestral: .12, night: .02, wide: .2, radio: .03, presence: .04 };
+    const haasDelay = { flat: 0, bass: 0, vocal: 0, clarity: 0, immersive: .00045, cinema51: .00075, surround71: .00105, atmos: .0014, custom: .0002, studio: 0, warm: .00015, punch: .0002, air: .00025, lofi: .0004, vinyl: .00035, club: .0003, acoustic: .00025, electronic: .0004, orchestral: .0005, night: 0, wide: .00125, radio: 0, presence: .00015 };
 
     const style = document.createElement('style');
     style.id = 'sunoapp-enhancements-style';
@@ -92,7 +111,43 @@
             --sa-card: linear-gradient(145deg, rgba(12,48,56,.96), rgba(8,22,28,.94));
             --sa-btn: rgba(62,198,201,.12);
         }
-        .sa-themes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        html[data-sunoapp-theme="glass"], body[data-sunoapp-theme="glass"] {
+            --sa-bg: #12141a;
+            --sa-titlebar: rgba(255,255,255,.14);
+            --sa-text: rgba(255,255,255,.94);
+            --sa-muted: rgba(255,255,255,.5);
+            --sa-accent: #7eb8ff;
+            --sa-accent-2: #e8eef8;
+            --sa-border: rgba(255,255,255,.22);
+            --sa-surface: rgba(255,255,255,.12);
+            --sa-card: linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.06));
+            --sa-btn: rgba(255,255,255,.12);
+        }
+        html[data-sunoapp-theme="aero"], body[data-sunoapp-theme="aero"] {
+            --sa-bg: #0a2a4a;
+            --sa-titlebar: rgba(120,190,255,.28);
+            --sa-text: rgba(245,252,255,.96);
+            --sa-muted: rgba(180,220,255,.62);
+            --sa-accent: #5ec8ff;
+            --sa-accent-2: #ffffff;
+            --sa-border: rgba(180,230,255,.35);
+            --sa-surface: rgba(40,120,200,.32);
+            --sa-card: linear-gradient(180deg, rgba(200,230,255,.35), rgba(20,70,140,.45));
+            --sa-btn: rgba(160,210,255,.18);
+        }
+        html[data-sunoapp-theme="musique"], body[data-sunoapp-theme="musique"] {
+            --sa-bg: #0c0c10;
+            --sa-titlebar: rgba(20,20,24,.8);
+            --sa-text: rgba(255,255,255,.94);
+            --sa-muted: rgba(255,255,255,.5);
+            --sa-accent: #ff5474;
+            --sa-accent-2: #ff8a5c;
+            --sa-border: rgba(255,255,255,.14);
+            --sa-surface: rgba(24,24,28,.82);
+            --sa-card: linear-gradient(145deg, rgba(40,40,48,.9), rgba(12,12,16,.92));
+            --sa-btn: rgba(255,255,255,.1);
+        }
+        .sa-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 8px; }
         .sa-theme {
             min-height: 64px; padding: 10px 8px 8px; border: 1px solid var(--sa-border);
             border-radius: 14px; color: var(--sa-text); background: var(--sa-btn);
@@ -108,11 +163,70 @@
         .sa-theme[data-theme="clair"]::before { background: linear-gradient(90deg, #f3f1ec, #d9486e); }
         .sa-theme[data-theme="cherry"]::before { background: linear-gradient(90deg, #1a0d14, #ff4f86 55%, #ff9ac2); }
         .sa-theme[data-theme="aurore"]::before { background: linear-gradient(90deg, #07141a, #3ec6c9 55%, #f0c36a); }
+        .sa-theme[data-theme="glass"]::before { background: linear-gradient(90deg, rgba(255,255,255,.55), #7eb8ff 60%, rgba(255,255,255,.2)); }
+        .sa-theme[data-theme="aero"]::before { background: linear-gradient(90deg, #7ec8ff, #1a5aa8 55%, #eaf6ff); }
+        .sa-theme[data-theme="musique"]::before { background: linear-gradient(90deg, #ff5474, #8a5cff, #3ec6c9, #f0c36a); }
 
 
         html[data-sunoapp-theme] { background: var(--sa-bg); }
         html[data-sunoapp-theme="clair"] { color-scheme: light; }
-        html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"] { color-scheme: dark; }
+        html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"],
+        html[data-sunoapp-theme="glass"], html[data-sunoapp-theme="aero"], html[data-sunoapp-theme="musique"] { color-scheme: dark; }
+        html[data-sunoapp-theme="glass"] #sunoapp-titlebar,
+        html[data-sunoapp-theme="musique"] #sunoapp-titlebar {
+            background: var(--sa-titlebar) !important;
+            backdrop-filter: blur(28px) saturate(180%) !important;
+            border-bottom: 1px solid var(--sa-border) !important;
+        }
+        html[data-sunoapp-theme="aero"] #sunoapp-titlebar {
+            background: linear-gradient(180deg, rgba(220,240,255,.45), rgba(40,110,190,.38)) !important;
+            backdrop-filter: blur(16px) saturate(170%) !important;
+            border-bottom: 1px solid rgba(255,255,255,.35) !important;
+        }
+        html[data-sunoapp-theme="glass"] #sunoapp-settings-overlay .sa-settings-card,
+        html[data-sunoapp-theme="aero"] #sunoapp-settings-overlay .sa-settings-card,
+        html[data-sunoapp-theme="musique"] #sunoapp-settings-overlay .sa-settings-card {
+            background: var(--sa-card) !important;
+            backdrop-filter: blur(32px) saturate(170%) !important;
+            border: 1px solid var(--sa-border) !important;
+        }
+        #sunoapp-top-menu { display: none !important; }
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="sidebar" i],
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="SideNav"],
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="side-nav"],
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="sidebar" i],
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="SideNav"],
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="side-nav"] {
+            background: transparent !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] nav,
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] aside,
+        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
+            background: rgba(18,20,28,.42) !important;
+            background-color: rgba(18,20,28,.42) !important;
+            backdrop-filter: blur(40px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+            border-color: rgba(255,255,255,.12) !important;
+        }
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] nav,
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] aside,
+        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
+            background: linear-gradient(180deg, rgba(190,225,255,.2), rgba(16,70,140,.28)) !important;
+            background-color: transparent !important;
+            backdrop-filter: blur(22px) saturate(165%) !important;
+            -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
+            border-color: rgba(180,230,255,.28) !important;
+        }
+        html[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item:hover,
+        html[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item.active,
+        html[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item:hover,
+        html[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item.active {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.16);
+            backdrop-filter: blur(18px) saturate(160%);
+        }
         body[data-sunoapp-theme] { background: var(--sa-bg) !important; }
         body[data-sunoapp-theme] nav,
         body[data-sunoapp-theme] aside,
@@ -145,46 +259,6 @@
             color: var(--sa-accent) !important;
         }
         body.sunoapp-frameless { box-sizing: border-box !important; padding-top: 38px !important; }
-        body.sunoapp-frameless.sunoapp-studio {
-            padding-top: 38px !important;
-            overflow: auto !important;
-            height: auto !important;
-            min-height: 100dvh !important;
-            max-height: none !important;
-            background: var(--sa-bg, #0b0c10) !important;
-        }
-        body.sunoapp-studio > .sunoapp-studio-root {
-            position: relative !important;
-            inset: auto !important;
-            width: 100% !important;
-            height: auto !important;
-            min-height: calc(100dvh - 38px) !important;
-            max-height: none !important;
-            overflow: visible !important;
-            transform: none !important;
-            background: var(--sa-bg, #0b0c10) !important;
-        }
-        body.sunoapp-studio > .sunoapp-studio-root > * {
-            box-sizing: border-box !important;
-            height: auto !important;
-            max-height: none !important;
-            min-height: calc(100dvh - 38px) !important;
-        }
-        body.sunoapp-studio [style*="100vh"],
-        body.sunoapp-studio [style*="100dvh"] {
-            height: calc(100dvh - 38px) !important;
-            max-height: calc(100dvh - 38px) !important;
-        }
-        body.sunoapp-studio .h-screen,
-        body.sunoapp-studio .min-h-screen,
-        body.sunoapp-studio [class*="h-[100vh]"],
-        body.sunoapp-studio [class*="h-[100dvh]"],
-        body.sunoapp-studio [class*="min-h-[100vh]"],
-        body.sunoapp-studio [class*="min-h-[100dvh]"] {
-            height: 100% !important;
-            min-height: 100% !important;
-            max-height: 100% !important;
-        }
         body.sunoapp-studio #sunoapp-titlebar {
             background: var(--sa-titlebar, #101217) !important;
             color: var(--sa-text, rgba(255,255,255,.88)) !important;
@@ -257,8 +331,8 @@
         .sa-menu-item svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 
         #sunoapp-rail-tools {
-            position: fixed; z-index: 2147483645; display: flex; flex-direction: column; gap: 2px;
-            box-sizing: border-box; padding: 4px 8px 8px; overflow: auto;
+            position: fixed; z-index: 2147483645; display: flex; flex-direction: column; gap: 0;
+            box-sizing: border-box; padding: 0; overflow: visible;
             color: var(--sa-text, rgba(255,255,255,.86));
             font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
             pointer-events: auto;
@@ -268,13 +342,13 @@
             font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
         }
         #sunoapp-rail-tools .sa-rail-item {
-            display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px;
-            padding: 6px 10px; border: 0; border-radius: 10px;
+            display: flex; align-items: center; gap: 12px; width: 100%; min-height: 40px;
+            padding: 8px 16px; border: 0; border-radius: 999px;
             color: inherit; background: transparent; font-size: 14px; font-weight: 620;
             text-align: left; cursor: pointer;
         }
-        #sunoapp-rail-tools .sa-rail-item:hover { background: rgba(255,255,255,.08); }
-        #sunoapp-rail-tools .sa-rail-item.active { color: var(--sa-accent, #ff5474); background: rgba(255,255,255,.06); }
+        #sunoapp-rail-tools .sa-rail-item:hover { background: rgba(255,255,255,.10); }
+        #sunoapp-rail-tools .sa-rail-item.active { background: rgba(255,255,255,.10); }
         #sunoapp-rail-tools .sa-rail-item svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
         #sunoapp-rail-tools .sa-rail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
         #sunoapp-rail-tools .sa-rail-grid .sa-rail-item { min-height: 30px; padding: 5px 8px; font-size: 12px; justify-content: center; }

@@ -1,5 +1,11 @@
 # Historique des versions
 
+## 1.0.10 — 2 septembre 2026
+
+### Corrections
+
+- Paramètres, thèmes et égaliseur enfin visibles dans la barre de gauche, dans le trou sous le profil (au-dessus de Earn Credits)
+
 ## 1.0.9 — 2 septembre 2026
 
 ### Corrections

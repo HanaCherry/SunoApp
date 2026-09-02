@@ -1,3 +1,127 @@
+            playerRoot = playerRoot.parentElement;
+        }
+        const playerLinks = playerRoot ? Array.from(playerRoot.querySelectorAll('a')).filter((link) => link.textContent?.trim()) : [];
+        const playbarTitle = document.querySelector('[aria-label*="Playbar: Title" i]') || playerLinks[0];
+        const title = navigator.mediaSession?.metadata?.title?.trim() || playbarTitle?.textContent?.trim();
+        if (!title) return false;
+        const playbarCover = playerRoot?.querySelector('img');
+        const artworkUrl = navigator.mediaSession?.metadata?.artwork?.slice(-1)[0]?.src || playbarCover?.currentSrc || playbarCover?.src || '';
+        const audioUrl = state.audioElement?.currentSrc || state.audioElement?.src || '';
+        const nextTrackKey = `${title}|${artworkUrl}|${audioUrl}`;
+        const trackChanged = nextTrackKey !== state.trackKey;
+        if (trackChanged) {
+            state.trackKey = nextTrackKey;
+            state.sourceActions = {};
+            state.themeSource = '';
+            state.waveformPeaks = null;
+        }
+        const candidates = Array.from(document.querySelectorAll('a, button, div, span'))
+            .filter((element) => {
+                if (nowCard.contains(element)) return false;
+                if (element === playbarTitle || element.contains(playbarTitle)) return false;
+                if ((element.textContent || '').trim() !== title) return false;
+                const rect = element.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0 && rect.left > window.innerWidth * .32 && rect.bottom < window.innerHeight - 75;
+            })
+            .map((element) => {
+                const color = getComputedStyle(element).color.match(/[\d.]+/g)?.map(Number) || [0, 0, 0];
+                const pinkScore = color[0] - ((color[1] + color[2]) / 2);
+                let row = element.parentElement;
+                for (let depth = 0; row && depth < 6; depth++) {
+                    if (row.querySelector('img') && row.querySelectorAll('button').length >= 3) break;
+                    row = row.parentElement;
+                }
+                const playingScore = row?.querySelector('button[aria-label*="pause" i], [data-state="playing"]') ? 1000 : 0;
+                const rowImage = row?.querySelector('img');
+                const rowArtwork = rowImage?.currentSrc || rowImage?.src || '';
+                const artworkScore = artworkUrl && rowArtwork && (rowArtwork === artworkUrl || rowArtwork.includes(artworkUrl) || artworkUrl.includes(rowArtwork)) ? 5000 : 0;
+                return { element, score: artworkScore + playingScore + pinkScore };
+            })
+            .sort((first, second) => second.score - first.score || first.element.querySelectorAll('*').length - second.element.querySelectorAll('*').length);
+        const titleElement = candidates[0]?.element;
+        if (!titleElement) return false;
+
+        let rowCursor = titleElement.parentElement;
+        const possibleRows = [];
+        for (let depth = 0; rowCursor && depth < 9; depth++) {
+            const rect = rowCursor.getBoundingClientRect();
+            if (rowCursor.querySelector('img') && rowCursor.querySelectorAll('button').length >= 3 && rect.height >= 70 && rect.height < 190) possibleRows.push(rowCursor);
+            rowCursor = rowCursor.parentElement;
+        }
+        const activeRow = possibleRows.sort((first, second) => second.getBoundingClientRect().width - first.getBoundingClientRect().width)[0];
+        if (!activeRow?.parentElement) return false;
+        if (state.activeTrackRow && state.activeTrackRow !== activeRow) state.activeTrackRow.classList.remove('sunoapp-source-row-hidden');
+        state.activeTrackRow = activeRow;
+        const overlayRect = activeRow.getBoundingClientRect();
+        nowCard.style.top = `${Math.round(overlayRect.top)}px`;
+        nowCard.style.left = `${Math.round(overlayRect.left)}px`;
+        nowCard.style.width = `${Math.round(overlayRect.width)}px`;
+        nowCard.style.height = `${Math.round(overlayRect.height)}px`;
+        nowCard.classList.add('sunoapp-now-overlay');
+        if (nowCard.parentElement !== document.body) document.body.appendChild(nowCard);
+
+        const cover = activeRow.querySelector('img');
+        const textSnippets = Array.from(activeRow.querySelectorAll('div, span, p'))
+            .map((element) => (element.textContent || '').trim())
+            .filter((value) => value && value !== title && value.length > 5 && value.length < 180)
+            .sort((first, second) => second.length - first.length);
+        const coverSource = cover?.currentSrc || cover?.src || '';
+        nowCard.querySelector('.sa-now-cover').src = coverSource;
+        applyCoverTheme(coverSource, title);
+        nowCard.querySelector('.sa-now-title').textContent = title;
+        nowCard.querySelector('.sa-now-style').textContent = textSnippets[0] || 'Création Suno';
+        const sourceButtons = Array.from(activeRow.querySelectorAll('button')).filter((button) => !button.closest('#sunoapp-now-card'));
+        const labelOf = (button) => `${button.getAttribute('aria-label') || ''} ${button.title || ''} ${button.textContent || ''}`.trim();
+        const rowRect = activeRow.getBoundingClientRect();
+        const rowCenterY = rowRect.top + rowRect.height / 2;
+        const remixButton = sourceButtons
+            .filter((button) => /remix/i.test(labelOf(button)))
+            .sort((first, second) => Math.abs((first.getBoundingClientRect().top + first.getBoundingClientRect().bottom) / 2 - rowCenterY) - Math.abs((second.getBoundingClientRect().top + second.getBoundingClientRect().bottom) / 2 - rowCenterY))[0];
+        const menuCandidates = sourceButtons.filter((button) => {
+            const label = labelOf(button);
+            const hasDotsIcon = button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '');
+            const isContextTrigger = button.hasAttribute('data-context-menu-trigger') || button.hasAttribute('data-context-menu');
+            return /more|plus|options/i.test(label) || hasDotsIcon || isContextTrigger;
+        });
+        const moreButton = menuCandidates.sort((first, second) => second.getBoundingClientRect().right - first.getBoundingClientRect().right)[0] || null;
+        const remixRect = remixButton?.getBoundingClientRect();
+        const iconButtons = sourceButtons.filter((button) => {
+            const rect = button.getBoundingClientRect();
+            const hasNoText = !(button.textContent || '').trim();
+            const isCompact = rect.width >= 20 && rect.width <= 64 && rect.height >= 20 && rect.height <= 64;
+            const isOnTrackLine = Math.abs((rect.top + rect.bottom) / 2 - rowCenterY) < Math.max(38, rowRect.height * .45);
+            return hasNoText && isCompact && isOnTrackLine && button !== moreButton;
+        });
+        const regularButtons = iconButtons
+            .filter((button) => !remixRect || button.getBoundingClientRect().right <= remixRect.left + 4)
+            .sort((first, second) => first.getBoundingClientRect().left - second.getBoundingClientRect().left)
+            .slice(-4);
+        state.sourceActions = {
+            like: sourceButtons.find((button) => /like|j'aime|thumbs up/i.test(labelOf(button))) || regularButtons[0] || state.sourceActions.like,
+            dislike: sourceButtons.find((button) => /dislike|je n'aime pas|thumbs down/i.test(labelOf(button))) || regularButtons[1] || state.sourceActions.dislike,
+            pin: sourceButtons.find((button) => /pin|éping/i.test(labelOf(button))) || regularButtons[2] || state.sourceActions.pin,
+            share: sourceButtons.find((button) => /share|partag/i.test(labelOf(button))) || regularButtons[3] || state.sourceActions.share,
+            remix: remixButton || state.sourceActions.remix,
+            more: moreButton || state.sourceActions.more
+        };
+        const shortcutMarkup = {
+            like: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 10.5 11 4.8c.8-1.3 2.8-.7 2.8.8v4h4.1c1.6 0 2.7 1.5 2.2 3l-1.7 5.1c-.3.9-1.2 1.5-2.2 1.5H7.5m0-8.7v8.7H4.8c-.8 0-1.4-.6-1.4-1.4v-5.9c0-.8.6-1.4 1.4-1.4z"/></svg>',
+            dislike: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 13.5 11 19.2c.8 1.3 2.8.7 2.8-.8v-4h4.1c1.6 0 2.7-1.5 2.2-3l-1.7-5.1c-.3-.9-1.2-1.5-2.2-1.5H7.5m0 8.7V4.8H4.8c-.8 0-1.4.6-1.4 1.4v5.9c0 .8.6 1.4 1.4 1.4z"/></svg>',
+            pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 6 0-1 5 3 3v1H7v-1l3-3zM12 13v7"/></svg>',
+            share: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M10 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4"/></svg>',
+            remix: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3.5c4.5 0 4.5 10 9 10H20M17 14l3 3-3 3M4 17h3.5c1.1 0 2-.6 2.8-1.5M14 8.5c.7-.9 1.4-1.5 2.2-1.5H20M17 4l3 3-3 3"/></svg><span>Remix</span>'
+        };
+        const actionsHost = nowCard.querySelector('.sa-now-actions');
+        ['like', 'dislike', 'pin', 'share', 'remix'].forEach((action) => {
+            const target = nowCard.querySelector(`[data-now-action="${action}"]`);
+            const source = state.sourceActions[action];
+            if (!target || !source?.isConnected) {
+                if (target) target.style.display = 'none';
+                return;
+            }
+            source.style.removeProperty('display');
+            target.style.removeProperty('display');
+            if (target.dataset.sunoappSource !== action) {
                 target.innerHTML = shortcutMarkup[action] || source.innerHTML;
                 target.dataset.sunoappSource = action;
             }
@@ -115,168 +239,3 @@
         const impulse = state.audioContext.createBuffer(2, impulseLength, state.audioContext.sampleRate);
         for (let channel = 0; channel < 2; channel++) {
             const data = impulse.getChannelData(channel);
-            for (let index = 0; index < impulseLength; index++) {
-                const envelope = Math.pow(1 - index / impulseLength, 3.1);
-                data[index] = (Math.random() * 2 - 1) * envelope;
-            }
-        }
-        state.convolver.buffer = impulse;
-        state.dryGain.gain.value = 1;
-        state.wetGain.gain.value = 0;
-        state.compressor.threshold.value = -5;
-        state.compressor.knee.value = 8;
-        state.compressor.ratio.value = 2;
-
-        previous.connect(state.dryGain);
-        previous.connect(state.convolver);
-        state.dryGain.connect(state.compressor);
-        state.convolver.connect(state.wetGain);
-        state.wetGain.connect(state.compressor);
-        state.compressor.connect(state.analyser);
-        state.analyser.connect(state.audioContext.destination);
-    };
-
-    const waveformToggle = document.getElementById('sunoapp-waveform-toggle');
-    waveformToggle.addEventListener('change', async () => {
-        state.waveformEnabled = waveformToggle.checked;
-        localStorage.setItem('sunoapp-waveform-enabled', String(state.waveformEnabled));
-        if (!state.waveformEnabled) {
-            waveform.classList.remove('visible');
-            status.textContent = 'Forme d\'onde masquée.';
-            return;
-        }
-        try {
-            await connectAudio();
-            status.textContent = 'Forme d\'onde active : elle apparaît automatiquement pendant la lecture.';
-        } catch (error) {
-            status.textContent = error.message || 'La forme d\'onde sera affichée dès le prochain morceau.';
-        }
-    });
-    const customPlayerToggle = document.getElementById('sunoapp-custom-player-toggle');
-    customPlayerToggle.addEventListener('change', () => {
-        state.customPlayerEnabled = customPlayerToggle.checked;
-        localStorage.setItem('sunoapp-custom-player-enabled', String(state.customPlayerEnabled));
-        if (!state.customPlayerEnabled) {
-            state.activeTrackRow?.classList.remove('sunoapp-source-row-hidden');
-            nowCard.classList.remove('sunoapp-now-overlay');
-            nowCard.style.display = 'none';
-            waveform.classList.remove('attached', 'visible');
-            document.body.appendChild(waveform);
-            status.textContent = 'Lecteur personnalisé désactivé.';
-        } else {
-            status.textContent = 'Lecteur personnalisé activé.';
-            attachWaveformToLoadedSong();
-        }
-    });
-
-    const analyseWholeTrack = async (media) => {
-        const sourceUrl = media?.currentSrc || media?.src || '';
-        if (!sourceUrl || sourceUrl === state.waveformSource) return;
-        state.waveformSource = sourceUrl;
-        state.waveformPeaks = null;
-        try {
-            const response = await fetch(sourceUrl, { credentials: 'omit' });
-            if (!response.ok) throw new Error(`Audio ${response.status}`);
-            const bytes = await response.arrayBuffer();
-            const decoder = state.audioContext || new AudioContext();
-            const buffer = await decoder.decodeAudioData(bytes.slice(0));
-            const channel = buffer.getChannelData(0);
-            const bucketCount = 720;
-            const bucketSize = Math.max(1, Math.floor(channel.length / bucketCount));
-            const peaks = new Float32Array(bucketCount);
-            let maximum = .0001;
-            for (let bucket = 0; bucket < bucketCount; bucket++) {
-                const start = bucket * bucketSize;
-                const end = Math.min(channel.length, start + bucketSize);
-                let peak = 0;
-                for (let sample = start; sample < end; sample += Math.max(1, Math.floor(bucketSize / 90))) {
-                    peak = Math.max(peak, Math.abs(channel[sample]));
-                }
-                peaks[bucket] = peak;
-                maximum = Math.max(maximum, peak);
-            }
-            for (let index = 0; index < peaks.length; index++) peaks[index] = Math.pow(peaks[index] / maximum, .72);
-            if (state.waveformSource === sourceUrl) state.waveformPeaks = peaks;
-        } catch (_) {
-            state.waveformPeaks = null;
-        }
-    };
-
-    const watchMedia = () => {
-        if (!state.waveformEnabled) return;
-        const media = Array.from(document.querySelectorAll('audio, video')).find((candidate) => candidate.src || candidate.currentSrc);
-        if (media && media !== state.audioElement) connectAudio().catch(() => {});
-        if (media) analyseWholeTrack(media);
-        attachWaveformToLoadedSong();
-    };
-    document.addEventListener('play', watchMedia, true);
-    window.addEventListener('scroll', () => { if (state.customPlayerEnabled) attachWaveformToLoadedSong(); }, true);
-    window.addEventListener('resize', () => { if (state.customPlayerEnabled) attachWaveformToLoadedSong(); });
-    window.__sunoAppWaveformTimer = setInterval(watchMedia, 1400);
-
-    const setGains = async (gains, mode = 'custom') => {
-        try {
-            await connectAudio();
-            gains.forEach((gain, index) => {
-                state.filters[index].gain.setTargetAtTime(gain, state.audioContext.currentTime, 0.035);
-                sliders[index].value = String(gain);
-                document.getElementById(`sa-gain-${index}`).textContent = `${gain > 0 ? '+' : ''}${gain} dB`;
-            });
-            state.wetGain.gain.setTargetAtTime(spatialMix[mode] ?? spatialMix.custom, state.audioContext.currentTime, .05);
-            document.querySelectorAll('.sa-mode').forEach((button) => button.classList.toggle('active', button.dataset.mode === mode));
-            if (mode !== 'custom') localStorage.setItem('sunoapp-sound-mode', mode);
-            const modeLabel = document.querySelector(`[data-mode="${mode}"]`)?.textContent || mode;
-            status.textContent = mode === 'custom'
-                ? 'Égaliseur personnalisé actif.'
-                : `Mode ${modeLabel} actif${['cinema51', 'surround71', 'atmos'].includes(mode) ? ' — spatialisation stéréo simulée.' : '.'}`;
-        } catch (error) {
-            status.textContent = error.message || 'Traitement audio indisponible pour ce morceau.';
-        }
-    };
-
-    document.querySelectorAll('.sa-mode').forEach((button) => {
-        button.addEventListener('click', () => setGains(presets[button.dataset.mode], button.dataset.mode));
-        button.classList.toggle('active', button.dataset.mode === state.mode);
-    });
-    sliders.forEach((slider) => slider.addEventListener('input', () => setGains(sliders.map((item) => Number(item.value)), 'custom')));
-
-    const refreshProfile = () => {
-        const creditElement = Array.from(document.querySelectorAll('*'))
-            .filter((element) => element.isConnected && /^\s*[\d,.]+\s+Credits?\s*$/i.test(element.textContent || ''))
-            .sort((first, second) => first.querySelectorAll('*').length - second.querySelectorAll('*').length)[0];
-        if (!creditElement) return;
-
-        let source = creditElement.parentElement;
-        for (let depth = 0; source && depth < 4; depth++) {
-            if (source.querySelector('img') && (source.textContent || '').length < 180) break;
-            source = source.parentElement;
-        }
-        if (!source) return;
-
-        source.classList.add('sunoapp-profile-centered');
-        source.style.display = 'flex';
-        state.profileSource = source;
-    };
-
-    refreshProfile();
-    window.__sunoAppProfileTimer = setInterval(refreshProfile, 2500);
-
-    const repairFullscreenBounds = () => {
-        if (document.body.classList.contains('sunoapp-studio')) {
-            document.querySelectorAll('.sunoapp-bounded-fullscreen').forEach((element) => element.classList.remove('sunoapp-bounded-fullscreen'));
-            return;
-        }
-        Array.from(document.body.querySelectorAll(':scope > div, :scope > section')).forEach((element) => {
-            if (element.id?.startsWith('sunoapp-')) return;
-            const computed = getComputedStyle(element);
-            if (computed.position !== 'fixed') return;
-            const zIndex = Number.parseInt(computed.zIndex, 10);
-            if (!Number.isFinite(zIndex) || zIndex < 50) return;
-            const rect = element.getBoundingClientRect();
-            const isFullscreenLayer = rect.top < 39 && rect.left < 4 && rect.width > window.innerWidth * .92 && rect.height > window.innerHeight * .82;
-            element.classList.toggle('sunoapp-bounded-fullscreen', isFullscreenLayer);
-        });
-    };
-    repairFullscreenBounds();
-    window.__sunoAppBoundsTimer = setInterval(repairFullscreenBounds, 700);
-})();

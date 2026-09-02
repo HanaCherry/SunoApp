@@ -1,5 +1,12 @@
 # Historique des versions
 
+## 1.0.9 — 2 septembre 2026
+
+### Corrections
+
+- Égaliseur à nouveau accessible depuis la barre de gauche (Home, Explore, Création, Studio, Library)
+- Thèmes Nuit, Clair, Cherry et Aurore affichés dans cette même barre
+
 ## 1.0.8 — 2 septembre 2026
 
 ### Corrections

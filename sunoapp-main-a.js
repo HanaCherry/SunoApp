@@ -1,11 +1,14 @@
 const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu, shell, clipboard, ipcMain, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const sunoI18n = require('./sunoapp-i18n.js');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
 let mainWindow;
 let miniWindow;
+let spectrumWindow;
+let spectrumTimer = null;
 let isPlaying = false;
 
 const sanitizeSelection = (text = '') => text.replace(/\s+/g, ' ').trim();
@@ -227,6 +230,10 @@ app.whenReady().then(() => {
             toggleMiniPlayer();
             return { action: 'deny' };
         }
+        if (url === 'sunoapp://spectrum') {
+            toggleSpectrumWindow();
+            return { action: 'deny' };
+        }
         if (url === 'sunoapp://fullscreen') {
             if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.setFullScreen(!mainWindow.isFullScreen());
@@ -273,15 +280,17 @@ app.whenReady().then(() => {
     const iconNext = nativeImage.createFromPath(path.join(__dirname, 'suiv.png')).resize({ width: 32, height: 32 });
     const iconMini = nativeImage.createFromPath(path.join(__dirname, 'mini.png')).resize({ width: 32, height: 32 });
 
+    const tt = (key) => sunoI18n.t(key, null, sunoI18n.resolve(app.getLocale()));
+
     const updateThumbar = () => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
         mainWindow.setThumbarButtons([
-            { tooltip: "J'aime", icon: iconLike, click() { controlSuno('like'); } },
-            { tooltip: 'Précédent', icon: iconPrev, click() { controlSuno('prev'); } },
-            { tooltip: isPlaying ? 'Pause' : 'Play', icon: isPlaying ? iconPause : iconPlay, click() { controlSuno('playpause'); } },
-            { tooltip: 'Stop', icon: iconStop, click() { controlSuno('stop'); } },
-            { tooltip: 'Suivant', icon: iconNext, click() { controlSuno('next'); } },
-            { tooltip: 'Mini Lecteur', icon: iconMini, click() { toggleMiniPlayer(); } }
+            { tooltip: tt('like'), icon: iconLike, click() { controlSuno('like'); } },
+            { tooltip: tt('prev'), icon: iconPrev, click() { controlSuno('prev'); } },
+            { tooltip: isPlaying ? tt('pause') : tt('play'), icon: isPlaying ? iconPause : iconPlay, click() { controlSuno('playpause'); } },
+            { tooltip: tt('stop'), icon: iconStop, click() { controlSuno('stop'); } },
+            { tooltip: tt('next'), icon: iconNext, click() { controlSuno('next'); } },
+            { tooltip: tt('miniPlayer'), icon: iconMini, click() { toggleMiniPlayer(); } }
         ]);
     };
 
@@ -337,6 +346,63 @@ app.whenReady().then(() => {
         miniWindow.on('closed', () => { miniWindow = null; });
     };
 
+    const stopSpectrumPump = () => {
+        if (spectrumTimer) {
+            clearInterval(spectrumTimer);
+            spectrumTimer = null;
+        }
+    };
+
+    const toggleSpectrumWindow = () => {
+        if (spectrumWindow && !spectrumWindow.isDestroyed()) {
+            spectrumWindow.close();
+            return;
+        }
+
+        spectrumWindow = new BrowserWindow({
+            width: 760,
+            height: 280,
+            minWidth: 420,
+            minHeight: 180,
+            frame: false,
+            transparent: true,
+            hasShadow: false,
+            resizable: true,
+            maximizable: false,
+            fullscreenable: false,
+            alwaysOnTop: true,
+            skipTaskbar: false,
+            backgroundColor: '#00000000',
+            icon: path.join(__dirname, 'icone_flora.ico'),
+            webPreferences: {
+                preload: path.join(__dirname, 'spectrum-preload.js'),
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true
+            }
+        });
+
+        spectrumWindow.loadFile(path.join(__dirname, 'spectrum.html'));
+        spectrumWindow.setAlwaysOnTop(true, 'screen-saver');
+        spectrumWindow.moveTop();
+        spectrumWindow.on('closed', () => {
+            spectrumWindow = null;
+            stopSpectrumPump();
+        });
+
+        stopSpectrumPump();
+        spectrumTimer = setInterval(() => {
+            if (!spectrumWindow || spectrumWindow.isDestroyed() || !mainWindow || mainWindow.isDestroyed()) return;
+            mainWindow.webContents.executeJavaScript(
+                "(function(){try{return window.__sunoAppGetSpectrum?window.__sunoAppGetSpectrum():null}catch(e){return null}})()"
+            ).then((payload) => {
+                if (spectrumWindow && !spectrumWindow.isDestroyed() && payload) {
+                    spectrumWindow.webContents.send('spectrum-data', payload);
+                }
+            }).catch(() => {});
+        }, 40);
+    };
+
     const installMiniPlayerButton = () => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
 
@@ -369,8 +435,8 @@ app.whenReady().then(() => {
                     const button = document.createElement('button');
                     button.id = 'sunoapp-mini-launcher';
                     button.type = 'button';
-                    button.title = 'Ouvrir le mini-lecteur';
-                    button.setAttribute('aria-label', 'Ouvrir le mini-lecteur');
+                    button.title = ${JSON.stringify(tt('openMini'))};
+                    button.setAttribute('aria-label', ${JSON.stringify(tt('openMini'))});
                     button.innerHTML = \`
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <rect x="3" y="4" width="15" height="12" rx="2.2"></rect>
@@ -383,8 +449,8 @@ app.whenReady().then(() => {
                     const fullscreenButton = document.createElement('button');
                     fullscreenButton.id = 'sunoapp-fullscreen-launcher';
                     fullscreenButton.type = 'button';
-                    fullscreenButton.title = 'Plein écran';
-                    fullscreenButton.setAttribute('aria-label', 'Plein écran');
+                    fullscreenButton.title = ${JSON.stringify(tt('fullscreen'))};
+                    fullscreenButton.setAttribute('aria-label', ${JSON.stringify(tt('fullscreen'))});
                     fullscreenButton.innerHTML = \`
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M9 4H4v5M15 4h5v5M4 15v5h5M20 15v5h-5"></path>

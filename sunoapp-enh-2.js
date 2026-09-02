@@ -1,3 +1,19 @@
+            position: fixed; inset: 0; z-index: 2147483647; display: none; place-items: center;
+            padding: 28px; background: rgba(3,3,6,.46); backdrop-filter: blur(14px);
+        }
+        #sunoapp-settings-overlay.open { display: grid; }
+        .sa-settings-card {
+            width: min(620px, 94vw); max-height: min(720px, 90vh); overflow: auto; padding: 25px;
+            border: 1px solid var(--sa-border, rgba(255,255,255,.14)); border-radius: 26px;
+            color: var(--sa-text, #fff); background: var(--sa-card, linear-gradient(145deg, rgba(34,34,40,.94), rgba(11,11,15,.93)));
+            box-shadow: inset 0 1px rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.6);
+        }
+        .sa-settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .sa-settings-head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
+        .sa-close { width: 36px; height: 36px; border: 0; border-radius: 50%; color: var(--sa-text, #fff); background: var(--sa-btn, rgba(255,255,255,.08)); font-size: 22px; cursor: pointer; }
+        .sa-section-title { margin: 22px 0 12px; color: var(--sa-muted, rgba(255,255,255,.55)); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+        .sa-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .sa-mode { min-height: 62px; padding: 9px 7px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; color: rgba(255,255,255,.72); background: rgba(255,255,255,.045); font-size: 12px; font-weight: 720; cursor: pointer; }
         .sa-mode:hover { background: rgba(255,255,255,.09); }
         .sa-mode.active { color: #151515; border-color: #fff; background: #fff; }
         .sa-eq { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px 12px 12px; border-radius: 18px; background: rgba(255,255,255,.035); }
@@ -126,26 +142,3 @@
     menu.innerHTML = `
         <button class="sa-glass-button" id="sunoapp-menu-button" aria-label="Menu SunoApp" title="Menu SunoApp">
             <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>
-        </button>
-        <div id="sunoapp-menu-popover">
-            <button class="sa-menu-item" id="sunoapp-open-settings">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
-                Paramètres
-            </button>
-            <button class="sa-menu-item" id="sunoapp-open-mini">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="15" height="12" rx="2"/><rect x="12" y="12" width="9" height="8" rx="2"/></svg>
-                Mini-lecteur
-            </button>
-        </div>
-    `;
-    document.body.appendChild(menu);
-
-    const overlay = document.createElement('div');
-    overlay.id = 'sunoapp-settings-overlay';
-    overlay.innerHTML = `
-        <section class="sa-settings-card">
-            <header class="sa-settings-head"><h2>Paramètres SunoApp</h2><button class="sa-close" id="sunoapp-close-settings">×</button></header>
-            <div class="sa-section-title">Qualité et mode sonore</div>
-            <div class="sa-modes">
-                <button class="sa-mode" data-mode="flat">Neutre</button>
-                <button class="sa-mode" data-mode="bass">Basses</button>

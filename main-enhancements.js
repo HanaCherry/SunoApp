@@ -255,6 +255,29 @@
         }
         .sa-menu-item:hover { background: rgba(255,255,255,.09); }
         .sa-menu-item svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+        #sunoapp-rail-tools {
+            position: fixed; z-index: 2147483645; display: flex; flex-direction: column; gap: 2px;
+            box-sizing: border-box; padding: 4px 8px 8px; overflow: auto;
+            color: var(--sa-text, rgba(255,255,255,.86));
+            font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif;
+            pointer-events: auto;
+        }
+        #sunoapp-rail-tools .sa-rail-label {
+            margin: 8px 8px 3px; color: var(--sa-muted, rgba(255,255,255,.4));
+            font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+        }
+        #sunoapp-rail-tools .sa-rail-item {
+            display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px;
+            padding: 6px 10px; border: 0; border-radius: 10px;
+            color: inherit; background: transparent; font-size: 14px; font-weight: 620;
+            text-align: left; cursor: pointer;
+        }
+        #sunoapp-rail-tools .sa-rail-item:hover { background: rgba(255,255,255,.08); }
+        #sunoapp-rail-tools .sa-rail-item.active { color: var(--sa-accent, #ff5474); background: rgba(255,255,255,.06); }
+        #sunoapp-rail-tools .sa-rail-item svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        #sunoapp-rail-tools .sa-rail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        #sunoapp-rail-tools .sa-rail-grid .sa-rail-item { min-height: 30px; padding: 5px 8px; font-size: 12px; justify-content: center; }
         .sunoapp-profile-centered {
             display: flex !important; flex-direction: column !important; align-items: center !important;
             justify-content: center !important; gap: 4px !important; width: 100% !important;
@@ -267,19 +290,3 @@
         }
         .sunoapp-profile-centered * { text-align: center !important; }
         #sunoapp-settings-overlay {
-            position: fixed; inset: 0; z-index: 2147483647; display: none; place-items: center;
-            padding: 28px; background: rgba(3,3,6,.46); backdrop-filter: blur(14px);
-        }
-        #sunoapp-settings-overlay.open { display: grid; }
-        .sa-settings-card {
-            width: min(620px, 94vw); max-height: min(720px, 90vh); overflow: auto; padding: 25px;
-            border: 1px solid var(--sa-border, rgba(255,255,255,.14)); border-radius: 26px;
-            color: var(--sa-text, #fff); background: var(--sa-card, linear-gradient(145deg, rgba(34,34,40,.94), rgba(11,11,15,.93)));
-            box-shadow: inset 0 1px rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.6);
-        }
-        .sa-settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-        .sa-settings-head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
-        .sa-close { width: 36px; height: 36px; border: 0; border-radius: 50%; color: var(--sa-text, #fff); background: var(--sa-btn, rgba(255,255,255,.08)); font-size: 22px; cursor: pointer; }
-        .sa-section-title { margin: 22px 0 12px; color: var(--sa-muted, rgba(255,255,255,.55)); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-        .sa-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .sa-mode { min-height: 62px; padding: 9px 7px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; color: rgba(255,255,255,.72); background: rgba(255,255,255,.045); font-size: 12px; font-weight: 720; cursor: pointer; }

@@ -1,3 +1,21 @@
+        .sa-mode:hover { background: rgba(255,255,255,.09); }
+        .sa-mode.active { color: #151515; border-color: #fff; background: #fff; }
+        .sa-eq { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px 12px 12px; border-radius: 18px; background: rgba(255,255,255,.035); }
+        .sa-band { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .sa-band input { width: 96px; accent-color: #ff6680; transform: rotate(-90deg); margin: 38px 0; }
+        .sa-band output { color: rgba(255,255,255,.65); font-size: 11px; }
+        .sa-band label { color: rgba(255,255,255,.82); font-size: 11px; font-weight: 720; }
+        #sunoapp-audio-status { margin-top: 14px; min-height: 18px; color: rgba(255,255,255,.48); font-size: 12px; }
+        .sa-option-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: rgba(255,255,255,.035); }
+        .sa-option-copy strong { display: block; margin-bottom: 3px; font-size: 14px; }
+        .sa-option-copy span { color: rgba(255,255,255,.48); font-size: 12px; }
+        .sa-switch { position: relative; width: 48px; height: 28px; flex: 0 0 auto; }
+        .sa-switch input { position: absolute; opacity: 0; pointer-events: none; }
+        .sa-switch span { position: absolute; inset: 0; border-radius: 99px; background: rgba(255,255,255,.16); box-shadow: inset 0 1px 3px rgba(0,0,0,.35); cursor: pointer; transition: .2s; }
+        .sa-switch span::after { content: ''; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 7px rgba(0,0,0,.4); transition: .2s; }
+        .sa-switch input:checked + span { background: linear-gradient(135deg, #ff4d72, #ff744d); }
+        .sa-switch input:checked + span::after { transform: translateX(20px); }
+        #sunoapp-waveform { display: none; position: relative; width: 100%; max-width: none; height: 34px; box-sizing: border-box; margin: 5px 0 3px; padding: 4px 9px; overflow: hidden; pointer-events: none; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025)); box-shadow: inset 0 1px rgba(255,255,255,.11), inset 0 -1px rgba(0,0,0,.2), 0 5px 18px rgba(0,0,0,.16); backdrop-filter: blur(18px) saturate(145%); opacity: 0; transform: translateY(2px); transition: opacity .25s, transform .25s, border-color .25s; }
         #sunoapp-waveform.visible { opacity: 1; transform: none; }
         #sunoapp-waveform.visible { border-color: rgba(255,112,137,.25); }
         #sunoapp-waveform.attached { display: block; }
@@ -44,6 +62,7 @@
         #sunoapp-now-card.sunoapp-now-overlay { display: grid; }
         .sunoapp-centered-song-menu { position: fixed !important; transform: none !important; margin: 0 !important; z-index: 2147483646 !important; }
         @media (max-width: 1250px) { #sunoapp-now-card { grid-template-columns: 62px 112px minmax(220px,1fr) 38px; gap: 9px; padding: 7px 9px; } .sa-now-cover { width: 58px; height: 58px; } .sa-now-title { font-size: 14px; } }
+
         .sunoapp-bounded-fullscreen { top: 38px !important; right: 0 !important; bottom: 0 !important; left: 0 !important; height: auto !important; max-height: none !important; }
         @media (max-width: 850px) {
             #sunoapp-top-menu { left: 14px; top: 86px; }
@@ -76,20 +95,7 @@
     });
     document.body.appendChild(titlebar);
 
-    const fitStudioPane = () => {
-        const pane = document.querySelector('body.sunoapp-studio > .sunoapp-studio-root');
-        if (!pane) return;
-        const height = Math.max(0, Math.round(pane.getBoundingClientRect().height));
-        if (!height) return;
-        const child = pane.firstElementChild;
-        if (child) {
-            child.style.boxSizing = 'border-box';
-            child.style.height = height + 'px';
-            child.style.maxHeight = height + 'px';
-            child.style.minHeight = '0';
-            child.style.overflow = 'auto';
-        }
-    };
+    let mountSidebarTools = () => {};
 
     const refreshPageMode = () => {
         const isStudio = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
@@ -109,12 +115,11 @@
         });
         const title = document.querySelector('.sa-title-center');
         if (title) title.textContent = isStudio ? 'Suno • Création' : 'Suno • Lecteur musical';
-        if (isStudio) requestAnimationFrame(fitStudioPane);
+        mountSidebarTools();
     };
 
     refreshPageMode();
     window.__sunoAppPageModeTimer = setInterval(refreshPageMode, 700);
-    window.addEventListener('resize', fitStudioPane);
 
     const menu = document.createElement('div');
     menu.id = 'sunoapp-top-menu';
@@ -144,34 +149,3 @@
             <div class="sa-modes">
                 <button class="sa-mode" data-mode="flat">Neutre</button>
                 <button class="sa-mode" data-mode="bass">Basses</button>
-                <button class="sa-mode" data-mode="vocal">Voix</button>
-                <button class="sa-mode" data-mode="clarity">Clarté</button>
-                <button class="sa-mode" data-mode="immersive">Immersif</button>
-                <button class="sa-mode" data-mode="cinema51">Cinéma 5.1 virtuel</button>
-                <button class="sa-mode" data-mode="surround71">Surround 7.1 virtuel</button>
-                <button class="sa-mode" data-mode="atmos">Atmos virtuel</button>
-            </div>
-            <div class="sa-section-title">Égaliseur</div>
-            <div class="sa-eq">
-                ${frequencies.map((frequency, index) => `
-                    <div class="sa-band">
-                        <output id="sa-gain-${index}">0 dB</output>
-                        <input type="range" min="-12" max="12" step="1" value="0" data-band="${index}" aria-label="${frequency} Hz">
-                        <label>${frequency >= 1000 ? (frequency / 1000) + 'k' : frequency} Hz</label>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="sa-section-title">Affichage du lecteur</div>
-            <div class="sa-option-row">
-                <div class="sa-option-copy"><strong>Forme d'onde audio</strong><span>Affiche la musique et sa progression sous le morceau.</span></div>
-                <label class="sa-switch" title="Afficher la forme d'onde"><input id="sunoapp-waveform-toggle" type="checkbox" ${state.waveformEnabled ? 'checked' : ''}><span></span></label>
-            </div>
-            <div class="sa-option-row" style="margin-top:8px">
-                <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Carte overlay sur le morceau en cours, sans modifier la liste virtualisée de Suno.</span></div>
-                <label class="sa-switch" title="Afficher le lecteur personnalisé"><input id="sunoapp-custom-player-toggle" type="checkbox" ${state.customPlayerEnabled ? 'checked' : ''}><span></span></label>
-            </div>
-            <div class="sa-section-title">Thème de l'interface</div>
-            <div class="sa-themes">
-                <button class="sa-theme" type="button" data-theme="nuit">Nuit</button>
-                <button class="sa-theme" type="button" data-theme="clair">Clair</button>
-                <button class="sa-theme" type="button" data-theme="cherry">Cherry</button>

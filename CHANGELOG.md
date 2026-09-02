@@ -1,5 +1,17 @@
 # Historique des versions
 
+## 1.0.9 — 2 septembre 2026
+
+### Corrections
+
+- Interface Création / Studio : plus de hauteur forcée qui coupait la page, le bas redevient visible
+- Thèmes appliqués à toute l’app (barre, fond, Création), pas seulement au chrome SunoApp
+
+### Nouveautés
+
+- Thèmes Nuit, Clair, Cherry et Aurore dans la barre de gauche, comme Home / Library
+- Modes de l’égaliseur (Neutre, Basses, Voix…) dans cette même barre
+
 ## 1.0.8 — 2 septembre 2026
 
 ### Corrections

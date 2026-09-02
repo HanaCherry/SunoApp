@@ -1,3 +1,26 @@
+        </button>
+        <div id="sunoapp-menu-popover">
+            <button class="sa-menu-item" id="sunoapp-open-settings">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+                Paramètres
+            </button>
+            <button class="sa-menu-item" id="sunoapp-open-mini">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="15" height="12" rx="2"/><rect x="12" y="12" width="9" height="8" rx="2"/></svg>
+                Mini-lecteur
+            </button>
+        </div>
+    `;
+    document.body.appendChild(menu);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'sunoapp-settings-overlay';
+    overlay.innerHTML = `
+        <section class="sa-settings-card">
+            <header class="sa-settings-head"><h2>Paramètres SunoApp</h2><button class="sa-close" id="sunoapp-close-settings">×</button></header>
+            <div class="sa-section-title">Qualité et mode sonore</div>
+            <div class="sa-modes">
+                <button class="sa-mode" data-mode="flat">Neutre</button>
+                <button class="sa-mode" data-mode="bass">Basses</button>
                 <button class="sa-mode" data-mode="vocal">Voix</button>
                 <button class="sa-mode" data-mode="clarity">Clarté</button>
                 <button class="sa-mode" data-mode="immersive">Immersif</button>
@@ -67,89 +90,88 @@
         if (themeButton) applyUiTheme(themeButton.dataset.theme);
     });
 
-    const findNavPrototype = () => {
-        const paths = ['/library', '/studio', '/create', '/explore', '/search', '/home'];
-        const links = Array.from(document.querySelectorAll('a[href]')).filter((anchor) => {
-            if (anchor.hasAttribute('data-sunoapp-nav')) return false;
-            try {
-                const url = new URL(anchor.href, location.origin);
-                if (url.origin !== location.origin) return false;
-                return paths.some((path) => url.pathname === path || url.pathname.startsWith(path + '/'));
-            } catch (_) {
-                return false;
-            }
-        });
-        if (!links.length) return null;
-        return links.find((anchor) => /\/library(?:\/|$)/i.test(anchor.pathname || anchor.getAttribute('href') || '')) || links[links.length - 1];
-    };
+    const sidebarText = (re) => Array.from(document.querySelectorAll('a, button, [role="link"], [role="button"]')).find((el) => {
+        if (el.closest('#sunoapp-rail-tools, #sunoapp-titlebar, #sunoapp-settings-overlay, #sunoapp-top-menu')) return false;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 8 || rect.left > 280) return false;
+        return re.test((el.textContent || '').replace(/\s+/g, ' ').trim());
+    });
 
-    const setLeafText = (root, text) => {
-        const leaves = Array.from(root.querySelectorAll('*')).filter((el) => !el.childElementCount && (el.textContent || '').trim());
-        if (leaves.length) {
-            leaves[leaves.length - 1].textContent = text;
+    const placeRail = () => {
+        const box = document.getElementById('sunoapp-rail-tools');
+        if (!box) return;
+        const create = Array.from(document.querySelectorAll('a[href]')).find((a) => /\/create(?:\/|$)/i.test(a.getAttribute('href') || '') && a.getBoundingClientRect().left < 280);
+        const earn = sidebarText(/earn credits|gagner des cr/i);
+        const labs = sidebarText(/^labs$/i);
+        const more = sidebarText(/more$/i);
+        const profile = sidebarText(/^floracherry$/i);
+        const anchor = create || earn || profile;
+        if (!anchor) {
+            box.style.left = '8px';
+            box.style.top = '220px';
+            box.style.width = '210px';
+            box.style.maxHeight = '42vh';
             return;
         }
-        const node = Array.from(root.childNodes).find((child) => child.nodeType === 3 && child.textContent.trim());
-        if (node) node.textContent = ' ' + text + ' ';
-    };
-
-    const ensureNavItem = (proto, spec) => {
-        let node = document.getElementById(spec.id);
-        if (node && proto.parentElement && node.parentElement !== proto.parentElement) {
-            proto.parentElement.appendChild(node);
-        }
-        if (node) return node;
-        node = proto.cloneNode(true);
-        node.id = spec.id;
-        node.setAttribute('data-sunoapp-nav', spec.kind);
-        node.setAttribute('href', '#sunoapp-' + spec.kind);
-        if (spec.theme) {
-            node.classList.add('sa-theme');
-            node.setAttribute('data-theme', spec.theme);
-        }
-        if (spec.mode) {
-            node.classList.add('sa-mode');
-            node.setAttribute('data-mode', spec.mode);
-        }
-        node.removeAttribute('aria-current');
-        setLeafText(node, spec.label);
-        node.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (spec.theme) applyUiTheme(spec.theme);
-            if (spec.mode && presets[spec.mode] && window.__sunoAppSetGains) window.__sunoAppSetGains(presets[spec.mode], spec.mode);
-        });
-        proto.parentElement.appendChild(node);
-        return node;
+        const col = anchor.getBoundingClientRect();
+        const left = Math.max(4, Math.round(col.left));
+        const width = Math.max(168, Math.min(240, Math.round(col.width + 28)));
+        let top = 250;
+        if (profile) top = Math.round(profile.getBoundingClientRect().bottom + 6);
+        else if (create) top = Math.round(create.getBoundingClientRect().bottom + 120);
+        let bottom = window.innerHeight - 150;
+        if (earn) bottom = Math.round(earn.getBoundingClientRect().top - 8);
+        else if (labs) bottom = Math.round(labs.getBoundingClientRect().top - 8);
+        else if (more) bottom = Math.round(more.getBoundingClientRect().top - 8);
+        box.style.left = left + 'px';
+        box.style.width = width + 'px';
+        box.style.top = Math.max(90, top) + 'px';
+        box.style.maxHeight = Math.max(140, bottom - top) + 'px';
     };
 
     mountSidebarTools = () => {
-        const proto = findNavPrototype();
-        if (!proto || !proto.parentElement) return;
-        const items = [
-            { id: 'sunoapp-nav-theme-nuit', kind: 'theme', theme: 'nuit', label: 'Nuit' },
-            { id: 'sunoapp-nav-theme-clair', kind: 'theme', theme: 'clair', label: 'Clair' },
-            { id: 'sunoapp-nav-theme-cherry', kind: 'theme', theme: 'cherry', label: 'Cherry' },
-            { id: 'sunoapp-nav-theme-aurore', kind: 'theme', theme: 'aurore', label: 'Aurore' },
-            { id: 'sunoapp-nav-eq-flat', kind: 'eq', mode: 'flat', label: 'Neutre' },
-            { id: 'sunoapp-nav-eq-bass', kind: 'eq', mode: 'bass', label: 'Basses' },
-            { id: 'sunoapp-nav-eq-vocal', kind: 'eq', mode: 'vocal', label: 'Voix' },
-            { id: 'sunoapp-nav-eq-clarity', kind: 'eq', mode: 'clarity', label: 'Clarté' },
-            { id: 'sunoapp-nav-eq-immersive', kind: 'eq', mode: 'immersive', label: 'Immersif' },
-            { id: 'sunoapp-nav-eq-cinema51', kind: 'eq', mode: 'cinema51', label: 'Cinéma 5.1' },
-            { id: 'sunoapp-nav-eq-surround71', kind: 'eq', mode: 'surround71', label: 'Surround 7.1' },
-            { id: 'sunoapp-nav-eq-atmos', kind: 'eq', mode: 'atmos', label: 'Atmos' }
-        ];
-        items.forEach((spec) => ensureNavItem(proto, spec));
-        applyUiTheme(state.uiTheme);
-        document.querySelectorAll('a[data-sunoapp-nav="eq"]').forEach((node) => {
-            const on = node.getAttribute('data-mode') === state.mode;
-            node.classList.toggle('active', on);
-            if (on) node.setAttribute('aria-current', 'page');
-            else node.removeAttribute('aria-current');
+        let box = document.getElementById('sunoapp-rail-tools');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'sunoapp-rail-tools';
+            box.innerHTML = `
+                <button type="button" class="sa-rail-item" id="sunoapp-rail-settings">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+                    Paramètres
+                </button>
+                <div class="sa-rail-label">Thèmes</div>
+                <div class="sa-rail-grid">
+                    <button type="button" class="sa-rail-item sa-theme" data-theme="nuit">Nuit</button>
+                    <button type="button" class="sa-rail-item sa-theme" data-theme="clair">Clair</button>
+                    <button type="button" class="sa-rail-item sa-theme" data-theme="cherry">Cherry</button>
+                    <button type="button" class="sa-rail-item sa-theme" data-theme="aurore">Aurore</button>
+                </div>
+                <div class="sa-rail-label">Égaliseur</div>
+                <div class="sa-rail-grid">
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="flat">Neutre</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="bass">Basses</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="vocal">Voix</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="clarity">Clarté</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="immersive">Immersif</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="cinema51">Cinéma 5.1</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="surround71">7.1</button>
+                    <button type="button" class="sa-rail-item sa-mode" data-mode="atmos">Atmos</button>
+                </div>
+            `;
+            document.body.appendChild(box);
+            box.querySelector('#sunoapp-rail-settings').addEventListener('click', (event) => {
+                event.preventDefault();
+                overlay.classList.add('open');
+            });
+            applyUiTheme(state.uiTheme);
+        }
+        placeRail();
+        document.querySelectorAll('#sunoapp-rail-tools .sa-mode').forEach((button) => {
+            button.classList.toggle('active', button.dataset.mode === state.mode);
         });
     };
     mountSidebarTools();
+    window.addEventListener('resize', placeRail);
 
     const status = document.getElementById('sunoapp-audio-status');
     const sliders = Array.from(document.querySelectorAll('.sa-band input'));
@@ -192,21 +214,3 @@
         <div class="sa-track-menu-group">
             <button class="sa-track-menu-item" data-action="publish">${menuIcon('M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20m0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16') }<span>Publish</span><span></span></button>
             <button class="sa-track-menu-item" data-action="share">${menuIcon('M13 4.04c0-.95 1.17-1.4 1.81-.69l6.91 7.67c.35.4.35 1 0 1.39l-6.91 7.68c-.64.7-1.81.25-1.81-.7v-3.52c-3.76 0-6.46 1.63-8.73 3.35-.67.51-1.63.08-1.57-.76C3.22 11.02 9.18 7.5 13 7.5z') }<span>Share</span>${chevron}</button>
-            <button class="sa-track-menu-item" data-action="download">${menuIcon('M12 15.58q-.2 0-.38-.07a.9.9 0 0 1-.32-.21l-3.6-3.6a.92.92 0 0 1-.29-.7q.02-.4.29-.7.3-.3.71-.31a.93.93 0 0 1 .71.28L11 12.15V5a1 1 0 0 1 2 0v7.15l1.88-1.88a.93.93 0 0 1 .71-.28q.41.01.71.31.28.3.29.7a.92.92 0 0 1-.29.7l-3.6 3.6q-.15.15-.32.21a1.1 1.1 0 0 1-.38.07M6 20a2 2 0 0 1-2-2v-2a1 1 0 0 1 2 0v2h12v-2a1 1 0 0 1 2 0v2a2 2 0 0 1-2 2z') }<span>Download</span>${chevron}</button>
-            <button class="sa-track-menu-item" data-action="manage">${menuIcon('M5.67 18.33A1.67 1.67 0 0 1 4 16.67v-10A1.67 1.67 0 0 1 5.67 5h4.31l2.35 1.67H19a1.67 1.67 0 0 1 1.67 1.66v8.34A1.67 1.67 0 0 1 19 18.33z') }<span>Manage</span>${chevron}</button>
-        </div>
-        <div class="sa-track-menu-group">
-            <button class="sa-track-menu-item" data-action="queue">${menuIcon('M4 17a1 1 0 1 1 0-2h6a1 1 0 1 1 0 2zm0-4a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2zm0-4a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2zm13.56 11.96A1 1 0 0 1 16 20.13v-4.26a1 1 0 0 1 1.56-.83l3.19 2.13a1 1 0 0 1 0 1.66z') }<span>Add to Queue</span><span></span></button>
-            <button class="sa-track-menu-item" data-action="playlist">${menuIcon('M12 4c-.63 0-1.14.51-1.14 1.14v5.72H5.14a1.14 1.14 0 0 0 0 2.28h5.72v5.72a1.14 1.14 0 0 0 2.28 0v-5.72h5.72a1.14 1.14 0 0 0 0-2.28h-5.72V5.14C13.14 4.51 12.63 4 12 4') }<span>Add to Playlist</span><span></span></button>
-            <button class="sa-track-menu-item" data-action="radio">${menuIcon('M12 9.23A2.76 2.76 0 1 0 12 14.78 2.76 2.76 0 0 0 12 9.23M8.84 7.35a.94.94 0 0 1 0 1.31 4.7 4.7 0 0 0 0 6.58.94.94 0 0 1-1.29 1.3c-2.45-2.5-2.43-6.6-.01-9.17a.89.89 0 0 1 1.3-.02m6.32.1a.89.89 0 0 1 1.28 0c2.45 2.5 2.43 6.6.01 9.17a.89.89 0 0 1-1.28.03.94.94 0 0 1-.03-1.31 4.7 4.7 0 0 0 0-6.58.94.94 0 0 1 .02-1.31') }<span>Song Radio</span><span></span></button>
-        </div>
-        <div class="sa-track-menu-group"><button class="sa-track-menu-item danger" data-action="trash">${menuIcon('M7.31 20.5a1.8 1.8 0 0 1-1.81-1.81V6h-.25a.75.75 0 0 1 0-1.5H9a.88.88 0 0 1 .88-.89h4.24A.88.88 0 0 1 15 4.5h3.75a.75.75 0 0 1 0 1.5h-.25v12.69a1.8 1.8 0 0 1-1.81 1.81z') }<span>Move to Trash</span><span></span></button></div>
-    `;
-    document.body.appendChild(customTrackMenu);
-    const formatTime = (seconds) => Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}` : '0:00';
-    nowCard.querySelector('.sa-now-cover-play').addEventListener('click', () => {
-        if (!state.audioElement) return;
-        if (state.audioElement.paused) state.audioElement.play().catch(() => {});
-        else state.audioElement.pause();
-    });
-    const toHex = (red, green, blue) => `#${[red, green, blue].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0')).join('')}`;

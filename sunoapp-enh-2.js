@@ -3,12 +3,20 @@
         }
         #sunoapp-settings-overlay.open { display: grid; }
         .sa-settings-card {
-            width: min(620px, 94vw); max-height: min(720px, 90vh); overflow: auto; padding: 25px;
+            width: min(820px, 96vw); max-height: min(780px, 92vh); overflow: auto; padding: 25px;
             border: 1px solid var(--sa-border, rgba(255,255,255,.14)); border-radius: 26px;
             color: var(--sa-text, #fff); background: var(--sa-card, linear-gradient(145deg, rgba(34,34,40,.94), rgba(11,11,15,.93)));
             box-shadow: inset 0 1px rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.6);
         }
-        .sa-settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .sa-settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .sa-about {
+            margin: 0 0 18px; padding: 14px 16px;
+            border: 1px solid rgba(244,197,66,.38); border-radius: 16px;
+            background: rgba(244,197,66,.08);
+        }
+        .sa-about-studio { font-size: 15px; font-weight: 800; letter-spacing: .04em; color: #F4C542; }
+        .sa-about p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; color: rgba(255,255,255,.72); }
+        .sa-about-unofficial { font-weight: 750; color: #ffb4c0 !important; }
         .sa-settings-head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
         .sa-close { width: 36px; height: 36px; border: 0; border-radius: 50%; color: var(--sa-text, #fff); background: var(--sa-btn, rgba(255,255,255,.08)); font-size: 22px; cursor: pointer; }
         .sa-section-title { margin: 22px 0 12px; color: var(--sa-muted, rgba(255,255,255,.55)); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
@@ -16,11 +24,30 @@
         .sa-mode { min-height: 62px; padding: 9px 7px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; color: rgba(255,255,255,.72); background: rgba(255,255,255,.045); font-size: 12px; font-weight: 720; cursor: pointer; }
         .sa-mode:hover { background: rgba(255,255,255,.09); }
         .sa-mode.active { color: #151515; border-color: #fff; background: #fff; }
-        .sa-eq { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px 12px 12px; border-radius: 18px; background: rgba(255,255,255,.035); }
-        .sa-band { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .sa-band input { width: 96px; accent-color: #ff6680; transform: rotate(-90deg); margin: 38px 0; }
-        .sa-band output { color: rgba(255,255,255,.65); font-size: 11px; }
-        .sa-band label { color: rgba(255,255,255,.82); font-size: 11px; font-weight: 720; }
+        .sa-eq { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; padding: 16px 8px 10px; border-radius: 18px; background: rgba(255,255,255,.035); }
+        .sa-band { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .sa-band input { width: 72px; accent-color: #ff6680; transform: rotate(-90deg); margin: 28px 0; }
+        .sa-band output { color: rgba(255,255,255,.65); font-size: 10px; }
+        .sa-band label { color: rgba(255,255,255,.82); font-size: 10px; font-weight: 720; }
+        .sa-eq-note { margin: 8px 0 0; color: rgba(255,255,255,.42); font-size: 11px; line-height: 1.4; }
+        .sa-preamp { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+        .sa-preamp input { flex: 1; accent-color: #ff6680; }
+        .sa-preamp output { min-width: 52px; color: rgba(255,255,255,.7); font-size: 12px; text-align: right; }
+        .sa-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .sa-ab { min-height: 40px; padding: 0 14px; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; color: #fff; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 750; cursor: pointer; }
+        .sa-ab.on { background: #fff; color: #111; }
+        #sunoapp-spectrum { display: block; width: 100%; height: 76px; margin-top: 10px; border-radius: 12px; background: rgba(0,0,0,.38); }
+        .sa-preset-row { display: flex; gap: 8px; margin-top: 10px; }
+        .sa-preset-row input { flex: 1; min-height: 40px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #fff; background: rgba(255,255,255,.06); font-size: 13px; }
+        #sunoapp-lang {
+            width: 100%; min-height: 40px; margin-top: 4px; padding: 0 12px;
+            border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+            color: inherit; background: rgba(255,255,255,.06); font-size: 13px; font-weight: 650;
+        }
+        .sa-preset-row button, .sa-user-preset { min-height: 40px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #fff; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 700; cursor: pointer; }
+        #sunoapp-user-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .sa-user-preset { display: inline-flex; align-items: center; gap: 8px; }
+        .sa-user-preset .sa-del { opacity: .55; font-size: 16px; }
         #sunoapp-audio-status { margin-top: 14px; min-height: 18px; color: rgba(255,255,255,.48); font-size: 12px; }
         .sa-option-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: rgba(255,255,255,.035); }
         .sa-option-copy strong { display: block; margin-bottom: 3px; font-size: 14px; }
@@ -114,7 +141,8 @@
     let mountSidebarTools = () => {};
 
     const refreshPageMode = () => {
-        const isStudio = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
+        const isStudio = /^\/studio(?:\/|$)/i.test(location.pathname);
+        const isCreate = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
         document.body.classList.toggle('sunoapp-studio', isStudio);
         document.documentElement.classList.toggle('sunoapp-studio', isStudio);
         const candidates = Array.from(document.body.children)
@@ -130,7 +158,7 @@
             }
         });
         const title = document.querySelector('.sa-title-center');
-        if (title) title.textContent = isStudio ? 'Suno • Création' : 'Suno • Lecteur musical';
+        if (title) title.textContent = isCreate ? 'Suno • Création' : 'Suno • Lecteur musical';
         mountSidebarTools();
     };
 

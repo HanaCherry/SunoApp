@@ -52,7 +52,29 @@
         state.themeEnd = second;
         nowCard.style.setProperty('--sa-accent-1', first);
         nowCard.style.setProperty('--sa-accent-2', second);
+        syncMusicTheme();
     };
+    const MUSIC_VARS = ['--sa-bg', '--sa-titlebar', '--sa-accent', '--sa-accent-2', '--sa-border', '--sa-surface', '--sa-btn'];
+    syncMusicTheme = () => {
+        const roots = [document.documentElement, document.body];
+        if (state.uiTheme !== 'musique') {
+            roots.forEach((el) => MUSIC_VARS.forEach((name) => el.style.removeProperty(name)));
+            return;
+        }
+        const first = state.themeStart || '#ff5474';
+        const second = state.themeEnd || '#ff8a5c';
+        const paint = {
+            '--sa-accent': first,
+            '--sa-accent-2': second,
+            '--sa-bg': `color-mix(in srgb, ${first} 28%, #09090c)`,
+            '--sa-titlebar': `color-mix(in srgb, ${first} 22%, rgba(12,12,16,.78))`,
+            '--sa-border': `color-mix(in srgb, ${second} 35%, rgba(255,255,255,.1))`,
+            '--sa-surface': `color-mix(in srgb, ${first} 18%, rgba(16,16,20,.84))`,
+            '--sa-btn': `color-mix(in srgb, ${first} 24%, rgba(255,255,255,.08))`
+        };
+        roots.forEach((el) => Object.entries(paint).forEach(([name, value]) => el.style.setProperty(name, value)));
+    };
+    syncMusicTheme();
     const activateSunoAction = (action) => {
         const row = state.activeTrackRow;
         if (!row?.isConnected) return false;

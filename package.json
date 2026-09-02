@@ -1,6 +1,6 @@
 {
   "name": "sunoapp",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Application Windows non officielle pour utiliser Suno avec un lecteur personnalisé, un mini-lecteur et des contrôles multimédias",
   "author": "Flora Cherry",
   "homepage": "https://github.com/HanaCherry/SunoApp",
@@ -39,6 +39,7 @@
       "sunoapp-enh-2.js",
       "sunoapp-enh-3.js",
       "sunoapp-enh-4.js",
+      "sunoapp-enh-5.js",
       "package.json",
       "icone_flora.ico",
       "like.png",
@@ -52,7 +53,7 @@
     ],
     "extraMetadata": {
       "name": "sunoapp",
-      "version": "1.0.7"
+      "version": "1.0.8"
     }
   }
 }

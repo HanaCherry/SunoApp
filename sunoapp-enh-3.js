@@ -1,3 +1,34 @@
+                <button class="sa-mode" data-mode="vocal">Voix</button>
+                <button class="sa-mode" data-mode="clarity">Clarté</button>
+                <button class="sa-mode" data-mode="immersive">Immersif</button>
+                <button class="sa-mode" data-mode="cinema51">Cinéma 5.1 virtuel</button>
+                <button class="sa-mode" data-mode="surround71">Surround 7.1 virtuel</button>
+                <button class="sa-mode" data-mode="atmos">Atmos virtuel</button>
+            </div>
+            <div class="sa-section-title">Égaliseur</div>
+            <div class="sa-eq">
+                ${frequencies.map((frequency, index) => `
+                    <div class="sa-band">
+                        <output id="sa-gain-${index}">0 dB</output>
+                        <input type="range" min="-12" max="12" step="1" value="0" data-band="${index}" aria-label="${frequency} Hz">
+                        <label>${frequency >= 1000 ? (frequency / 1000) + 'k' : frequency} Hz</label>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="sa-section-title">Affichage du lecteur</div>
+            <div class="sa-option-row">
+                <div class="sa-option-copy"><strong>Forme d'onde audio</strong><span>Affiche la musique et sa progression sous le morceau.</span></div>
+                <label class="sa-switch" title="Afficher la forme d'onde"><input id="sunoapp-waveform-toggle" type="checkbox" ${state.waveformEnabled ? 'checked' : ''}><span></span></label>
+            </div>
+            <div class="sa-option-row" style="margin-top:8px">
+                <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Carte overlay sur le morceau en cours, sans modifier la liste virtualisée de Suno.</span></div>
+                <label class="sa-switch" title="Afficher le lecteur personnalisé"><input id="sunoapp-custom-player-toggle" type="checkbox" ${state.customPlayerEnabled ? 'checked' : ''}><span></span></label>
+            </div>
+            <div class="sa-section-title">Thème de l'interface</div>
+            <div class="sa-themes">
+                <button class="sa-theme" type="button" data-theme="nuit">Nuit</button>
+                <button class="sa-theme" type="button" data-theme="clair">Clair</button>
+                <button class="sa-theme" type="button" data-theme="cherry">Cherry</button>
                 <button class="sa-theme" type="button" data-theme="aurore">Aurore</button>
             </div>
             <div id="sunoapp-audio-status">Sélectionnez un mode pour activer le traitement audio.</div>
@@ -17,16 +48,108 @@
     const applyUiTheme = (id) => {
         const theme = ['nuit', 'clair', 'cherry', 'aurore'].includes(id) ? id : 'nuit';
         state.uiTheme = theme;
+        document.documentElement.dataset.sunoappTheme = theme;
         document.body.dataset.sunoappTheme = theme;
+        document.documentElement.style.colorScheme = theme === 'clair' ? 'light' : 'dark';
         localStorage.setItem('sunoapp-ui-theme', theme);
-        document.querySelectorAll('.sa-theme').forEach((button) => {
-            button.classList.toggle('active', button.dataset.theme === theme);
+        document.querySelectorAll('[data-theme]').forEach((button) => {
+            const on = button.dataset.theme === theme;
+            button.classList.toggle('active', on);
+            if (button.hasAttribute('data-sunoapp-nav')) {
+                if (on) button.setAttribute('aria-current', 'page');
+                else button.removeAttribute('aria-current');
+            }
         });
     };
     applyUiTheme(state.uiTheme);
-    document.querySelectorAll('.sa-theme').forEach((button) => {
-        button.addEventListener('click', () => applyUiTheme(button.dataset.theme));
+    document.addEventListener('click', (event) => {
+        const themeButton = event.target.closest('.sa-theme[data-theme]');
+        if (themeButton) applyUiTheme(themeButton.dataset.theme);
     });
+
+    const findNavPrototype = () => {
+        const paths = ['/library', '/studio', '/create', '/explore', '/search', '/home'];
+        const links = Array.from(document.querySelectorAll('a[href]')).filter((anchor) => {
+            if (anchor.hasAttribute('data-sunoapp-nav')) return false;
+            try {
+                const url = new URL(anchor.href, location.origin);
+                if (url.origin !== location.origin) return false;
+                return paths.some((path) => url.pathname === path || url.pathname.startsWith(path + '/'));
+            } catch (_) {
+                return false;
+            }
+        });
+        if (!links.length) return null;
+        return links.find((anchor) => /\/library(?:\/|$)/i.test(anchor.pathname || anchor.getAttribute('href') || '')) || links[links.length - 1];
+    };
+
+    const setLeafText = (root, text) => {
+        const leaves = Array.from(root.querySelectorAll('*')).filter((el) => !el.childElementCount && (el.textContent || '').trim());
+        if (leaves.length) {
+            leaves[leaves.length - 1].textContent = text;
+            return;
+        }
+        const node = Array.from(root.childNodes).find((child) => child.nodeType === 3 && child.textContent.trim());
+        if (node) node.textContent = ' ' + text + ' ';
+    };
+
+    const ensureNavItem = (proto, spec) => {
+        let node = document.getElementById(spec.id);
+        if (node && proto.parentElement && node.parentElement !== proto.parentElement) {
+            proto.parentElement.appendChild(node);
+        }
+        if (node) return node;
+        node = proto.cloneNode(true);
+        node.id = spec.id;
+        node.setAttribute('data-sunoapp-nav', spec.kind);
+        node.setAttribute('href', '#sunoapp-' + spec.kind);
+        if (spec.theme) {
+            node.classList.add('sa-theme');
+            node.setAttribute('data-theme', spec.theme);
+        }
+        if (spec.mode) {
+            node.classList.add('sa-mode');
+            node.setAttribute('data-mode', spec.mode);
+        }
+        node.removeAttribute('aria-current');
+        setLeafText(node, spec.label);
+        node.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (spec.theme) applyUiTheme(spec.theme);
+            if (spec.mode && presets[spec.mode] && window.__sunoAppSetGains) window.__sunoAppSetGains(presets[spec.mode], spec.mode);
+        });
+        proto.parentElement.appendChild(node);
+        return node;
+    };
+
+    mountSidebarTools = () => {
+        const proto = findNavPrototype();
+        if (!proto || !proto.parentElement) return;
+        const items = [
+            { id: 'sunoapp-nav-theme-nuit', kind: 'theme', theme: 'nuit', label: 'Nuit' },
+            { id: 'sunoapp-nav-theme-clair', kind: 'theme', theme: 'clair', label: 'Clair' },
+            { id: 'sunoapp-nav-theme-cherry', kind: 'theme', theme: 'cherry', label: 'Cherry' },
+            { id: 'sunoapp-nav-theme-aurore', kind: 'theme', theme: 'aurore', label: 'Aurore' },
+            { id: 'sunoapp-nav-eq-flat', kind: 'eq', mode: 'flat', label: 'Neutre' },
+            { id: 'sunoapp-nav-eq-bass', kind: 'eq', mode: 'bass', label: 'Basses' },
+            { id: 'sunoapp-nav-eq-vocal', kind: 'eq', mode: 'vocal', label: 'Voix' },
+            { id: 'sunoapp-nav-eq-clarity', kind: 'eq', mode: 'clarity', label: 'Clarté' },
+            { id: 'sunoapp-nav-eq-immersive', kind: 'eq', mode: 'immersive', label: 'Immersif' },
+            { id: 'sunoapp-nav-eq-cinema51', kind: 'eq', mode: 'cinema51', label: 'Cinéma 5.1' },
+            { id: 'sunoapp-nav-eq-surround71', kind: 'eq', mode: 'surround71', label: 'Surround 7.1' },
+            { id: 'sunoapp-nav-eq-atmos', kind: 'eq', mode: 'atmos', label: 'Atmos' }
+        ];
+        items.forEach((spec) => ensureNavItem(proto, spec));
+        applyUiTheme(state.uiTheme);
+        document.querySelectorAll('a[data-sunoapp-nav="eq"]').forEach((node) => {
+            const on = node.getAttribute('data-mode') === state.mode;
+            node.classList.toggle('active', on);
+            if (on) node.setAttribute('aria-current', 'page');
+            else node.removeAttribute('aria-current');
+        });
+    };
+    mountSidebarTools();
 
     const status = document.getElementById('sunoapp-audio-status');
     const sliders = Array.from(document.querySelectorAll('.sa-band input'));
@@ -87,130 +210,3 @@
         else state.audioElement.pause();
     });
     const toHex = (red, green, blue) => `#${[red, green, blue].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0')).join('')}`;
-    const applyCoverTheme = async (sourceUrl, title) => {
-        if (!sourceUrl || sourceUrl === state.themeSource) return;
-        state.themeSource = sourceUrl;
-        let hash = Array.from(title || 'Suno').reduce((value, character) => ((value * 33) ^ character.charCodeAt(0)) >>> 0, 5381);
-        const fallbackHue = hash % 360;
-        let first = `hsl(${fallbackHue} 82% 61%)`;
-        let second = `hsl(${(fallbackHue + 48) % 360} 86% 62%)`;
-        try {
-            const response = await fetch(sourceUrl, { credentials: 'omit' });
-            if (!response.ok) throw new Error('Cover unavailable');
-            const bitmap = await createImageBitmap(await response.blob());
-            const sampleCanvas = document.createElement('canvas');
-            sampleCanvas.width = 24;
-            sampleCanvas.height = 24;
-            const sampleContext = sampleCanvas.getContext('2d', { willReadFrequently: true });
-            sampleContext.drawImage(bitmap, 0, 0, 24, 24);
-            const pixels = sampleContext.getImageData(0, 0, 24, 24).data;
-            const vivid = [];
-            for (let index = 0; index < pixels.length; index += 4) {
-                const red = pixels[index], green = pixels[index + 1], blue = pixels[index + 2];
-                const maximum = Math.max(red, green, blue), minimum = Math.min(red, green, blue);
-                const saturation = maximum - minimum;
-                const brightness = (red + green + blue) / 3;
-                if (brightness > 32 && brightness < 238) vivid.push({ red, green, blue, score: saturation * .8 + brightness * .2 });
-            }
-            vivid.sort((a, b) => b.score - a.score);
-            const primary = vivid[Math.min(8, vivid.length - 1)];
-            const secondary = vivid.find((color) => primary && Math.abs(color.red - primary.red) + Math.abs(color.green - primary.green) + Math.abs(color.blue - primary.blue) > 105) || vivid[Math.min(35, vivid.length - 1)];
-            if (primary) first = toHex(primary.red, primary.green, primary.blue);
-            if (secondary) second = toHex(secondary.red, secondary.green, secondary.blue);
-        } catch (_) {}
-        if (state.themeSource !== sourceUrl) return;
-        state.themeStart = first;
-        state.themeEnd = second;
-        nowCard.style.setProperty('--sa-accent-1', first);
-        nowCard.style.setProperty('--sa-accent-2', second);
-    };
-    const activateSunoAction = (action) => {
-        const row = state.activeTrackRow;
-        if (!row?.isConnected) return false;
-        const sourceButtons = Array.from(row.querySelectorAll('button')).filter((button) => !button.closest('#sunoapp-now-card'));
-        const labelOf = (button) => `${button.getAttribute('aria-label') || ''} ${button.title || ''} ${button.textContent || ''}`.trim();
-        const patterns = {
-            like: /like|j'aime|thumbs up/i,
-            dislike: /dislike|je n'aime pas|thumbs down/i,
-            pin: /pin|éping/i,
-            share: /share|partag/i,
-            remix: /remix/i,
-            more: /more|plus|options/i
-        };
-        let source = sourceButtons.find((button) => patterns[action]?.test(labelOf(button)));
-        if (!source && action === 'more') {
-            source = sourceButtons.find((button) => button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '') || button.hasAttribute('data-context-menu'));
-        }
-        if (!source && action !== 'more') {
-            const shortcut = nowCard.querySelector(`[data-now-action="${action}"]`);
-            const signature = shortcut?.querySelector('path')?.getAttribute('d');
-            if (signature) source = sourceButtons.find((button) => button.querySelector(`path[d="${CSS.escape(signature)}"]`));
-        }
-        if (!source) source = state.sourceActions[action];
-        if (!source?.isConnected) return false;
-        const rect = source.getBoundingClientRect();
-        if (!rect.width || !rect.height) return false;
-        const originalChildren = Array.from(row.children).filter((element) => element !== nowCard);
-        nowCard.style.setProperty('pointer-events', 'none', 'important');
-        originalChildren.forEach((element) => element.style.setProperty('pointer-events', 'auto', 'important'));
-        window.open(`sunoapp://native-click?x=${encodeURIComponent(rect.left + rect.width / 2)}&y=${encodeURIComponent(rect.top + rect.height / 2)}`);
-        setTimeout(() => {
-            nowCard.style.removeProperty('pointer-events');
-            originalChildren.forEach((element) => element.style.removeProperty('pointer-events'));
-        }, 180);
-        return true;
-    };
-    ['like', 'dislike', 'pin', 'share', 'remix'].forEach((action) => {
-        nowCard.querySelector(`[data-now-action="${action}"]`).addEventListener('click', () => activateSunoAction(action));
-    });
-    const moreControl = nowCard.querySelector('.sa-now-more');
-    moreControl.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    });
-    moreControl.addEventListener('click', (event) => {
-        if (event.button !== 0) return;
-        event.stopPropagation();
-        customTrackMenu.hidden = true;
-        moreControl.setAttribute('aria-expanded', 'false');
-        activateSunoAction('more');
-    });
-    document.addEventListener('click', (event) => {
-        if (!customTrackMenu.hidden && !customTrackMenu.contains(event.target) && event.target !== moreControl) {
-            customTrackMenu.hidden = true;
-            moreControl.setAttribute('aria-expanded', 'false');
-        }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !customTrackMenu.hidden) {
-            customTrackMenu.hidden = true;
-            moreControl.setAttribute('aria-expanded', 'false');
-            moreControl.focus();
-        }
-    });
-    customTrackMenu.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
-        const action = button.dataset.action;
-        state.sourceActions[action]?.click();
-        document.dispatchEvent(new CustomEvent('suno:action', { detail: { action, trackRow: state.activeTrackRow } }));
-        customTrackMenu.hidden = true;
-        moreControl.setAttribute('aria-expanded', 'false');
-    }));
-
-    const attachWaveformToLoadedSong = () => {
-        // Overlay the custom card with position:fixed. Never append it into a
-        // virtualized row or hide/move that row's children — Suno reuses those nodes.
-        if (!state.customPlayerEnabled || document.body.classList.contains('sunoapp-studio')) {
-            state.activeTrackRow?.classList.remove('sunoapp-source-row-hidden');
-            nowCard.classList.remove('sunoapp-now-overlay');
-            nowCard.style.display = 'none';
-            waveform.classList.remove('attached', 'visible');
-            if (waveform.parentElement !== document.body) document.body.appendChild(waveform);
-            return false;
-        }
-        if (!state.audioElement) {
-            state.audioElement = Array.from(document.querySelectorAll('audio, video')).find((candidate) => candidate.src || candidate.currentSrc) || null;
-        }
-        const playbarButton = document.querySelector('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i]');
-        let playerRoot = playbarButton?.parentElement || null;
-        for (let depth = 0; playerRoot && depth < 7; depth++) {
-            if (playerRoot.querySelector('img') && playerRoot.querySelectorAll('button').length >= 5) break;

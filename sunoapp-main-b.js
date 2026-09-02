@@ -54,9 +54,23 @@
     const installSunoAppEnhancements = () => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
         const enhancementScript = [
+            'sunoapp-i18n-1.js',
+            'sunoapp-i18n-2.js',
+            'sunoapp-i18n-3.js',
+            'sunoapp-i18n-4.js',
+            'sunoapp-i18n-5.js',
+            'sunoapp-i18n-6.js',
+            'sunoapp-i18n-7.js',
+            'sunoapp-i18n-8.js',
+            'sunoapp-i18n-9.js',
+            'sunoapp-i18n-10.js',
+            'sunoapp-i18n-11.js',
+            'sunoapp-i18n-12.js',
+            'sunoapp-i18n-13.js',
             'main-enhancements.js',
             'sunoapp-enh-2.js',
             'sunoapp-enh-3.js',
+            'sunoapp-enh-3b.js',
             'sunoapp-enh-4.js',
             'sunoapp-enh-5.js',
             'sunoapp-enh-6.js'
@@ -128,6 +142,10 @@
     ipcMain.handle('mini-control', (_event, action, value) => {
         if (action === 'close-mini') {
             if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close();
+            return;
+        }
+        if (action === 'close-spectrum') {
+            if (spectrumWindow && !spectrumWindow.isDestroyed()) spectrumWindow.close();
             return;
         }
         if (action === 'show-main') {

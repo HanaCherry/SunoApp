@@ -47,7 +47,7 @@
         };
         let source = sourceButtons.find((button) => patterns[action]?.test(labelOf(button)));
         if (!source && action === 'more') {
-            source = sourceButtons.find((button) => button.querySelectorAll('circle').length >= 3 || /\.\.\.|\u2026/.test(button.textContent || '') || button.hasAttribute('data-context-menu'));
+            source = sourceButtons.find((button) => button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '') || button.hasAttribute('data-context-menu'));
         }
         if (!source && action !== 'more') {
             const shortcut = nowCard.querySelector(`[data-now-action="${action}"]`);
@@ -203,7 +203,7 @@
             .sort((first, second) => Math.abs((first.getBoundingClientRect().top + first.getBoundingClientRect().bottom) / 2 - rowCenterY) - Math.abs((second.getBoundingClientRect().top + second.getBoundingClientRect().bottom) / 2 - rowCenterY))[0];
         const menuCandidates = sourceButtons.filter((button) => {
             const label = labelOf(button);
-            const hasDotsIcon = button.querySelectorAll('circle').length >= 3 || /\.\.\.|\u2026/.test(button.textContent || '');
+            const hasDotsIcon = button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '');
             const isContextTrigger = button.hasAttribute('data-context-menu-trigger') || button.hasAttribute('data-context-menu');
             return /more|plus|options/i.test(label) || hasDotsIcon || isContextTrigger;
         });

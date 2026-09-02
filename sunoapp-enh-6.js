@@ -50,7 +50,7 @@
 
     const refreshProfile = () => {
         const creditElement = Array.from(document.querySelectorAll('*'))
-            .filter((element) => element.isConnected && /^\s*[\d,.]+ *Credits?\s*$/i.test(element.textContent || ''))
+            .filter((element) => element.isConnected && /^\s*[\d,.]+\s+Credits?\s*$/i.test(element.textContent || ''))
             .sort((first, second) => first.querySelectorAll('*').length - second.querySelectorAll('*').length)[0];
         if (!creditElement) return;
 

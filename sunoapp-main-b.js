@@ -57,7 +57,8 @@
             'main-enhancements.js',
             'sunoapp-enh-2.js',
             'sunoapp-enh-3.js',
-            'sunoapp-enh-4.js'
+            'sunoapp-enh-4.js',
+            'sunoapp-enh-5.js'
         ].map((file) => fs.readFileSync(path.join(__dirname, file), 'utf8')).join('');
         const diagnosticScript = `
             (() => {

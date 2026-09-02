@@ -393,3 +393,4 @@ app.whenReady().then(() => {
                     fullscreenButton.addEventListener('click', () => window.open('sunoapp://fullscreen', '_blank'));
                     anchorButton.parentElement.insertBefore(fullscreenButton, anchorButton);
                 };
+

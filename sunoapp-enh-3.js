@@ -1,3 +1,50 @@
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="15" height="12" rx="2"/><rect x="12" y="12" width="9" height="8" rx="2"/></svg>
+                Mini-lecteur
+            </button>
+        </div>
+    `;
+    document.body.appendChild(menu);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'sunoapp-settings-overlay';
+    overlay.innerHTML = `
+        <section class="sa-settings-card">
+            <header class="sa-settings-head"><h2>Paramètres SunoApp</h2><button class="sa-close" id="sunoapp-close-settings">×</button></header>
+            <div class="sa-section-title">Qualité et mode sonore</div>
+            <div class="sa-modes">
+                <button class="sa-mode" data-mode="flat">Neutre</button>
+                <button class="sa-mode" data-mode="bass">Basses</button>
+                <button class="sa-mode" data-mode="vocal">Voix</button>
+                <button class="sa-mode" data-mode="clarity">Clarté</button>
+                <button class="sa-mode" data-mode="immersive">Immersif</button>
+                <button class="sa-mode" data-mode="cinema51">Cinéma 5.1 virtuel</button>
+                <button class="sa-mode" data-mode="surround71">Surround 7.1 virtuel</button>
+                <button class="sa-mode" data-mode="atmos">Atmos virtuel</button>
+            </div>
+            <div class="sa-section-title">Égaliseur</div>
+            <div class="sa-eq">
+                ${frequencies.map((frequency, index) => `
+                    <div class="sa-band">
+                        <output id="sa-gain-${index}">0 dB</output>
+                        <input type="range" min="-12" max="12" step="1" value="0" data-band="${index}" aria-label="${frequency} Hz">
+                        <label>${frequency >= 1000 ? (frequency / 1000) + 'k' : frequency} Hz</label>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="sa-section-title">Affichage du lecteur</div>
+            <div class="sa-option-row">
+                <div class="sa-option-copy"><strong>Forme d'onde audio</strong><span>Affiche la musique et sa progression sous le morceau.</span></div>
+                <label class="sa-switch" title="Afficher la forme d'onde"><input id="sunoapp-waveform-toggle" type="checkbox" ${state.waveformEnabled ? 'checked' : ''}><span></span></label>
+            </div>
+            <div class="sa-option-row" style="margin-top:8px">
+                <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Carte overlay sur le morceau en cours, sans modifier la liste virtualisée de Suno.</span></div>
+                <label class="sa-switch" title="Afficher le lecteur personnalisé"><input id="sunoapp-custom-player-toggle" type="checkbox" ${state.customPlayerEnabled ? 'checked' : ''}><span></span></label>
+            </div>
+            <div class="sa-section-title">Thème de l'interface</div>
+            <div class="sa-themes">
+                <button class="sa-theme" type="button" data-theme="nuit">Nuit</button>
+                <button class="sa-theme" type="button" data-theme="clair">Clair</button>
+                <button class="sa-theme" type="button" data-theme="cherry">Cherry</button>
                 <button class="sa-theme" type="button" data-theme="aurore">Aurore</button>
             </div>
             <div id="sunoapp-audio-status">Sélectionnez un mode pour activer le traitement audio.</div>
@@ -24,9 +71,103 @@
         });
     };
     applyUiTheme(state.uiTheme);
-    document.querySelectorAll('.sa-theme').forEach((button) => {
-        button.addEventListener('click', () => applyUiTheme(button.dataset.theme));
+    document.addEventListener('click', (event) => {
+        const themeButton = event.target.closest('.sa-theme[data-theme]');
+        if (themeButton) applyUiTheme(themeButton.dataset.theme);
     });
+
+    const findSidebarHost = () => {
+        const paths = ['/library', '/studio', '/create', '/explore', '/search', '/home'];
+        const links = Array.from(document.querySelectorAll('a[href]')).filter((anchor) => {
+            try {
+                const url = new URL(anchor.href, location.origin);
+                if (url.origin !== location.origin) return false;
+                return paths.some((path) => url.pathname === path || url.pathname.startsWith(path + '/'));
+            } catch (_) {
+                return false;
+            }
+        });
+        if (links.length < 2) return null;
+        let node = links[0].parentElement;
+        for (let depth = 0; node && node !== document.body && depth < 12; depth++) {
+            const hits = links.filter((link) => node.contains(link)).length;
+            if (hits >= 3) return node;
+            node = node.parentElement;
+        }
+        return links[0].parentElement;
+    };
+
+    const eqFlyout = document.createElement('div');
+    eqFlyout.id = 'sunoapp-eq-flyout';
+    eqFlyout.innerHTML = `
+        <div class="sa-section-title">Égaliseur</div>
+        <div class="sa-modes">
+            <button class="sa-mode" data-mode="flat">Neutre</button>
+            <button class="sa-mode" data-mode="bass">Basses</button>
+            <button class="sa-mode" data-mode="vocal">Voix</button>
+            <button class="sa-mode" data-mode="clarity">Clarté</button>
+            <button class="sa-mode" data-mode="immersive">Immersif</button>
+            <button class="sa-mode" data-mode="cinema51">Cinéma 5.1</button>
+            <button class="sa-mode" data-mode="surround71">Surround 7.1</button>
+            <button class="sa-mode" data-mode="atmos">Atmos</button>
+        </div>
+        <div class="sa-section-title">Bandes</div>
+        <div class="sa-eq">
+            ${frequencies.map((frequency, index) => `
+                <div class="sa-band">
+                    <output data-sa-gain="${index}">0 dB</output>
+                    <input type="range" min="-12" max="12" step="1" value="0" data-band="${index}" aria-label="${frequency} Hz">
+                    <label>${frequency >= 1000 ? (frequency / 1000) + 'k' : frequency} Hz</label>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    document.body.appendChild(eqFlyout);
+
+    const placeEqFlyout = () => {
+        const rail = document.getElementById('sunoapp-sidebar-tools');
+        const rect = (rail || document.body).getBoundingClientRect();
+        const left = Math.min(window.innerWidth - 372, Math.max(8, Math.round(rect.right + 8)));
+        eqFlyout.style.left = left + 'px';
+        eqFlyout.style.top = Math.max(46, Math.round(rect.top || 52)) + 'px';
+    };
+
+    mountSidebarTools = () => {
+        const host = findSidebarHost();
+        let box = document.getElementById('sunoapp-sidebar-tools');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'sunoapp-sidebar-tools';
+            box.innerHTML = `
+                <div class="sa-side-label">SunoApp</div>
+                <div class="sa-side-themes">
+                    <button class="sa-theme" type="button" data-theme="nuit">Nuit</button>
+                    <button class="sa-theme" type="button" data-theme="clair">Clair</button>
+                    <button class="sa-theme" type="button" data-theme="cherry">Cherry</button>
+                    <button class="sa-theme" type="button" data-theme="aurore">Aurore</button>
+                </div>
+                <button type="button" class="sa-side-eq-btn" id="sunoapp-sidebar-eq-toggle">Égaliseur</button>
+            `;
+            box.querySelector('#sunoapp-sidebar-eq-toggle').addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const open = !eqFlyout.classList.contains('open');
+                eqFlyout.classList.toggle('open', open);
+                event.currentTarget.classList.toggle('open', open);
+                if (open) placeEqFlyout();
+            });
+            applyUiTheme(state.uiTheme);
+        }
+        if (host) {
+            box.style.cssText = '';
+            if (box.parentElement !== host) host.appendChild(box);
+        } else if (box.parentElement !== document.body) {
+            box.style.cssText = 'position:fixed;left:10px;top:90px;z-index:2147483645;width:168px;background:var(--sa-surface,#16161c);border:1px solid var(--sa-border,rgba(255,255,255,.1));border-radius:16px;';
+            document.body.appendChild(box);
+        }
+        if (eqFlyout.classList.contains('open')) placeEqFlyout();
+    };
+    mountSidebarTools();
 
     const status = document.getElementById('sunoapp-audio-status');
     const sliders = Array.from(document.querySelectorAll('.sa-band input'));
@@ -77,140 +218,3 @@
             <button class="sa-track-menu-item" data-action="playlist">${menuIcon('M12 4c-.63 0-1.14.51-1.14 1.14v5.72H5.14a1.14 1.14 0 0 0 0 2.28h5.72v5.72a1.14 1.14 0 0 0 2.28 0v-5.72h5.72a1.14 1.14 0 0 0 0-2.28h-5.72V5.14C13.14 4.51 12.63 4 12 4') }<span>Add to Playlist</span><span></span></button>
             <button class="sa-track-menu-item" data-action="radio">${menuIcon('M12 9.23A2.76 2.76 0 1 0 12 14.78 2.76 2.76 0 0 0 12 9.23M8.84 7.35a.94.94 0 0 1 0 1.31 4.7 4.7 0 0 0 0 6.58.94.94 0 0 1-1.29 1.3c-2.45-2.5-2.43-6.6-.01-9.17a.89.89 0 0 1 1.3-.02m6.32.1a.89.89 0 0 1 1.28 0c2.45 2.5 2.43 6.6.01 9.17a.89.89 0 0 1-1.28.03.94.94 0 0 1-.03-1.31 4.7 4.7 0 0 0 0-6.58.94.94 0 0 1 .02-1.31') }<span>Song Radio</span><span></span></button>
         </div>
-        <div class="sa-track-menu-group"><button class="sa-track-menu-item danger" data-action="trash">${menuIcon('M7.31 20.5a1.8 1.8 0 0 1-1.81-1.81V6h-.25a.75.75 0 0 1 0-1.5H9a.88.88 0 0 1 .88-.89h4.24A.88.88 0 0 1 15 4.5h3.75a.75.75 0 0 1 0 1.5h-.25v12.69a1.8 1.8 0 0 1-1.81 1.81z') }<span>Move to Trash</span><span></span></button></div>
-    `;
-    document.body.appendChild(customTrackMenu);
-    const formatTime = (seconds) => Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}` : '0:00';
-    nowCard.querySelector('.sa-now-cover-play').addEventListener('click', () => {
-        if (!state.audioElement) return;
-        if (state.audioElement.paused) state.audioElement.play().catch(() => {});
-        else state.audioElement.pause();
-    });
-    const toHex = (red, green, blue) => `#${[red, green, blue].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0')).join('')}`;
-    const applyCoverTheme = async (sourceUrl, title) => {
-        if (!sourceUrl || sourceUrl === state.themeSource) return;
-        state.themeSource = sourceUrl;
-        let hash = Array.from(title || 'Suno').reduce((value, character) => ((value * 33) ^ character.charCodeAt(0)) >>> 0, 5381);
-        const fallbackHue = hash % 360;
-        let first = `hsl(${fallbackHue} 82% 61%)`;
-        let second = `hsl(${(fallbackHue + 48) % 360} 86% 62%)`;
-        try {
-            const response = await fetch(sourceUrl, { credentials: 'omit' });
-            if (!response.ok) throw new Error('Cover unavailable');
-            const bitmap = await createImageBitmap(await response.blob());
-            const sampleCanvas = document.createElement('canvas');
-            sampleCanvas.width = 24;
-            sampleCanvas.height = 24;
-            const sampleContext = sampleCanvas.getContext('2d', { willReadFrequently: true });
-            sampleContext.drawImage(bitmap, 0, 0, 24, 24);
-            const pixels = sampleContext.getImageData(0, 0, 24, 24).data;
-            const vivid = [];
-            for (let index = 0; index < pixels.length; index += 4) {
-                const red = pixels[index], green = pixels[index + 1], blue = pixels[index + 2];
-                const maximum = Math.max(red, green, blue), minimum = Math.min(red, green, blue);
-                const saturation = maximum - minimum;
-                const brightness = (red + green + blue) / 3;
-                if (brightness > 32 && brightness < 238) vivid.push({ red, green, blue, score: saturation * .8 + brightness * .2 });
-            }
-            vivid.sort((a, b) => b.score - a.score);
-            const primary = vivid[Math.min(8, vivid.length - 1)];
-            const secondary = vivid.find((color) => primary && Math.abs(color.red - primary.red) + Math.abs(color.green - primary.green) + Math.abs(color.blue - primary.blue) > 105) || vivid[Math.min(35, vivid.length - 1)];
-            if (primary) first = toHex(primary.red, primary.green, primary.blue);
-            if (secondary) second = toHex(secondary.red, secondary.green, secondary.blue);
-        } catch (_) {}
-        if (state.themeSource !== sourceUrl) return;
-        state.themeStart = first;
-        state.themeEnd = second;
-        nowCard.style.setProperty('--sa-accent-1', first);
-        nowCard.style.setProperty('--sa-accent-2', second);
-    };
-    const activateSunoAction = (action) => {
-        const row = state.activeTrackRow;
-        if (!row?.isConnected) return false;
-        const sourceButtons = Array.from(row.querySelectorAll('button')).filter((button) => !button.closest('#sunoapp-now-card'));
-        const labelOf = (button) => `${button.getAttribute('aria-label') || ''} ${button.title || ''} ${button.textContent || ''}`.trim();
-        const patterns = {
-            like: /like|j'aime|thumbs up/i,
-            dislike: /dislike|je n'aime pas|thumbs down/i,
-            pin: /pin|éping/i,
-            share: /share|partag/i,
-            remix: /remix/i,
-            more: /more|plus|options/i
-        };
-        let source = sourceButtons.find((button) => patterns[action]?.test(labelOf(button)));
-        if (!source && action === 'more') {
-            source = sourceButtons.find((button) => button.querySelectorAll('circle').length >= 3 || /\.\.\.|…/.test(button.textContent || '') || button.hasAttribute('data-context-menu'));
-        }
-        if (!source && action !== 'more') {
-            const shortcut = nowCard.querySelector(`[data-now-action="${action}"]`);
-            const signature = shortcut?.querySelector('path')?.getAttribute('d');
-            if (signature) source = sourceButtons.find((button) => button.querySelector(`path[d="${CSS.escape(signature)}"]`));
-        }
-        if (!source) source = state.sourceActions[action];
-        if (!source?.isConnected) return false;
-        const rect = source.getBoundingClientRect();
-        if (!rect.width || !rect.height) return false;
-        const originalChildren = Array.from(row.children).filter((element) => element !== nowCard);
-        nowCard.style.setProperty('pointer-events', 'none', 'important');
-        originalChildren.forEach((element) => element.style.setProperty('pointer-events', 'auto', 'important'));
-        window.open(`sunoapp://native-click?x=${encodeURIComponent(rect.left + rect.width / 2)}&y=${encodeURIComponent(rect.top + rect.height / 2)}`);
-        setTimeout(() => {
-            nowCard.style.removeProperty('pointer-events');
-            originalChildren.forEach((element) => element.style.removeProperty('pointer-events'));
-        }, 180);
-        return true;
-    };
-    ['like', 'dislike', 'pin', 'share', 'remix'].forEach((action) => {
-        nowCard.querySelector(`[data-now-action="${action}"]`).addEventListener('click', () => activateSunoAction(action));
-    });
-    const moreControl = nowCard.querySelector('.sa-now-more');
-    moreControl.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    });
-    moreControl.addEventListener('click', (event) => {
-        if (event.button !== 0) return;
-        event.stopPropagation();
-        customTrackMenu.hidden = true;
-        moreControl.setAttribute('aria-expanded', 'false');
-        activateSunoAction('more');
-    });
-    document.addEventListener('click', (event) => {
-        if (!customTrackMenu.hidden && !customTrackMenu.contains(event.target) && event.target !== moreControl) {
-            customTrackMenu.hidden = true;
-            moreControl.setAttribute('aria-expanded', 'false');
-        }
-    });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !customTrackMenu.hidden) {
-            customTrackMenu.hidden = true;
-            moreControl.setAttribute('aria-expanded', 'false');
-            moreControl.focus();
-        }
-    });
-    customTrackMenu.querySelectorAll('[data-action]').forEach((button) => button.addEventListener('click', () => {
-        const action = button.dataset.action;
-        state.sourceActions[action]?.click();
-        document.dispatchEvent(new CustomEvent('suno:action', { detail: { action, trackRow: state.activeTrackRow } }));
-        customTrackMenu.hidden = true;
-        moreControl.setAttribute('aria-expanded', 'false');
-    }));
-
-    const attachWaveformToLoadedSong = () => {
-        // Overlay the custom card with position:fixed. Never append it into a
-        // virtualized row or hide/move that row's children — Suno reuses those nodes.
-        if (!state.customPlayerEnabled || document.body.classList.contains('sunoapp-studio')) {
-            state.activeTrackRow?.classList.remove('sunoapp-source-row-hidden');
-            nowCard.classList.remove('sunoapp-now-overlay');
-            nowCard.style.display = 'none';
-            waveform.classList.remove('attached', 'visible');
-            if (waveform.parentElement !== document.body) document.body.appendChild(waveform);
-            return false;
-        }
-        if (!state.audioElement) {
-            state.audioElement = Array.from(document.querySelectorAll('audio, video')).find((candidate) => candidate.src || candidate.currentSrc) || null;
-        }
-        const playbarButton = document.querySelector('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i]');
-        let playerRoot = playbarButton?.parentElement || null;
-        for (let depth = 0; playerRoot && depth < 7; depth++) {
-            if (playerRoot.querySelector('img') && playerRoot.querySelectorAll('button').length >= 5) break;

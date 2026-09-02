@@ -4,13 +4,15 @@ SunoApp est une application Windows basée sur Electron qui intègre Suno dans u
 
 ## Version actuelle
 
-**SunoApp 1.0.10**
+**SunoApp 1.0.11** — GalaxyBunny Studio (non officiel, non affilié à Suno)
 
 ## Fonctionnalités
 
 - Interface Windows intégrée sans barre de titre classique
 - Lecteur personnalisé avec pochette, progression et forme d’onde
-- Thèmes d’interface : Nuit, Clair, Cherry et Aurore
+- Thèmes : Nuit, Clair, Cherry, Aurore, Glass Apple, Aero, Musique
+- Interface en 31 langues
+- Égaliseur 10 bandes, spectre, réverbe, écho, mini-lecteur
 - Couleurs dynamiques adaptées à la pochette du morceau
 - Mini-lecteur externe, toujours visible et placé en bas à droite
 - Contrôles lecture, pause, précédent, suivant et volume

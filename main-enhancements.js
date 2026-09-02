@@ -44,7 +44,7 @@
     const style = document.createElement('style');
     style.id = 'sunoapp-enhancements-style';
     style.textContent = `
-        :root, body.sunoapp-frameless {
+        :root, html, body.sunoapp-frameless {
             --sa-bg: #0b0c10;
             --sa-titlebar: rgba(16,18,23,.96);
             --sa-text: rgba(255,255,255,.88);
@@ -56,7 +56,7 @@
             --sa-card: linear-gradient(145deg, rgba(34,34,40,.96), rgba(11,11,15,.94));
             --sa-btn: rgba(255,255,255,.08);
         }
-        body[data-sunoapp-theme="clair"] {
+        html[data-sunoapp-theme="clair"], body[data-sunoapp-theme="clair"] {
             --sa-bg: #f3f1ec;
             --sa-titlebar: rgba(255,252,248,.96);
             --sa-text: rgba(28,24,22,.92);
@@ -68,7 +68,7 @@
             --sa-card: linear-gradient(145deg, #fff, #f6f1ea);
             --sa-btn: rgba(28,24,22,.07);
         }
-        body[data-sunoapp-theme="cherry"] {
+        html[data-sunoapp-theme="cherry"], body[data-sunoapp-theme="cherry"] {
             --sa-bg: #1a0d14;
             --sa-titlebar: rgba(42,14,28,.96);
             --sa-text: rgba(255,232,240,.94);
@@ -80,7 +80,7 @@
             --sa-card: linear-gradient(145deg, rgba(64,18,40,.96), rgba(22,8,16,.94));
             --sa-btn: rgba(255,120,160,.12);
         }
-        body[data-sunoapp-theme="aurore"] {
+        html[data-sunoapp-theme="aurore"], body[data-sunoapp-theme="aurore"] {
             --sa-bg: #07141a;
             --sa-titlebar: rgba(8,28,36,.96);
             --sa-text: rgba(230,248,250,.94);
@@ -109,32 +109,71 @@
         .sa-theme[data-theme="cherry"]::before { background: linear-gradient(90deg, #1a0d14, #ff4f86 55%, #ff9ac2); }
         .sa-theme[data-theme="aurore"]::before { background: linear-gradient(90deg, #07141a, #3ec6c9 55%, #f0c36a); }
 
+
+        html[data-sunoapp-theme] { background: var(--sa-bg); }
+        html[data-sunoapp-theme="clair"] { color-scheme: light; }
+        html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"] { color-scheme: dark; }
+        body[data-sunoapp-theme] { background: var(--sa-bg) !important; }
+        body[data-sunoapp-theme] nav,
+        body[data-sunoapp-theme] aside,
+        body[data-sunoapp-theme] [class*="sidebar" i],
+        body[data-sunoapp-theme] [class*="SideNav"],
+        body[data-sunoapp-theme] [class*="side-nav"] {
+            background: var(--sa-titlebar) !important;
+            color: var(--sa-text) !important;
+            border-color: var(--sa-border) !important;
+        }
+        body[data-sunoapp-theme] .sunoapp-studio-root {
+            background: var(--sa-bg) !important;
+        }
+        body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
+            background-color: var(--sa-bg) !important;
+        }
+        body[data-sunoapp-theme] a, body[data-sunoapp-theme] button, body[data-sunoapp-theme] [role="button"] {
+            accent-color: var(--sa-accent);
+        }
+        body[data-sunoapp-theme="clair"] .sunoapp-studio-root,
+        body[data-sunoapp-theme="clair"]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
+            filter: invert(1) hue-rotate(180deg);
+        }
+        body[data-sunoapp-theme="clair"] img,
+        body[data-sunoapp-theme="clair"] video,
+        body[data-sunoapp-theme="clair"] canvas {
+            filter: invert(1) hue-rotate(180deg);
+        }
+        a[data-sunoapp-nav].active, a[data-sunoapp-nav][aria-current="page"] {
+            color: var(--sa-accent) !important;
+        }
         body.sunoapp-frameless { box-sizing: border-box !important; padding-top: 38px !important; }
         body.sunoapp-frameless.sunoapp-studio {
-            padding-top: 0 !important;
-            overflow: hidden !important;
-            height: 100dvh !important;
-            max-height: 100dvh !important;
+            padding-top: 38px !important;
+            overflow: auto !important;
+            height: auto !important;
+            min-height: 100dvh !important;
+            max-height: none !important;
             background: var(--sa-bg, #0b0c10) !important;
         }
         body.sunoapp-studio > .sunoapp-studio-root {
-            position: fixed !important;
-            top: 38px !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            left: 0 !important;
+            position: relative !important;
+            inset: auto !important;
             width: 100% !important;
             height: auto !important;
+            min-height: calc(100dvh - 38px) !important;
             max-height: none !important;
-            min-height: 0 !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             transform: none !important;
+            background: var(--sa-bg, #0b0c10) !important;
         }
         body.sunoapp-studio > .sunoapp-studio-root > * {
             box-sizing: border-box !important;
-            height: 100% !important;
-            max-height: 100% !important;
-            min-height: 100% !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: calc(100dvh - 38px) !important;
+        }
+        body.sunoapp-studio [style*="100vh"],
+        body.sunoapp-studio [style*="100dvh"] {
+            height: calc(100dvh - 38px) !important;
+            max-height: calc(100dvh - 38px) !important;
         }
         body.sunoapp-studio .h-screen,
         body.sunoapp-studio .min-h-screen,
@@ -244,21 +283,3 @@
         .sa-section-title { margin: 22px 0 12px; color: var(--sa-muted, rgba(255,255,255,.55)); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
         .sa-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .sa-mode { min-height: 62px; padding: 9px 7px; border: 1px solid rgba(255,255,255,.09); border-radius: 14px; color: rgba(255,255,255,.72); background: rgba(255,255,255,.045); font-size: 12px; font-weight: 720; cursor: pointer; }
-        .sa-mode:hover { background: rgba(255,255,255,.09); }
-        .sa-mode.active { color: #151515; border-color: #fff; background: #fff; }
-        .sa-eq { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px 12px 12px; border-radius: 18px; background: rgba(255,255,255,.035); }
-        .sa-band { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .sa-band input { width: 96px; accent-color: #ff6680; transform: rotate(-90deg); margin: 38px 0; }
-        .sa-band output { color: rgba(255,255,255,.65); font-size: 11px; }
-        .sa-band label { color: rgba(255,255,255,.82); font-size: 11px; font-weight: 720; }
-        #sunoapp-audio-status { margin-top: 14px; min-height: 18px; color: rgba(255,255,255,.48); font-size: 12px; }
-        .sa-option-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: rgba(255,255,255,.035); }
-        .sa-option-copy strong { display: block; margin-bottom: 3px; font-size: 14px; }
-        .sa-option-copy span { color: rgba(255,255,255,.48); font-size: 12px; }
-        .sa-switch { position: relative; width: 48px; height: 28px; flex: 0 0 auto; }
-        .sa-switch input { position: absolute; opacity: 0; pointer-events: none; }
-        .sa-switch span { position: absolute; inset: 0; border-radius: 99px; background: rgba(255,255,255,.16); box-shadow: inset 0 1px 3px rgba(0,0,0,.35); cursor: pointer; transition: .2s; }
-        .sa-switch span::after { content: ''; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 7px rgba(0,0,0,.4); transition: .2s; }
-        .sa-switch input:checked + span { background: linear-gradient(135deg, #ff4d72, #ff744d); }
-        .sa-switch input:checked + span::after { transform: translateX(20px); }
-        #sunoapp-waveform { display: none; position: relative; width: 100%; max-width: none; height: 34px; box-sizing: border-box; margin: 5px 0 3px; padding: 4px 9px; overflow: hidden; pointer-events: none; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025)); box-shadow: inset 0 1px rgba(255,255,255,.11), inset 0 -1px rgba(0,0,0,.2), 0 5px 18px rgba(0,0,0,.16); backdrop-filter: blur(18px) saturate(145%); opacity: 0; transform: translateY(2px); transition: opacity .25s, transform .25s, border-color .25s; }

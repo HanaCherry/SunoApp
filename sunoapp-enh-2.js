@@ -1,3 +1,34 @@
+        #sunoapp-waveform.visible { opacity: 1; transform: none; }
+        #sunoapp-waveform.visible { border-color: rgba(255,112,137,.25); }
+        #sunoapp-waveform.attached { display: block; }
+        #sunoapp-waveform canvas { display: block; width: 100%; height: 100%; }
+        .sunoapp-source-row-hidden { position: relative !important; }
+        .sunoapp-source-row-hidden > *:not(#sunoapp-now-card) { visibility: visible !important; opacity: 0 !important; pointer-events: none !important; }
+        #sunoapp-now-card { --sa-accent-1: #ff5474; --sa-accent-2: #ff8a5c; position: fixed !important; inset: auto !important; z-index: 2147483645; display: none; grid-template-columns: 76px 150px minmax(300px,1fr) 44px; align-items: center; gap: 14px; box-sizing: border-box; margin: 0; padding: 9px 12px; border: 1px solid color-mix(in srgb, var(--sa-accent-1) 32%, rgba(255,255,255,.08)); border-radius: 17px; color: #fff; background: radial-gradient(circle at 7% 28%, color-mix(in srgb, var(--sa-accent-1) 16%, transparent), transparent 27%), radial-gradient(circle at 60% 100%, color-mix(in srgb, var(--sa-accent-2) 9%, transparent), transparent 38%), linear-gradient(145deg, rgba(27,28,35,.97), rgba(12,13,17,.96)); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 10px 28px rgba(0,0,0,.3); backdrop-filter: blur(24px) saturate(155%); transition: border-color .45s, background .45s; pointer-events: auto; }
+        .sa-now-cover-wrap { position: relative; width: 70px; height: 70px; }
+        .sa-now-cover { width: 70px; height: 70px; border-radius: 13px; object-fit: cover; box-shadow: 0 0 0 1px color-mix(in srgb, var(--sa-accent-1) 70%, white), 0 0 19px color-mix(in srgb, var(--sa-accent-1) 30%, transparent); transition: box-shadow .45s, filter .2s; }
+        .sa-now-cover-play { position: absolute; inset: 50% auto auto 50%; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; color: #111; background: rgba(255,255,255,.94); box-shadow: 0 6px 16px rgba(0,0,0,.35); opacity: 0; transform: translate(-50%,-50%) scale(.84); transition: opacity .18s, transform .18s; cursor: pointer; }
+        .sa-now-cover-wrap:hover .sa-now-cover { filter: brightness(.68); }
+        .sa-now-cover-wrap:hover .sa-now-cover-play { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+        .sa-now-cover-play svg { width: 17px; height: 17px; fill: currentColor; }
+        .sa-now-copy { min-width: 0; }
+        .sa-now-title { overflow: hidden; color: #fff; font-size: 16px; font-weight: 800; letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
+        .sa-now-style { display: inline-block; max-width: 100%; margin-top: 7px; padding: 3px 7px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); border-radius: 7px; color: rgba(255,255,255,.58); background: rgba(255,255,255,.055); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+        .sa-now-main { min-width: 0; }
+        .sa-now-wave { min-height: 42px; padding: 2px 7px 0; border: 1px solid rgba(255,255,255,.09); border-radius: 12px; background: rgba(5,6,9,.28); box-shadow: inset 0 1px rgba(255,255,255,.045); }
+        .sa-now-wave #sunoapp-waveform { display: block; width: 100% !important; height: 26px; margin: 0; padding: 1px; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+        .sa-now-times { display: flex; justify-content: space-between; margin: -1px 4px 3px; color: rgba(255,255,255,.7); font-size: 11px; }
+        .sa-now-actions { display: flex; align-items: center; gap: 8px; min-height: 32px; margin-top: 5px; }
+        .sa-now-action.remix { display: inline-grid !important; }
+        .sa-now-action { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid rgba(255,255,255,.09); border-radius: 50%; color: rgba(255,255,255,.76); background: rgba(255,255,255,.045); cursor: pointer; }
+        .sa-now-action:hover { color: #fff; background: rgba(255,255,255,.1); }
+        .sa-now-action.sunoapp-native-shortcut { display: grid !important; position: static !important; min-width: 26px !important; min-height: 26px !important; margin: 0 !important; padding: 0 !important; transform: none !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+        .sa-now-action.primary { width: 31px; height: 31px; border: 0; color: #fff; background: linear-gradient(135deg,#ff4779,#ff884d); box-shadow: 0 6px 15px rgba(255,76,112,.22); font-size: 13px; }
+        .sa-now-action.remix { display: inline-flex !important; align-items: center; justify-content: center; width: auto !important; height: 30px !important; padding: 0 12px !important; border-radius: 15px !important; gap: 7px; font-size: 11px; font-weight: 750; letter-spacing: .01em; }
+        .sa-now-action svg, .sa-now-more svg { display: block; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .sa-now-action.remix svg { width: 15px; height: 15px; color: var(--sa-accent-2); }
+        .sa-now-action.sunoapp-native-shortcut svg { fill: currentColor !important; stroke: none !important; }
+        .sunoapp-native-hit-target { visibility: visible !important; pointer-events: auto !important; z-index: 2147483645 !important; }
         .sa-now-more { align-self: center; justify-self: center; display: inline-flex !important; position: static !important; align-items: center; justify-content: center; width: 42px !important; height: 42px !important; min-width: 42px !important; min-height: 42px !important; margin: 0 !important; padding: 0 !important; border: 1px solid rgba(255,255,255,.1); border-radius: 50% !important; color: #fff; background: rgba(255,255,255,.035); font-size: 18px; line-height: 1; transform: none !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; cursor: pointer; }
         .sa-now-more svg { display: block; flex: 0 0 18px; width: 18px; height: 18px; margin: 0; }
         .sa-now-more:hover, .sa-now-more[aria-expanded="true"] { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.085); }
@@ -13,7 +44,7 @@
         #sunoapp-now-card.sunoapp-now-overlay { display: grid; }
         .sunoapp-centered-song-menu { position: fixed !important; transform: none !important; margin: 0 !important; z-index: 2147483646 !important; }
         @media (max-width: 1250px) { #sunoapp-now-card { grid-template-columns: 62px 112px minmax(220px,1fr) 38px; gap: 9px; padding: 7px 9px; } .sa-now-cover { width: 58px; height: 58px; } .sa-now-title { font-size: 14px; } }
-        .sunoapp-bounded-fullscreen { top: 38px !important; bottom: 0 !important; height: calc(100vh - 38px) !important; max-height: calc(100vh - 38px) !important; }
+        .sunoapp-bounded-fullscreen { top: 38px !important; right: 0 !important; bottom: 0 !important; left: 0 !important; height: auto !important; max-height: none !important; }
         @media (max-width: 850px) {
             #sunoapp-top-menu { left: 14px; top: 86px; }
             .sa-modes { grid-template-columns: repeat(2, 1fr); }
@@ -45,21 +76,45 @@
     });
     document.body.appendChild(titlebar);
 
+    const fitStudioPane = () => {
+        const pane = document.querySelector('body.sunoapp-studio > .sunoapp-studio-root');
+        if (!pane) return;
+        const height = Math.max(0, Math.round(pane.getBoundingClientRect().height));
+        if (!height) return;
+        const child = pane.firstElementChild;
+        if (child) {
+            child.style.boxSizing = 'border-box';
+            child.style.height = height + 'px';
+            child.style.maxHeight = height + 'px';
+            child.style.minHeight = '0';
+            child.style.overflow = 'auto';
+        }
+    };
+
     const refreshPageMode = () => {
         const isStudio = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
         document.body.classList.toggle('sunoapp-studio', isStudio);
+        document.documentElement.classList.toggle('sunoapp-studio', isStudio);
         const candidates = Array.from(document.body.children)
             .filter((element) => !element.id?.startsWith('sunoapp-') && element.tagName !== 'SCRIPT' && element.tagName !== 'STYLE');
         candidates.forEach((element) => {
             element.classList.toggle('sunoapp-studio-root', isStudio);
             element.style.removeProperty('--sunoapp-studio-scale-y');
+            if (!isStudio) {
+                element.style.removeProperty('height');
+                element.style.removeProperty('max-height');
+                element.style.removeProperty('min-height');
+                element.style.removeProperty('overflow');
+            }
         });
         const title = document.querySelector('.sa-title-center');
         if (title) title.textContent = isStudio ? 'Suno • Création' : 'Suno • Lecteur musical';
+        if (isStudio) requestAnimationFrame(fitStudioPane);
     };
 
     refreshPageMode();
     window.__sunoAppPageModeTimer = setInterval(refreshPageMode, 700);
+    window.addEventListener('resize', fitStudioPane);
 
     const menu = document.createElement('div');
     menu.id = 'sunoapp-top-menu';
@@ -115,79 +170,8 @@
                 <div class="sa-option-copy"><strong>Lecteur personnalisé</strong><span>Carte overlay sur le morceau en cours, sans modifier la liste virtualisée de Suno.</span></div>
                 <label class="sa-switch" title="Afficher le lecteur personnalisé"><input id="sunoapp-custom-player-toggle" type="checkbox" ${state.customPlayerEnabled ? 'checked' : ''}><span></span></label>
             </div>
-            <div id="sunoapp-audio-status">Sélectionnez un mode pour activer le traitement audio.</div>
-        </section>
-    `;
-    document.body.appendChild(overlay);
-
-    const popover = document.getElementById('sunoapp-menu-popover');
-    document.getElementById('sunoapp-menu-button').addEventListener('click', () => popover.classList.toggle('open'));
-    document.getElementById('sunoapp-open-settings').addEventListener('click', () => {
-        popover.classList.remove('open');
-        overlay.classList.add('open');
-    });
-    document.getElementById('sunoapp-close-settings').addEventListener('click', () => overlay.classList.remove('open'));
-    document.getElementById('sunoapp-open-mini').addEventListener('click', () => window.open('sunoapp://mini', '_blank'));
-
-    const status = document.getElementById('sunoapp-audio-status');
-    const sliders = Array.from(document.querySelectorAll('.sa-band input'));
-
-    const waveform = document.createElement('div');
-    waveform.id = 'sunoapp-waveform';
-    waveform.innerHTML = '<canvas aria-label="Forme d\'onde de la musique"></canvas>';
-    document.body.appendChild(waveform);
-    const waveformCanvas = waveform.querySelector('canvas');
-    const waveformContext = waveformCanvas.getContext('2d');
-
-    const nowCard = document.createElement('section');
-    nowCard.id = 'sunoapp-now-card';
-    nowCard.innerHTML = `
-        <div class="sa-now-cover-wrap"><img class="sa-now-cover" alt="Pochette du morceau"><button class="sa-now-cover-play" title="Lecture ou pause"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg></button></div>
-        <div class="sa-now-copy"><div class="sa-now-title">Morceau en lecture</div><div class="sa-now-style">Suno</div></div>
-        <div class="sa-now-main">
-            <div class="sa-now-wave"><div class="sa-now-wave-host"></div><div class="sa-now-times"><span class="sa-now-current">0:00</span><span class="sa-now-duration">0:00</span></div></div>
-            <div class="sa-now-actions">
-                <button class="sa-now-action" data-now-action="like" title="J'aime"></button>
-                <button class="sa-now-action" data-now-action="dislike" title="Je n'aime pas"></button>
-                <button class="sa-now-action" data-now-action="pin" title="Épingler"></button>
-                <button class="sa-now-action" data-now-action="share" title="Partager"></button>
-                <button class="sa-now-action remix" data-now-action="remix" title="Remix"></button>
-            </div>
-        </div>
-        <button class="sa-now-more" title="Plus d'options" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.7" fill="currentColor" stroke="none"/></svg></button>
-    `;
-    const menuIcon = (path) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"></path></svg>`;
-    const chevron = '<svg class="chevron" viewBox="0 0 24 24"><path d="M9 7.343c0-.89 1.077-1.337 1.707-.707l4.657 4.657a1 1 0 0 1 0 1.414l-4.657 4.657c-.63.63-1.707.184-1.707-.707z"></path></svg>';
-    const customTrackMenu = document.createElement('div');
-    customTrackMenu.id = 'sunoapp-custom-track-menu';
-    customTrackMenu.setAttribute('role', 'menu');
-    customTrackMenu.hidden = true;
-    customTrackMenu.innerHTML = `
-        <div class="sa-track-menu-group">
-            <button class="sa-track-menu-item" data-action="remix">${menuIcon('M3.2 14.17a1 1 0 0 1 1.23-.7l2.89.8a1 1 0 0 1-.53 1.93l-.49-.14A7 7 0 0 0 18 15.59c.21-.35.58-.59.98-.59.73 0 1.24.72.89 1.36A9 9 0 0 1 4.5 16.98l-.17.62a1 1 0 0 1-1.93-.54zM12 3a9 9 0 0 1 7.86 4.62l.22-.52a1 1 0 0 1 1.84.79l-1.18 2.76a1 1 0 0 1-1.31.52l-2.76-1.18a1 1 0 0 1 .79-1.84l.53.23A7 7 0 0 0 5.99 8.41c-.21.35-.57.59-.98.59-.73 0-1.23-.72-.88-1.36A9 9 0 0 1 12 3') }<span>Remix</span>${chevron}</button>
-            <button class="sa-track-menu-item" data-action="edit">${menuIcon('M4.89 20A.89.89 0 0 1 4 19.11v-2.52c0-.24.09-.46.26-.63L15.73 4.51q.27-.25.59-.38Q16.64 4 17 4t.69.13q.33.14.58.4l1.22 1.25q.27.24.39.58a1.93 1.93 0 0 1 0 1.34 1.7 1.7 0 0 1-.39.59L8.04 19.74a.9.9 0 0 1-.63.26z') }<span>Edit</span>${chevron}</button>
-        </div>
-        <div class="sa-track-menu-group">
-            <button class="sa-track-menu-item" data-action="publish">${menuIcon('M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20m0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16') }<span>Publish</span><span></span></button>
-            <button class="sa-track-menu-item" data-action="share">${menuIcon('M13 4.04c0-.95 1.17-1.4 1.81-.69l6.91 7.67c.35.4.35 1 0 1.39l-6.91 7.68c-.64.7-1.81.25-1.81-.7v-3.52c-3.76 0-6.46 1.63-8.73 3.35-.67.51-1.63.08-1.57-.76C3.22 11.02 9.18 7.5 13 7.5z') }<span>Share</span>${chevron}</button>
-            <button class="sa-track-menu-item" data-action="download">${menuIcon('M12 15.58q-.2 0-.38-.07a.9.9 0 0 1-.32-.21l-3.6-3.6a.92.92 0 0 1-.29-.7q.02-.4.29-.7.3-.3.71-.31a.93.93 0 0 1 .71.28L11 12.15V5a1 1 0 0 1 2 0v7.15l1.88-1.88a.93.93 0 0 1 .71-.28q.41.01.71.31.28.3.29.7a.92.92 0 0 1-.29.7l-3.6 3.6q-.15.15-.32.21a1.1 1.1 0 0 1-.38.07M6 20a2 2 0 0 1-2-2v-2a1 1 0 0 1 2 0v2h12v-2a1 1 0 0 1 2 0v2a2 2 0 0 1-2 2z') }<span>Download</span>${chevron}</button>
-            <button class="sa-track-menu-item" data-action="manage">${menuIcon('M5.67 18.33A1.67 1.67 0 0 1 4 16.67v-10A1.67 1.67 0 0 1 5.67 5h4.31l2.35 1.67H19a1.67 1.67 0 0 1 1.67 1.66v8.34A1.67 1.67 0 0 1 19 18.33z') }<span>Manage</span>${chevron}</button>
-        </div>
-        <div class="sa-track-menu-group">
-            <button class="sa-track-menu-item" data-action="queue">${menuIcon('M4 17a1 1 0 1 1 0-2h6a1 1 0 1 1 0 2zm0-4a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2zm0-4a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2zm13.56 11.96A1 1 0 0 1 16 20.13v-4.26a1 1 0 0 1 1.56-.83l3.19 2.13a1 1 0 0 1 0 1.66z') }<span>Add to Queue</span><span></span></button>
-            <button class="sa-track-menu-item" data-action="playlist">${menuIcon('M12 4c-.63 0-1.14.51-1.14 1.14v5.72H5.14a1.14 1.14 0 0 0 0 2.28h5.72v5.72a1.14 1.14 0 0 0 2.28 0v-5.72h5.72a1.14 1.14 0 0 0 0-2.28h-5.72V5.14C13.14 4.51 12.63 4 12 4') }<span>Add to Playlist</span><span></span></button>
-            <button class="sa-track-menu-item" data-action="radio">${menuIcon('M12 9.23A2.76 2.76 0 1 0 12 14.78 2.76 2.76 0 0 0 12 9.23M8.84 7.35a.94.94 0 0 1 0 1.31 4.7 4.7 0 0 0 0 6.58.94.94 0 0 1-1.29 1.3c-2.45-2.5-2.43-6.6-.01-9.17a.89.89 0 0 1 1.3-.02m6.32.1a.89.89 0 0 1 1.28 0c2.45 2.5 2.43 6.6.01 9.17a.89.89 0 0 1-1.28.03.94.94 0 0 1-.03-1.31 4.7 4.7 0 0 0 0-6.58.94.94 0 0 1 .02-1.31') }<span>Song Radio</span><span></span></button>
-        </div>
-        <div class="sa-track-menu-group"><button class="sa-track-menu-item danger" data-action="trash">${menuIcon('M7.31 20.5a1.8 1.8 0 0 1-1.81-1.81V6h-.25a.75.75 0 0 1 0-1.5H9a.88.88 0 0 1 .88-.89h4.24A.88.88 0 0 1 15 4.5h3.75a.75.75 0 0 1 0 1.5h-.25v12.69a1.8 1.8 0 0 1-1.81 1.81z') }<span>Move to Trash</span><span></span></button></div>
-    `;
-    document.body.appendChild(customTrackMenu);
-    const formatTime = (seconds) => Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}` : '0:00';
-    nowCard.querySelector('.sa-now-cover-play').addEventListener('click', () => {
-        if (!state.audioElement) return;
-        if (state.audioElement.paused) state.audioElement.play().catch(() => {});
-        else state.audioElement.pause();
-    });
-    const toHex = (red, green, blue) => `#${[red, green, blue].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0')).join('')}`;
-    const applyCoverTheme = async (sourceUrl, title) => {
-        if (!sourceUrl || sourceUrl === state.themeSource) return;
-        state.themeSource = sourceUrl;
+            <div class="sa-section-title">Thème de l'interface</div>
+            <div class="sa-themes">
+                <button class="sa-theme" type="button" data-theme="nuit">Nuit</button>
+                <button class="sa-theme" type="button" data-theme="clair">Clair</button>
+                <button class="sa-theme" type="button" data-theme="cherry">Cherry</button>

@@ -1,5 +1,20 @@
 # Historique des versions
 
+## 1.0.11 — 2 septembre 2026
+
+### Important
+
+- Application indépendante de **GalaxyBunny Studio**. Ce n’est pas l’app officielle de Suno : le studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.
+
+### Nouveautés
+
+- 31 langues (Auto suit la langue du PC) + sélecteur dans Paramètres
+- Égaliseur 10 bandes, styles de mix, A/B, presets perso, analyseur de spectre
+- Mini-lecteur et fenêtre Spectre depuis Paramètres
+- Réverbe, écho, voix L ↔ R
+- Thèmes Glass Apple, Aero et Musique
+- Pastille Paramètres alignée sur Create
+
 ## 1.0.10 — 2 septembre 2026
 
 ### Corrections

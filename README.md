@@ -4,7 +4,7 @@ SunoApp est une application Windows basée sur Electron qui intègre Suno dans u
 
 ## Version actuelle
 
-**SunoApp 1.0.8**
+**SunoApp 1.0.9**
 
 ## Fonctionnalités
 

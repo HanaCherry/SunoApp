@@ -116,7 +116,7 @@
 
 ## 1.0.1 — 26 juin 2026
 
-- Ajout du menu contextuel copier, coller et couter
+- Ajout du menu contextuel copier, coller et couper
 - Amélioration de l’accessibilité des commandes de presse-papiers
 
 ## 1.0.0 — 24 juin 2026

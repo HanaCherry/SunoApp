@@ -132,7 +132,7 @@
 
     const connectAudio = async () => {
         const media = Array.from(document.querySelectorAll('audio, video')).find((candidate) => candidate.src || candidate.currentSrc);
-        if (!media) throw new Error('Lancez un morceau avant d’activer l’égaliseur.');
+        if (!media) throw new Error(t('statusNeedTrack'));
         if (state.audioElement === media && state.source) return;
 
         if (!state.audioContext) state.audioContext = new AudioContext();
@@ -144,7 +144,7 @@
             const filter = state.audioContext.createBiquadFilter();
             filter.type = index === 0 ? 'lowshelf' : index === frequencies.length - 1 ? 'highshelf' : 'peaking';
             filter.frequency.value = frequency;
-            filter.Q.value = 1;
+            filter.Q.value = index === 0 || index === frequencies.length - 1 ? 0.7 : 1.05;
             return filter;
         });
 
@@ -154,36 +154,82 @@
             previous = filter;
         });
 
+        state.preamp = state.audioContext.createGain();
+        state.preamp.gain.value = 1;
+        previous.connect(state.preamp);
+        previous = state.preamp;
+
+        state.haas = state.audioContext.createDelay(0.05);
+        state.haas.delayTime.value = 0;
+        const splitter = state.audioContext.createChannelSplitter(2);
+        const merger = state.audioContext.createChannelMerger(2);
+        previous.connect(splitter);
+        splitter.connect(merger, 0, 0);
+        splitter.connect(state.haas, 1);
+        state.haas.connect(merger, 0, 1);
+        previous = merger;
+
         state.dryGain = state.audioContext.createGain();
         state.wetGain = state.audioContext.createGain();
         state.convolver = state.audioContext.createConvolver();
         state.compressor = state.audioContext.createDynamicsCompressor();
         state.analyser = state.audioContext.createAnalyser();
-        state.analyser.fftSize = 1024;
-        state.analyser.smoothingTimeConstant = .72;
+        state.analyser.fftSize = 2048;
+        state.analyser.smoothingTimeConstant = .68;
 
-        const impulseLength = Math.floor(state.audioContext.sampleRate * .42);
-        const impulse = state.audioContext.createBuffer(2, impulseLength, state.audioContext.sampleRate);
+        const rate = state.audioContext.sampleRate;
+        const impulseLength = Math.floor(rate * .55);
+        const impulse = state.audioContext.createBuffer(2, impulseLength, rate);
+        const early = [0.007, 0.013, 0.019, 0.027, 0.036];
         for (let channel = 0; channel < 2; channel++) {
             const data = impulse.getChannelData(channel);
             for (let index = 0; index < impulseLength; index++) {
-                const envelope = Math.pow(1 - index / impulseLength, 3.1);
-                data[index] = (Math.random() * 2 - 1) * envelope;
+                const t = index / rate;
+                const envelope = Math.pow(1 - index / impulseLength, 2.4) * Math.exp(-t * 5.5);
+                data[index] = (Math.random() * 2 - 1) * envelope * 0.35;
             }
+            early.forEach((ms, i) => {
+                const at = Math.floor(ms * rate) + (channel ? 90 : 0);
+                if (at < impulseLength) data[at] += (i % 2 ? -1 : 1) * (0.22 - i * 0.03) * (channel ? 0.85 : 1);
+            });
         }
         state.convolver.buffer = impulse;
         state.dryGain.gain.value = 1;
         state.wetGain.gain.value = 0;
-        state.compressor.threshold.value = -5;
-        state.compressor.knee.value = 8;
-        state.compressor.ratio.value = 2;
+        state.compressor.threshold.value = -8;
+        state.compressor.knee.value = 10;
+        state.compressor.ratio.value = 3;
+        state.compressor.attack.value = 0.003;
+        state.compressor.release.value = 0.14;
+
+        state.echoDelay = state.audioContext.createDelay(1.2);
+        state.echoFb = state.audioContext.createGain();
+        state.echoSend = state.audioContext.createGain();
+        state.echoDelay.delayTime.value = Number(document.getElementById('sunoapp-echo-time')?.value || 0.32);
+        state.echoFb.gain.value = 0.34;
+        state.echoSend.gain.value = Number(document.getElementById('sunoapp-echo')?.value || 0);
+        previous.connect(state.echoSend);
+        state.echoSend.connect(state.echoDelay);
+        state.echoDelay.connect(state.echoFb);
+        state.echoFb.connect(state.echoDelay);
 
         previous.connect(state.dryGain);
         previous.connect(state.convolver);
         state.dryGain.connect(state.compressor);
         state.convolver.connect(state.wetGain);
         state.wetGain.connect(state.compressor);
-        state.compressor.connect(state.analyser);
+        state.echoDelay.connect(state.compressor);
+        state.panner = state.audioContext.createStereoPanner();
+        state.panLfo = state.audioContext.createOscillator();
+        state.panDepth = state.audioContext.createGain();
+        state.panLfo.type = 'sine';
+        state.panLfo.frequency.value = Number(document.getElementById('sunoapp-autopan-rate')?.value || 0.28);
+        state.panDepth.gain.value = document.getElementById('sunoapp-autopan')?.checked ? 1 : 0;
+        state.panLfo.connect(state.panDepth);
+        state.panDepth.connect(state.panner.pan);
+        state.panLfo.start();
+        state.compressor.connect(state.panner);
+        state.panner.connect(state.analyser);
         state.analyser.connect(state.audioContext.destination);
     };
 
@@ -193,12 +239,12 @@
         localStorage.setItem('sunoapp-waveform-enabled', String(state.waveformEnabled));
         if (!state.waveformEnabled) {
             waveform.classList.remove('visible');
-            status.textContent = 'Forme d\'onde masquée.';
+            status.textContent = t('statusWaveOff');
             return;
         }
         try {
             await connectAudio();
-            status.textContent = 'Forme d\'onde active : elle apparaît automatiquement pendant la lecture.';
+            status.textContent = t('statusWaveOn');
         } catch (error) {
             status.textContent = error.message || 'La forme d\'onde sera affichée dès le prochain morceau.';
         }
@@ -213,9 +259,9 @@
             nowCard.style.display = 'none';
             waveform.classList.remove('attached', 'visible');
             document.body.appendChild(waveform);
-            status.textContent = 'Lecteur personnalisé désactivé.';
+            status.textContent = t('statusCustomOff');
         } else {
-            status.textContent = 'Lecteur personnalisé activé.';
+            status.textContent = t('statusCustomOn');
             attachWaveformToLoadedSong();
         }
     });

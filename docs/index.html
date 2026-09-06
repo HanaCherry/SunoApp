@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SunoApp · GalaxyBunny Studio</title>
+  <meta name="description" content="Application Windows non officielle pour Suno. Lecteur personnalisé, mini-lecteur, égaliseur, 31 langues. Par GalaxyBunny Studio.">
+  <meta name="theme-color" content="#070513">
+  <link rel="canonical" href="https://hanacherry.github.io/SunoApp/">
+  <link rel="icon" href="assets/studio-logo.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SunoApp · GalaxyBunny Studio">
+  <meta property="og:description" content="Application Windows non officielle pour Suno. Lecteur personnalisé, mini-lecteur, égaliseur.">
+  <meta property="og:image" content="https://hanacherry.github.io/SunoApp/assets/hero-banner.jpg">
+  <meta property="og:url" content="https://hanacherry.github.io/SunoApp/">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root { --bg:#070513; --card:rgba(16,17,34,.78); --line:rgba(213,201,255,.14); --text:#f4f6fb; --muted:#aab1c4; --pink:#c9bcff; --font:Inter,"Segoe UI",system-ui,sans-serif; }
+    * { box-sizing:border-box; } html { scroll-behavior:smooth; }
+    body { margin:0; min-height:100vh; font-family:var(--font); color:var(--text); background:#070513; }
+    .galaxy { position:fixed; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse at 12% 0%, #38207988, transparent 55%), radial-gradient(ellipse at 90% 80%, #152f7088, transparent 50%), #070513; }
+    .nebula { position:absolute; width:60vw; height:60vh; filter:blur(70px); border-radius:50%; opacity:.45; }
+    .n1 { left:-18%; top:-12%; background:radial-gradient(ellipse,#8436d9aa,transparent 68%); }
+    .n2 { right:-16%; top:28%; background:radial-gradient(ellipse,#296aeb99,transparent 68%); }
+    .n3 { left:20%; bottom:-30%; background:radial-gradient(ellipse,#c139a466,transparent 68%); }
+    header,main,footer { position:relative; z-index:1; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 28px; border-bottom:1px solid var(--line); background:rgba(7,5,19,.55); backdrop-filter:blur(16px); position:sticky; top:0; z-index:5; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit; }
+    .brand img { width:46px; height:46px; object-fit:contain; }
+    .brand strong { display:block; font-size:14px; } .brand small { color:var(--muted); font-size:12px; }
+    nav { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    nav a,.btn { color:var(--text); text-decoration:none; font-size:14px; padding:9px 14px; border-radius:10px; border:1px solid transparent; }
+    nav a:hover { background:#9980ff22; }
+    .btn { background:#8670ef; border-color:#a897ff50; font-weight:700; }
+    .btn:hover { background:#9b85fc; } .btn.ghost { background:#ffffff09; border-color:var(--line); }
+    select#lang { background:#090b16; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font:inherit; font-size:13px; }
+    .wrap { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+    .hero { padding:54px 0 28px; display:grid; grid-template-columns:1.05fr .95fr; gap:36px; align-items:center; }
+    .kicker { color:var(--pink); letter-spacing:.18em; font-size:12px; text-transform:uppercase; margin-bottom:12px; }
+    h1 { font-size:clamp(32px,5vw,52px); line-height:1.08; letter-spacing:-1.2px; margin:0 0 16px; }
+    .lead { color:var(--muted); font-size:18px; line-height:1.6; margin:0 0 22px; max-width:540px; }
+    .cta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+    .pills { display:flex; gap:8px; flex-wrap:wrap; }
+    .pill { font-size:12px; color:var(--pink); border:1px solid var(--line); background:#8971ec18; border-radius:999px; padding:6px 10px; }
+    .hero-visual { border:1px solid var(--line); border-radius:22px; overflow:hidden; background:#0b0918; box-shadow:0 30px 80px #00000066; }
+    .hero-visual img { width:100%; display:block; }
+    .shots { display:grid; grid-template-columns:1.2fr .8fr; gap:16px; padding:10px 0 50px; }
+    figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px; overflow:hidden; }
+    figure img { width:100%; border-radius:12px; display:block; }
+    figcaption { color:var(--muted); font-size:13px; margin-top:10px; }
+    h2 { font-size:28px; letter-spacing:-.6px; margin:0 0 18px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; }
+    .card h3 { margin:0 0 8px; font-size:16px; } .card p { margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
+    section { padding:18px 0 46px; }
+    ol.steps { margin:0; padding:0; list-style:none; display:grid; gap:12px; }
+    ol.steps li { display:grid; grid-template-columns:42px 1fr; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+    .num { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:#8670ef33; color:#d8d1f9; font-weight:800; }
+    pre { margin-top:16px; background:#090b16; border:1px solid var(--line); border-radius:14px; padding:16px; overflow:auto; }
+    .banner-sim { display:flex; justify-content:space-between; gap:18px; align-items:center; background:linear-gradient(135deg,#8971ec22,#c139a422); border:1px solid var(--line); border-radius:18px; padding:22px; }
+    footer { border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted); font-size:13px; line-height:1.7; }
+    @media (max-width:900px) { .hero,.shots,.grid,.banner-sim { grid-template-columns:1fr; display:grid; } header { flex-wrap:wrap; } nav a:not(.btn) { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="galaxy" aria-hidden="true"><div class="nebula n1"></div><div class="nebula n2"></div><div class="nebula n3"></div></div>
+  <header>
+    <a class="brand" href="index.html">
+      <img src="assets/studio-logo.png" alt="GalaxyBunny Studio" width="46" height="46">
+      <span><strong>GalaxyBunny</strong><small>Studio</small></span>
+    </a>
+    <nav>
+      <a href="index.html" data-i18n="navHome">Accueil</a>
+      <a href="https://github.com/HanaCherry/SunoApp" data-i18n="navGithub">GitHub</a>
+      <select id="lang" aria-label="Language"></select>
+      <a class="btn" href="https://github.com/HanaCherry/SunoApp/releases/latest" data-i18n="ctaInstall">Télécharger</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="kicker" data-i18n="heroKicker">SUNOAPP · 2026</div>
+        <h1 data-i18n="heroTitle">Suno, dans une fenêtre Windows à vous.</h1>
+        <p class="lead" data-i18n="heroLead">Application de bureau non officielle : lecteur personnalisé, mini-lecteur, égaliseur, thèmes GalaxyBunny. Votre session reste sur la machine.</p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/HanaCherry/SunoApp/releases/latest" data-i18n="ctaInstall">Télécharger</a>
+          <a class="btn ghost" href="#install" data-i18n="ctaDev">Développer</a>
+        </div>
+        <div class="pills">
+          <span class="pill" data-i18n="pillWin">Windows</span>
+          <span class="pill" data-i18n="pillUnofficial">Non officiel</span>
+          <span class="pill" data-i18n="pillFree">Gratuit & open source</span>
+        </div>
+      </div>
+      <div class="hero-visual"><img src="assets/hero-banner.jpg" alt="SunoApp"></div>
+    </section>
+    <section class="shots">
+      <figure>
+        <img src="assets/hero-banner.jpg" alt="SunoApp">
+        <figcaption data-i18n="shotHero">Lecteur & spectre</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mini.png" alt="Mini-lecteur">
+        <figcaption data-i18n="shotMini">Mini-lecteur</figcaption>
+      </figure>
+    </section>
+    <section>
+      <h2 data-i18n="featuresTitle">Un studio d’écoute, pas seulement un navigateur</h2>
+      <div class="grid">
+        <article class="card"><h3 data-i18n="fPlayerT">Lecteur personnalisé</h3><p data-i18n="fPlayerD">Pochette, progression, forme d’onde, couleurs dynamiques selon le morceau.</p></article>
+        <article class="card"><h3 data-i18n="fMiniT">Mini-lecteur</h3><p data-i18n="fMiniD">Toujours visible, en bas à droite, avec lecture, pause, précédent, suivant et volume.</p></article>
+        <article class="card"><h3 data-i18n="fEqT">Égaliseur 10 bandes</h3><p data-i18n="fEqD">Spectre, réverbe, écho, plusieurs profils sonores.</p></article>
+        <article class="card"><h3 data-i18n="fThemeT">Thèmes</h3><p data-i18n="fThemeD">Nuit, Clair, Cherry, Aurore, Glass Apple, Aero, Musique.</p></article>
+        <article class="card"><h3 data-i18n="fI18nT">31 langues</h3><p data-i18n="fI18nD">L’app et ce site parlent votre langue.</p></article>
+        <article class="card"><h3 data-i18n="fWinT">Windows natif</h3><p data-i18n="fWinD">Contrôles multimédias dans la barre des tâches, session conservée.</p></article>
+      </div>
+    </section>
+    <section id="install">
+      <h2 data-i18n="installTitle">Installation Windows</h2>
+      <p class="lead" data-i18n="installLead">Téléchargez l’installateur de la dernière release. Windows SmartScreen peut avertir : l’app n’a pas encore de certificat commercial.</p>
+      <ol class="steps">
+        <li><span class="num">1</span><div data-i18n="step1">Ouvrez la page Releases du dépôt.</div></li>
+        <li><span class="num">2</span><div data-i18n="step2">Téléchargez l’installateur .exe de la dernière version.</div></li>
+        <li><span class="num">3</span><div data-i18n="step3">Lancez l’installateur.</div></li>
+        <li><span class="num">4</span><div data-i18n="step4">Ouvrez SunoApp et connectez-vous à Suno comme d’habitude.</div></li>
+      </ol>
+      <h2 style="margin-top:36px" data-i18n="devTitle">Développement</h2>
+      <p class="lead" data-i18n="devLead">Node.js 22 ou plus.</p>
+      <pre><code>git clone https://github.com/HanaCherry/SunoApp.git
+cd SunoApp
+npm install
+npm start</code></pre>
+    </section>
+    <section>
+      <div class="banner-sim">
+        <div>
+          <h2 data-i18n="discTitle">Projet indépendant</h2>
+          <p class="lead" style="margin:0" data-i18n="discLead">SunoApp n’est ni affilié ni approuvé par Suno. Marque et service appartiennent à leurs détenteurs.</p>
+        </div>
+        <a class="btn ghost" href="https://github.com/HanaCherry/SunoApp" data-i18n="navGithub">GitHub</a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p data-i18n="disclaimer">SunoApp est un projet indépendant, non officiel. GalaxyBunny Studio / Flora Cherry.</p>
+      <p data-i18n="footer">GalaxyBunny Studio · application Windows pour Suno</p>
+    </div>
+  </footer>
+  <script src="i18n.js"></script>
+  <script src="site.js"></script>
+</body>
+</html>

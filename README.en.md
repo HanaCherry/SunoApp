@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/hero-banner.jpg" alt="SunoApp — GalaxyBunny Studio" width="900">
+  <img src="docs/assets/dashboard.png" alt="SunoApp — GalaxyBunny Studio" width="900">
 </p>
 
 ## Suno, in a Windows window
@@ -41,11 +41,7 @@ SunoApp wraps Suno in a **desktop app**: custom player, always-on mini player, 1
 ## Preview
 
 <p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp player and equalizer" width="900">
-</p>
-
-<p align="center">
-  <img src="docs/assets/mini-player.png" alt="SunoApp mini player" width="420">
+  <img src="docs/assets/dashboard.png" alt="SunoApp on Windows" width="900">
 </p>
 
 ## Features

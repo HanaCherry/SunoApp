@@ -58,7 +58,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/hero-banner.jpg" alt="SunoApp — GalaxyBunny Studio" width="900">
+  <img src="docs/assets/dashboard.png" alt="SunoApp — GalaxyBunny Studio" width="900">
 </p>
 
 ## Suno, dans une fenêtre Windows
@@ -70,11 +70,7 @@ Projet **indépendant**, développé par **Flora Cherry** / GalaxyBunny Studio. 
 ## Aperçu
 
 <p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp — lecteur et égaliseur" width="900">
-</p>
-
-<p align="center">
-  <img src="docs/assets/mini-player.png" alt="Mini-lecteur SunoApp" width="420">
+  <img src="docs/assets/dashboard.png" alt="SunoApp sur Windows" width="900">
 </p>
 
 ## Fonctions

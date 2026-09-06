@@ -70,7 +70,11 @@ Projet **indépendant**, développé par **Flora Cherry** / GalaxyBunny Studio. 
 ## Aperçu
 
 <p align="center">
-  <img src="docs/assets/mini.png" alt="Mini-lecteur" width="280">
+  <img src="docs/assets/dashboard.png" alt="SunoApp — lecteur et égaliseur" width="900">
+</p>
+
+<p align="center">
+  <img src="docs/assets/mini-player.png" alt="Mini-lecteur SunoApp" width="420">
 </p>
 
 ## Fonctions

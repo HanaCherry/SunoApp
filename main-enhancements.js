@@ -147,6 +147,18 @@
             --sa-card: linear-gradient(145deg, rgba(40,40,48,.9), rgba(12,12,16,.92));
             --sa-btn: rgba(255,255,255,.1);
         }
+        html[data-sunoapp-theme="galaxybunny"], body[data-sunoapp-theme="galaxybunny"] {
+            --sa-bg: #070513;
+            --sa-titlebar: rgba(24, 16, 48, .92);
+            --sa-text: #f4f6fb;
+            --sa-muted: #aab1c4;
+            --sa-accent: #c9bcff;
+            --sa-accent-2: #ff9ac8;
+            --sa-border: rgba(213, 201, 255, .16);
+            --sa-surface: rgba(18, 14, 40, .94);
+            --sa-card: linear-gradient(145deg, rgba(56, 32, 121, .55), rgba(7, 5, 19, .94));
+            --sa-btn: rgba(134, 112, 239, .16);
+        }
         .sa-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 8px; }
         .sa-theme {
             min-height: 64px; padding: 10px 8px 8px; border: 1px solid var(--sa-border);
@@ -166,12 +178,14 @@
         .sa-theme[data-theme="glass"]::before { background: linear-gradient(90deg, rgba(255,255,255,.55), #7eb8ff 60%, rgba(255,255,255,.2)); }
         .sa-theme[data-theme="aero"]::before { background: linear-gradient(90deg, #7ec8ff, #1a5aa8 55%, #eaf6ff); }
         .sa-theme[data-theme="musique"]::before { background: linear-gradient(90deg, #ff5474, #8a5cff, #3ec6c9, #f0c36a); }
+        .sa-theme[data-theme="galaxybunny"]::before { background: linear-gradient(90deg, #070513, #382079 40%, #8670ef 70%, #ff9ac8); }
 
 
         html[data-sunoapp-theme] { background: var(--sa-bg); }
         html[data-sunoapp-theme="clair"] { color-scheme: light; }
         html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"],
-        html[data-sunoapp-theme="glass"], html[data-sunoapp-theme="aero"], html[data-sunoapp-theme="musique"] { color-scheme: dark; }
+        html[data-sunoapp-theme="glass"], html[data-sunoapp-theme="aero"], html[data-sunoapp-theme="musique"],
+        html[data-sunoapp-theme="galaxybunny"] { color-scheme: dark; }
         html[data-sunoapp-theme="glass"] #sunoapp-titlebar,
         html[data-sunoapp-theme="musique"] #sunoapp-titlebar {
             background: var(--sa-titlebar) !important;
@@ -182,6 +196,67 @@
             background: linear-gradient(180deg, rgba(220,240,255,.45), rgba(40,110,190,.38)) !important;
             backdrop-filter: blur(16px) saturate(170%) !important;
             border-bottom: 1px solid rgba(255,255,255,.35) !important;
+        }
+        html[data-sunoapp-theme="galaxybunny"] #sunoapp-titlebar {
+            background: rgba(16, 12, 32, .9) !important;
+            backdrop-filter: blur(16px) saturate(150%) !important;
+            border-bottom: 1px solid rgba(201, 188, 255, .16) !important;
+        }
+        html[data-sunoapp-theme="galaxybunny"] #sunoapp-settings-overlay .sa-settings-card {
+            background: linear-gradient(160deg, rgba(56, 32, 121, .55), rgba(12, 8, 28, .94)) !important;
+            backdrop-filter: blur(28px) saturate(160%) !important;
+            border: 1px solid rgba(201, 188, 255, .2) !important;
+        }
+        html[data-sunoapp-theme="galaxybunny"] #sunoapp-rail-tools .sa-rail-item:hover,
+        html[data-sunoapp-theme="galaxybunny"] #sunoapp-rail-tools .sa-rail-item.active {
+            background: rgba(134, 112, 239, .22);
+            border: 1px solid rgba(201, 188, 255, .28);
+        }
+        #sunoapp-galaxy-sky {
+            position: fixed; inset: 0; z-index: 8; pointer-events: none; overflow: hidden;
+            background: transparent;
+        }
+        #sunoapp-galaxy-sky .sa-gb-nebula {
+            position: absolute; border-radius: 50%; filter: blur(72px); opacity: .18;
+            animation: saGbNebula 28s ease-in-out infinite alternate;
+        }
+        #sunoapp-galaxy-sky .sa-gb-nebula.n1 { width: 460px; height: 460px; left: -90px; top: 8%; background: #6b2cff; }
+        #sunoapp-galaxy-sky .sa-gb-nebula.n2 { width: 540px; height: 380px; right: -130px; top: 38%; background: #2a4dff; animation-duration: 36s; }
+        #sunoapp-galaxy-sky .sa-gb-nebula.n3 { width: 400px; height: 400px; left: 32%; bottom: -150px; background: #c43dff; animation-duration: 22s; }
+        #sunoapp-galaxy-sky .sa-gb-stars i {
+            position: absolute; border-radius: 50%; background: #fff;
+            box-shadow: 0 0 6px #fff;
+            animation: saGbTwinkle 2.8s ease-in-out infinite;
+        }
+        #sunoapp-galaxy-sky .sa-gb-shoot {
+            position: absolute; top: 16%; left: -12%; width: 120px; height: 1px;
+            background: linear-gradient(90deg, transparent, #fff, #c9bcff);
+            opacity: 0;
+            animation: saGbShoot 8s linear infinite;
+        }
+        #sunoapp-galaxy-sky .sa-gb-petals i {
+            position: absolute; top: -16px; width: 8px; height: 8px;
+            background: radial-gradient(circle at 30% 30%, #ffd0e6, #ff7eb0 70%);
+            border-radius: 0 70% 0 70%; opacity: .22;
+            animation: saGbPetal linear infinite;
+        }
+        @keyframes saGbNebula {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(40px, -28px) scale(1.1); }
+        }
+        @keyframes saGbTwinkle {
+            0%, 100% { opacity: .15; transform: scale(0.6); }
+            50% { opacity: 1; transform: scale(1.25); }
+        }
+        @keyframes saGbShoot {
+            0%, 74% { opacity: 0; transform: rotate(18deg) translate(0, 0); }
+            80% { opacity: .85; }
+            100% { opacity: 0; transform: rotate(18deg) translate(130vw, 38vh); }
+        }
+        @keyframes saGbPetal {
+            0% { transform: translate3d(0, -10px, 0) rotate(0deg); opacity: 0; }
+            14% { opacity: .28; }
+            100% { transform: translate3d(36px, 110vh, 0) rotate(220deg); opacity: 0; }
         }
         html[data-sunoapp-theme="glass"] #sunoapp-settings-overlay .sa-settings-card,
         html[data-sunoapp-theme="aero"] #sunoapp-settings-overlay .sa-settings-card,

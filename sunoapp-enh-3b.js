@@ -52,21 +52,57 @@
     document.getElementById('sunoapp-open-mini').addEventListener('click', () => window.open('sunoapp://mini', '_blank'));
 
     let syncMusicTheme = () => {};
+    const mountGalaxySky = (on) => {
+        try {
+            let sky = document.getElementById('sunoapp-galaxy-sky');
+            if (!on) {
+                sky?.remove();
+                return;
+            }
+            if (sky || !document.body) return;
+            sky = document.createElement('div');
+            sky.id = 'sunoapp-galaxy-sky';
+            sky.setAttribute('aria-hidden', 'true');
+            sky.innerHTML = '<div class="sa-gb-nebula n1"></div><div class="sa-gb-nebula n2"></div><div class="sa-gb-nebula n3"></div><div class="sa-gb-stars"></div><div class="sa-gb-shoot"></div><div class="sa-gb-petals"></div>';
+            document.body.appendChild(sky);
+            const starBox = sky.querySelector('.sa-gb-stars');
+            if (starBox) {
+                for (let i = 0; i < 90; i += 1) {
+                    const star = document.createElement('i');
+                    const size = Math.random() > 0.82 ? 3 : 2;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    star.style.animationDelay = `${-Math.random() * 2.8}s`;
+                    star.style.animationDuration = `${2.2 + Math.random() * 2.4}s`;
+                    if (Math.random() > 0.7) star.style.background = '#c9bcff';
+                    starBox.appendChild(star);
+                }
+            }
+            const petals = sky.querySelector('.sa-gb-petals');
+            if (petals) {
+                for (let i = 0; i < 8; i += 1) {
+                    const petal = document.createElement('i');
+                    petal.style.left = `${8 + Math.random() * 84}%`;
+                    petal.style.animationDelay = `${-Math.random() * 18}s`;
+                    petal.style.animationDuration = `${16 + Math.random() * 12}s`;
+                    petals.appendChild(petal);
+                }
+            }
+        } catch (_) {}
+    };
     const applyUiTheme = (id) => {
-        const theme = ['nuit', 'clair', 'cherry', 'aurore', 'glass', 'aero', 'musique'].includes(id) ? id : 'nuit';
+        const theme = ['nuit', 'clair', 'cherry', 'aurore', 'glass', 'aero', 'musique', 'galaxybunny'].includes(id) ? id : 'nuit';
         state.uiTheme = theme;
         document.documentElement.dataset.sunoappTheme = theme;
         document.body.dataset.sunoappTheme = theme;
         document.documentElement.style.colorScheme = theme === 'clair' ? 'light' : 'dark';
         localStorage.setItem('sunoapp-ui-theme', theme);
-        document.querySelectorAll('[data-theme]').forEach((button) => {
-            const on = button.dataset.theme === theme;
-            button.classList.toggle('active', on);
-            if (button.hasAttribute('data-sunoapp-nav')) {
-                if (on) button.setAttribute('aria-current', 'page');
-                else button.removeAttribute('aria-current');
-            }
+        document.querySelectorAll('.sa-theme[data-theme]').forEach((button) => {
+            button.classList.toggle('active', button.dataset.theme === theme);
         });
+        mountGalaxySky(theme === 'galaxybunny');
         syncMusicTheme();
     };
     applyUiTheme(state.uiTheme);

@@ -126,6 +126,7 @@
                 <button class="sa-theme" type="button" data-theme="glass" data-i18n="themeGlass">Glass Apple</button>
                 <button class="sa-theme" type="button" data-theme="aero" data-i18n="themeAero">Aero</button>
                 <button class="sa-theme" type="button" data-theme="musique" data-i18n="themeMusique">Musique</button>
+                <button class="sa-theme" type="button" data-theme="galaxybunny" data-i18n="themeGalaxyBunny">Galaxy Bunny</button>
             </div>
             <div id="sunoapp-audio-status" data-i18n="statusPickMode">Sélectionnez un mode pour activer le traitement audio.</div>
         </section>

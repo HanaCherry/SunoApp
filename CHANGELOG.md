@@ -1,5 +1,11 @@
 # Historique des versions
 
+## 1.0.12 — 6 septembre 2026
+
+### Nouveautés
+
+- Thème **Galaxy Bunny** : ciel étoilé animé, nébuleuses, étoile filante et pétales sakura
+
 ## 1.0.11 — 2 septembre 2026
 
 ### Important

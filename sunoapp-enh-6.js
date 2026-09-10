@@ -313,6 +313,11 @@
             element?.title,
             element?.textContent
         ].filter(Boolean).join(' ').trim();
+        const isEditableTarget = (target) => {
+            const element = target?.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"], [role="textbox"]');
+            return Boolean(element);
+        };
+        const isCentralSongListPoint = (x) => x > Math.max(300, window.innerWidth * .28) && x < window.innerWidth * .84;
         const findSongRow = (target) => {
             let node = target?.closest?.('article,li,[role="row"],[data-testid],div');
             for (let depth = 0; node && depth < 10; depth++) {
@@ -321,6 +326,10 @@
                     continue;
                 }
                 const rect = node.getBoundingClientRect();
+                if (!isCentralSongListPoint(rect.left + rect.width / 2)) {
+                    node = node.parentElement;
+                    continue;
+                }
                 const hasArtwork = !!node.querySelector('img');
                 const buttons = Array.from(node.querySelectorAll('button,[role="button"]')).filter(visible);
                 const text = labelOf(node);
@@ -338,7 +347,7 @@
                 const rect = element.getBoundingClientRect();
                 if (rect.width < 140 || rect.height < 50) return false;
                 const text = labelOf(element);
-                return /audio|remix|create|création|lyrics|paroles|styles|voice|voix|inspo/i.test(text);
+                return /audio|remix|create|création|styles|voice|voix|inspo/i.test(text);
             });
         };
         const clickRemixForRow = (row) => {
@@ -361,6 +370,8 @@
         let dragCandidate = null;
         document.addEventListener('pointerdown', (event) => {
             if (event.button !== 0) return;
+            if (isEditableTarget(event.target)) return;
+            if (!isCentralSongListPoint(event.clientX)) return;
             const row = findSongRow(event.target);
             if (!row) return;
             dragCandidate = { row, x: event.clientX, y: event.clientY, active: false };

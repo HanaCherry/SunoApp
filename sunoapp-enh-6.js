@@ -296,4 +296,90 @@
     };
     repairFullscreenBounds();
     window.__sunoAppBoundsTimer = setInterval(repairFullscreenBounds, 700);
+
+    const installCreateDropBridge = () => {
+        if (window.__sunoAppCreateDropBridgeInstalled) return;
+        window.__sunoAppCreateDropBridgeInstalled = true;
+
+        const visible = (element) => {
+            if (!element || !element.isConnected) return false;
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+        };
+        const labelOf = (element) => [
+            element?.getAttribute?.('aria-label'),
+            element?.getAttribute?.('data-testid'),
+            element?.title,
+            element?.textContent
+        ].filter(Boolean).join(' ').trim();
+        const findSongRow = (target) => {
+            let node = target?.closest?.('article,li,[role="row"],[data-testid],div');
+            for (let depth = 0; node && depth < 10; depth++) {
+                if (node.id?.startsWith('sunoapp-')) {
+                    node = node.parentElement;
+                    continue;
+                }
+                const rect = node.getBoundingClientRect();
+                const hasArtwork = !!node.querySelector('img');
+                const buttons = Array.from(node.querySelectorAll('button,[role="button"]')).filter(visible);
+                const text = labelOf(node);
+                const looksLikeSong = hasArtwork && buttons.length >= 1 && rect.width > 180 && rect.height >= 44 && /remix|cover|v\d|like|share|bottom|song|track/i.test(text);
+                if (looksLikeSong) return node;
+                node = node.parentElement;
+            }
+            return null;
+        };
+        const isCreateAudioTarget = (x, y) => {
+            if (x > Math.max(760, window.innerWidth * .46)) return false;
+            const path = document.elementsFromPoint(x, y);
+            return path.some((element) => {
+                if (!element || element.id?.startsWith('sunoapp-')) return false;
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 140 || rect.height < 50) return false;
+                const text = labelOf(element);
+                return /audio|remix|create|création|lyrics|paroles|styles|voice|voix|inspo/i.test(text);
+            });
+        };
+        const clickRemixForRow = (row) => {
+            const rowButtons = Array.from(row.querySelectorAll('button,[role="button"]')).filter(visible);
+            const remixButton = rowButtons.find((button) => /remix|edit|modifier/i.test(labelOf(button)));
+            if (remixButton) {
+                remixButton.click();
+                return true;
+            }
+
+            row.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+            setTimeout(() => {
+                const buttons = Array.from(document.querySelectorAll('button,[role="button"]')).filter(visible);
+                const detailRemix = buttons.find((button) => /remix\s*\/?\s*edit|remix|edit|modifier/i.test(labelOf(button)));
+                detailRemix?.click();
+            }, 120);
+            return true;
+        };
+
+        let dragCandidate = null;
+        document.addEventListener('pointerdown', (event) => {
+            if (event.button !== 0) return;
+            const row = findSongRow(event.target);
+            if (!row) return;
+            dragCandidate = { row, x: event.clientX, y: event.clientY, active: false };
+        }, true);
+        document.addEventListener('pointermove', (event) => {
+            if (!dragCandidate) return;
+            const distance = Math.hypot(event.clientX - dragCandidate.x, event.clientY - dragCandidate.y);
+            if (distance > 18) dragCandidate.active = true;
+        }, true);
+        document.addEventListener('pointerup', (event) => {
+            const current = dragCandidate;
+            dragCandidate = null;
+            if (!current?.active || !current.row?.isConnected) return;
+            if (!isCreateAudioTarget(event.clientX, event.clientY)) return;
+            clickRemixForRow(current.row);
+        }, true);
+        document.addEventListener('pointercancel', () => {
+            dragCandidate = null;
+        }, true);
+    };
+    installCreateDropBridge();
 })();

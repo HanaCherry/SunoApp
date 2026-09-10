@@ -411,23 +411,44 @@ app.whenReady().then(() => {
                 const ensureMiniButton = () => {
                     if (document.getElementById('sunoapp-mini-launcher')) return;
 
-                    const volumeButton = Array.from(document.querySelectorAll('button')).find((candidate) => {
-                        const label = [candidate.getAttribute('aria-label'), candidate.title, candidate.textContent]
-                            .filter(Boolean).join(' ');
-                        return /volume/i.test(label);
-                    });
-                    const detailsButton = Array.from(document.querySelectorAll('button')).find((candidate) => {
-                        const label = [candidate.getAttribute('aria-label'), candidate.title, candidate.textContent]
-                            .filter(Boolean).join(' ');
-                        return /song details|détails du morceau/i.test(label);
-                    });
-                    const anchorButton = detailsButton || volumeButton;
+                    const visible = (element) => {
+                        if (!element) return false;
+                        const rect = element.getBoundingClientRect();
+                        const style = window.getComputedStyle(element);
+                        return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+                    };
+                    const buttonText = (candidate) => [
+                        candidate.getAttribute('aria-label'),
+                        candidate.getAttribute('data-testid'),
+                        candidate.title,
+                        candidate.textContent
+                    ].filter(Boolean).join(' ').trim();
+                    const findButton = (patterns) => Array.from(document.querySelectorAll('button,[role="button"]'))
+                        .filter(visible)
+                        .find((candidate) => patterns.some((pattern) => pattern.test(buttonText(candidate))));
+                    const volumeButton = findButton([/volume/i, /mute/i, /sound/i]);
+                    const detailsButton = findButton([/song details/i, /détails du morceau/i, /more/i, /options/i, /menu/i]);
+                    const mediaButton = findButton([/playbar/i, /play/i, /pause/i, /next/i, /previous/i, /skip/i]);
+                    const mediaElement = Array.from(document.querySelectorAll('audio,video')).find((media) => media.src || media.currentSrc);
+                    let anchorButton = detailsButton || volumeButton || mediaButton;
+                    if (!anchorButton && mediaElement) {
+                        let node = mediaElement.parentElement;
+                        for (let depth = 0; node && depth < 10; depth++) {
+                            const buttons = Array.from(node.querySelectorAll('button,[role="button"]')).filter(visible);
+                            if (buttons.length >= 2) {
+                                anchorButton = buttons[buttons.length - 1];
+                                break;
+                            }
+                            node = node.parentElement;
+                        }
+                    }
                     if (!anchorButton?.parentElement) return;
 
                     let playbar = anchorButton.parentElement;
                     for (let depth = 0; playbar && depth < 7; depth++) {
                         const rect = playbar.getBoundingClientRect();
-                        if (rect.width >= window.innerWidth * 0.82 && rect.height >= 58 && rect.height <= 150) break;
+                        const hasMediaControls = playbar.querySelectorAll('button,[role="button"]').length >= 2;
+                        if (rect.width >= window.innerWidth * 0.55 && rect.height >= 42 && rect.height <= 180 && hasMediaControls) break;
                         playbar = playbar.parentElement;
                     }
                     if (playbar) playbar.classList.add('sunoapp-glass-playbar');

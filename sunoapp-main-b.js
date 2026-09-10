@@ -193,42 +193,60 @@
 
         mainWindow.webContents.executeJavaScript(`
             try {
-                let audios = document.querySelectorAll('audio, video');
-                let btns;
-                if ('${action}' === 'playpause') {
-                    let audioTrouve = false;
-                    for (let i = 0; i < audios.length; i++) {
-                        if (audios[i].src || audios[i].currentSrc) {
-                            if (audios[i].paused) audios[i].play();
-                            else audios[i].pause();
-                            audioTrouve = true; break;
-                        }
+                const visible = (element) => {
+                    if (!element) return false;
+                    const rect = element.getBoundingClientRect();
+                    const style = window.getComputedStyle(element);
+                    return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+                };
+                const textOf = (element) => [
+                    element.getAttribute('aria-label'),
+                    element.getAttribute('data-testid'),
+                    element.getAttribute('data-state'),
+                    element.title,
+                    element.textContent
+                ].filter(Boolean).join(' ').trim();
+                const clickButton = (patterns) => {
+                    const buttons = Array.from(document.querySelectorAll('button,[role="button"]')).filter(visible);
+                    const matches = buttons.filter((button) => patterns.some((pattern) => pattern.test(textOf(button))));
+                    if (matches.length > 0) {
+                        matches[matches.length - 1].click();
+                        return true;
                     }
-                    if (!audioTrouve) {
-                        btns = document.querySelectorAll('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i], button[aria-label="Play" i], button[aria-label="Pause" i], button[aria-label="Lecture" i], button[data-testid*="play" i], button[data-testid*="pause" i]');
-                        if (btns.length > 0) btns[btns.length - 1].click();
+                    return false;
+                };
+                const medias = Array.from(document.querySelectorAll('audio, video')).filter((media) => media.src || media.currentSrc);
+                const activeMedia = medias.find((media) => !media.paused) || medias[medias.length - 1];
+                if ('${action}' === 'playpause') {
+                    if (navigator.mediaSession?.playbackState === 'playing') {
+                        if (!clickButton([/playbar.*pause/i, /pause/i, /paused/i])) activeMedia?.pause();
+                    } else if (navigator.mediaSession?.playbackState === 'paused') {
+                        if (!clickButton([/playbar.*play/i, /^play$/i, /play button/i])) activeMedia?.play?.();
+                    } else if (activeMedia) {
+                        if (activeMedia.paused) activeMedia.play();
+                        else activeMedia.pause();
+                    } else {
+                        clickButton([/playbar.*(play|pause)/i, /^(play|pause)$/i, /(play|pause) button/i, /lecture/i]);
                     }
                 }
                 else if ('${action}' === 'stop') {
-                    for (let i = 0; i < audios.length; i++) {
-                        if (audios[i].src || audios[i].currentSrc) {
-                            audios[i].pause();
-                            audios[i].currentTime = 0;
-                            break;
+                    for (let i = 0; i < medias.length; i++) {
+                        try {
+                            medias[i].pause();
+                            medias[i].currentTime = 0;
+                        } catch (error) {
+                            // Ignore media elements that do not allow seeking.
                         }
                     }
                 }
                 else if ('${action}' === 'prev') {
-                    btns = document.querySelectorAll('button[aria-label*="Previous" i], button[aria-label*="Précédent" i], button[aria-label*="Back" i], button[data-testid*="previous" i], button[data-testid*="prev" i]');
-                    if (btns.length > 0) btns[btns.length - 1].click();
+                    clickButton([/playbar.*(previous|prev|back)/i, /previous/i, /précédent/i, /prev/i, /back/i, /skip.*back/i]);
                 }
                 else if ('${action}' === 'next') {
-                    btns = document.querySelectorAll('button[aria-label*="Next" i], button[aria-label*="Suivant" i], button[data-testid*="next" i]');
-                    if (btns.length > 0) btns[btns.length - 1].click();
+                    clickButton([/playbar.*next/i, /next/i, /suivant/i, /skip.*forward/i]);
                 }
                 else if ('${action}' === 'like') {
-                    btns = document.querySelectorAll('button[aria-label*="Like" i], button[aria-label*="Favorite" i], button[aria-label*="aime" i], button[data-testid*="like" i]');
-                    if (btns.length > 0) btns[btns.length - 1].click();
+                    clickButton([/like/i, /favorite/i, /favourite/i, /heart/i, /aime/i]);
                 }
             } catch(e) {}
         `).catch(() => {});
@@ -252,21 +270,30 @@
             if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.webContents.executeJavaScript(`
                     (function() {
-                        let audios = document.querySelectorAll('audio, video');
-                        let playing = false;
-                        for (let i = 0; i < audios.length; i++) {
-                            if (audios[i].src || audios[i].currentSrc) {
-                                playing = !audios[i].paused;
-                                break;
-                            }
-                        }
+                        const visible = (element) => {
+                            if (!element) return false;
+                            const rect = element.getBoundingClientRect();
+                            const style = window.getComputedStyle(element);
+                            return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+                        };
+                        const textOf = (element) => [
+                            element.getAttribute('aria-label'),
+                            element.getAttribute('data-testid'),
+                            element.title,
+                            element.textContent
+                        ].filter(Boolean).join(' ').trim();
+                        const medias = Array.from(document.querySelectorAll('audio, video')).filter((media) => media.src || media.currentSrc);
+                        const activeMedia = medias.find((media) => !media.paused) || medias[medias.length - 1];
+                        const playing = navigator.mediaSession?.playbackState === 'playing' || Boolean(activeMedia && !activeMedia.paused);
 
-                        const playbarButton = document.querySelector('button[aria-label*="Playbar: Play" i], button[aria-label*="Playbar: Pause" i]');
-                        let playerRoot = playbarButton?.parentElement || null;
+                        const playbarButton = Array.from(document.querySelectorAll('button,[role="button"]'))
+                            .filter(visible)
+                            .find((button) => /playbar|play|pause|next|previous|skip/i.test(textOf(button)));
+                        let playerRoot = playbarButton?.parentElement || activeMedia?.parentElement || null;
                         for (let depth = 0; playerRoot && depth < 7; depth++) {
                             const hasCover = !!playerRoot.querySelector('img');
                             const hasLinks = playerRoot.querySelectorAll('a').length >= 2;
-                            const hasControls = playerRoot.querySelectorAll('button').length >= 5;
+                            const hasControls = playerRoot.querySelectorAll('button,[role="button"]').length >= 2;
                             if (hasCover && hasLinks && hasControls) break;
                             playerRoot = playerRoot.parentElement;
                         }
@@ -274,9 +301,9 @@
                         const playerLinks = playerRoot
                             ? Array.from(playerRoot.querySelectorAll('a')).filter((link) => link.textContent?.trim())
                             : [];
-                        const titleLink = document.querySelector('[aria-label*="Playbar: Title" i]') || playerLinks[0];
-                        const artistLink = document.querySelector('[aria-label*="Playbar: Artist" i]') || playerLinks[1];
-                        const coverImage = playerRoot?.querySelector('img') || document.querySelector('img[aria-label*="Playbar: Cover" i], img[alt*="cover" i]');
+                        const titleLink = document.querySelector('[aria-label*="Playbar: Title" i], [aria-label*="Song title" i], [data-testid*="title" i]') || playerLinks[0];
+                        const artistLink = document.querySelector('[aria-label*="Playbar: Artist" i], [aria-label*="Artist" i], [data-testid*="artist" i]') || playerLinks[1];
+                        const coverImage = playerRoot?.querySelector('img') || document.querySelector('img[aria-label*="Playbar: Cover" i], img[aria-label*="cover" i], img[alt*="cover" i], img[src*="image"], img[src*="cdn"]');
 
                         const mediaMetadata = navigator.mediaSession?.metadata;
                         const mediaArtwork = mediaMetadata?.artwork;
@@ -287,7 +314,7 @@
                         const resolvedTitle = mediaMetadata?.title || titleLink?.textContent?.trim() || '';
 
                         return {
-                            playing: navigator.mediaSession?.playbackState === 'playing' || playing,
+                            playing,
                             title: /suno\s*\|\s*ai music/i.test(resolvedTitle) ? '' : resolvedTitle,
                             artist: mediaMetadata?.artist || artistLink?.textContent?.trim() || 'SunoApp',
                             cover: mediaCover || coverImage?.src || ''

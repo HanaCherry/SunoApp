@@ -53,7 +53,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musiikki",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Aaltomuoto piilotettu.",
         "statusWaveOn": "Aaltomuoto päällä: näkyy automaattisesti toiston aikana.",
         "statusCustomOff": "Mukautettu soitin pois.",
@@ -103,11 +103,11 @@
         "waveformCanvas": "Musiikin aaltomuoto",
         "autoPanAria": "Autopan-nopeus",
         "echoTimeAria": "Echon aika",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Tietoja",
         "unofficial": "Tämä ei ole virallinen Suno-sovellus.",
-        "unaffiliated": "GalaxyBunny Studio ei ole sidoksissa Sunoon, ei tee yhteistyötä Sunon kanssa eikä Suno ole hyväksynyt sitä.",
-        "madeBy": "GalaxyBunny Studion itsenäisesti tekemä."
+        "unaffiliated": "Galaxy Studio ei ole sidoksissa Sunoon, ei tee yhteistyötä Sunon kanssa eikä Suno ole hyväksynyt sitä.",
+        "madeBy": "Galaxy Studion itsenäisesti tekemä."
     },
     "cs": {
         "settings": "Nastavení",
@@ -170,7 +170,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Hudba",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Vlna skrytá.",
         "statusWaveOn": "Vlna zapnutá: objeví se automaticky během přehrávání.",
         "statusCustomOff": "Vlastní přehrávač vypnut.",
@@ -220,11 +220,11 @@
         "waveformCanvas": "Hudební vlna",
         "autoPanAria": "Rychlost auto-pan",
         "echoTimeAria": "Čas echa",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "O aplikaci",
         "unofficial": "Toto není oficiální aplikace Suno.",
-        "unaffiliated": "GalaxyBunny Studio není spojeno se Suno, nespolupracuje se Suno a není společností Suno schváleno.",
-        "madeBy": "Nezávisle vytvořilo GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio není spojeno se Suno, nespolupracuje se Suno a není společností Suno schváleno.",
+        "madeBy": "Nezávisle vytvořilo Galaxy Studio."
     },
     "hu": {
         "settings": "Beállítások",
@@ -287,7 +287,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Zene",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Hullámforma rejtve.",
         "statusWaveOn": "Hullámforma be: lejátszás közben automatikusan megjelenik.",
         "statusCustomOff": "Egyedi lejátszó kikapcsolva.",

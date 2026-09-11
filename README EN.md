@@ -13,4 +13,4 @@ Installation
 Currently in development.
 
 Credits
-Developed with passion by Flora Cherry.
+Developed with passion by SunoApp Maintainers.

@@ -67,7 +67,11 @@
             waveform.classList.remove('visible');
             return;
         }
-        attachWaveformToLoadedSong();
+        const now = performance.now();
+        if (!state.lastWaveformAttachAt || now - state.lastWaveformAttachAt > 1000) {
+            state.lastWaveformAttachAt = now;
+            attachWaveformToLoadedSong();
+        }
         if (!waveform.classList.contains('attached')) return;
         const rect = waveformCanvas.getBoundingClientRect();
         const ratio = Math.min(window.devicePixelRatio || 1, 2);

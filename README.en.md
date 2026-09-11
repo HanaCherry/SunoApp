@@ -1,12 +1,8 @@
-<p align="center">
-  <img src="docs/assets/studio-logo.png" alt="GalaxyBunny Studio" width="120">
-</p>
-
 <h1 align="center">SunoApp</h1>
-<p align="center"><strong>GalaxyBunny Studio</strong> · unofficial Windows app for Suno</p>
+<p align="center"><strong>Galaxy Studio</strong> · unofficial Windows app for Suno</p>
 
 <p align="center">
-  Custom player, mini player, equalizer, GalaxyBunny themes.<br>
+  Custom player, mini player, equalizer, Galaxy themes.<br>
   Independent project — not affiliated with Suno.
 </p>
 
@@ -28,28 +24,18 @@
   <a href="https://github.com/HanaCherry/SunoApp/releases/latest">Latest release</a>
 </p>
 
-<p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp — GalaxyBunny Studio" width="900">
-</p>
-
 ## Suno, in a Windows window
 
 SunoApp wraps Suno in a **desktop app**: custom player, always-on mini player, 10-band equalizer, themes (Night, Light, Cherry, Aurora, Glass Apple, Aero, Music), UI in 31 languages.
 
-**Independent** project by **Flora Cherry** / GalaxyBunny Studio. Not affiliated with or endorsed by Suno.
-
-## Preview
-
-<p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp on Windows" width="900">
-</p>
+**Independent** project by **SunoApp Maintainers** / Galaxy Studio. Not affiliated with or endorsed by Suno.
 
 ## Features
 
 - **Custom player** — cover, progress, waveform, dynamic colors
 - **Mini player** — always visible, bottom-right
 - **Equalizer** — 10 bands, spectrum, reverb, echo
-- **GalaxyBunny themes** — Night, Light, Cherry, Aurora, Glass Apple, Aero, Music
+- **Galaxy themes** — Night, Light, Cherry, Aurora, Glass Apple, Aero, Music
 - **Windows** — taskbar media controls, session kept
 - **31 languages** in the app
 
@@ -84,4 +70,4 @@ SunoApp is an independent, unofficial project. Suno belongs to its owners.
 
 ## License
 
-GalaxyBunny Studio / Flora Cherry project.
+Galaxy Studio / SunoApp Maintainers project.

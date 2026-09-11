@@ -48,7 +48,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Музыка",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Волна скрыта.",
         "statusWaveOn": "Волна включена: появляется автоматически во время воспроизведения.",
         "statusCustomOff": "Свой плеер выключен.",
@@ -98,11 +98,11 @@
         "waveformCanvas": "Волна музыки",
         "autoPanAria": "Скорость автопанорамы",
         "echoTimeAria": "Время эха",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "О приложении",
         "unofficial": "Это не официальное приложение Suno.",
-        "unaffiliated": "GalaxyBunny Studio не связано с Suno, не работает с Suno и не одобрено Suno.",
-        "madeBy": "Создано независимо студией GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio не связано с Suno, не работает с Suno и не одобрено Suno.",
+        "madeBy": "Создано независимо студией Galaxy Studio."
     },
     "uk": {
         "settings": "Налаштування",
@@ -165,7 +165,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Музика",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Хвилю приховано.",
         "statusWaveOn": "Хвиля увімкнена: з’являється автоматично під час відтворення.",
         "statusCustomOff": "Власний плеєр вимкнено.",
@@ -215,11 +215,11 @@
         "waveformCanvas": "Хвиля музики",
         "autoPanAria": "Швидкість автопанорами",
         "echoTimeAria": "Час відлуння",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Про застосунок",
         "unofficial": "Це не офіційний застосунок Suno.",
-        "unaffiliated": "GalaxyBunny Studio не пов’язана з Suno, не працює з Suno і не має схвалення Suno.",
-        "madeBy": "Створено незалежно студією GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio не пов’язана з Suno, не працює з Suno і не має схвалення Suno.",
+        "madeBy": "Створено незалежно студією Galaxy Studio."
     },
     "tr": {
         "settings": "Ayarlar",

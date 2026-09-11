@@ -43,7 +43,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musik",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Vågform dold.",
         "statusWaveOn": "Vågform på: visas automatiskt under uppspelning.",
         "statusCustomOff": "Anpassad spelare av.",
@@ -93,11 +93,11 @@
         "waveformCanvas": "Musikvågform",
         "autoPanAria": "Auto-pan-hastighet",
         "echoTimeAria": "Ekotid",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Om",
         "unofficial": "Detta är inte den officiella Suno-appen.",
-        "unaffiliated": "GalaxyBunny Studio är inte anslutet till Suno, samarbetar inte med Suno och stöds inte av Suno.",
-        "madeBy": "Skapat oberoende av GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio är inte anslutet till Suno, samarbetar inte med Suno och stöds inte av Suno.",
+        "madeBy": "Skapat oberoende av Galaxy Studio."
     },
     "da": {
         "settings": "Indstillinger",
@@ -160,7 +160,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musik",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Bølgeform skjult.",
         "statusWaveOn": "Bølgeform til: vises automatisk under afspilning.",
         "statusCustomOff": "Tilpasset afspiller slået fra.",
@@ -210,11 +210,11 @@
         "waveformCanvas": "Musikbølgeform",
         "autoPanAria": "Auto-pan-hastighed",
         "echoTimeAria": "Ekkotid",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Om",
         "unofficial": "Dette er ikke den officielle Suno-app.",
-        "unaffiliated": "GalaxyBunny Studio er ikke tilknyttet Suno, arbejder ikke med Suno og er ikke godkendt af Suno.",
-        "madeBy": "Lavet uafhængigt af GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio er ikke tilknyttet Suno, arbejder ikke med Suno og er ikke godkendt af Suno.",
+        "madeBy": "Lavet uafhængigt af Galaxy Studio."
     },
     "no": {
         "settings": "Innstillinger",
@@ -277,7 +277,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musikk",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Bølgeform skjult.",
         "statusWaveOn": "Bølgeform på: vises automatisk under avspilling.",
         "statusCustomOff": "Tilpasset spiller av.",
@@ -327,11 +327,11 @@
         "waveformCanvas": "Musikkbølgeform",
         "autoPanAria": "Auto-pan-hastighet",
         "echoTimeAria": "Ekkotid",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Om",
         "unofficial": "Dette er ikke den offisielle Suno-appen.",
-        "unaffiliated": "GalaxyBunny Studio er ikke tilknyttet Suno, samarbeider ikke med Suno og er ikke godkjent av Suno.",
-        "madeBy": "Laget uavhengig av GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio er ikke tilknyttet Suno, samarbeider ikke med Suno og er ikke godkjent av Suno.",
+        "madeBy": "Laget uavhengig av Galaxy Studio."
     },
     "fi": {
         "settings": "Asetukset",

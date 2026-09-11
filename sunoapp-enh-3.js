@@ -18,10 +18,10 @@
         <section class="sa-settings-card">
             <header class="sa-settings-head"><h2 data-i18n="settingsTitle">Paramètres SunoApp</h2><button class="sa-close" id="sunoapp-close-settings" data-i18n="close" data-i18n-attr="aria-label">×</button></header>
             <div class="sa-about">
-                <div class="sa-about-studio" data-i18n="studioName">GalaxyBunny Studio</div>
+                <div class="sa-about-studio" data-i18n="studioName">Galaxy Studio</div>
                 <p class="sa-about-unofficial" data-i18n="unofficial">Ceci n’est pas l’application officielle de Suno.</p>
-                <p data-i18n="unaffiliated">GalaxyBunny Studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.</p>
-                <p data-i18n="madeBy">Créé de façon indépendante par GalaxyBunny Studio.</p>
+                <p data-i18n="unaffiliated">Galaxy Studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.</p>
+                <p data-i18n="madeBy">Créé de façon indépendante par Galaxy Studio.</p>
             </div>
             <div class="sa-section-title" data-i18n="language">Langue</div>
             <select id="sunoapp-lang" aria-label="Language"></select>
@@ -126,7 +126,7 @@
                 <button class="sa-theme" type="button" data-theme="glass" data-i18n="themeGlass">Glass Apple</button>
                 <button class="sa-theme" type="button" data-theme="aero" data-i18n="themeAero">Aero</button>
                 <button class="sa-theme" type="button" data-theme="musique" data-i18n="themeMusique">Musique</button>
-                <button class="sa-theme" type="button" data-theme="galaxybunny" data-i18n="themeGalaxyBunny">Galaxy Bunny</button>
+                <button class="sa-theme" type="button" data-theme="galaxy" data-i18n="themeGalaxy">Galaxy</button>
             </div>
             <div id="sunoapp-audio-status" data-i18n="statusPickMode">Sélectionnez un mode pour activer le traitement audio.</div>
         </section>

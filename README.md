@@ -1,12 +1,8 @@
-<p align="center">
-  <img src="docs/assets/studio-logo.png" alt="GalaxyBunny Studio" width="120">
-</p>
-
 <h1 align="center">SunoApp</h1>
-<p align="center"><strong>GalaxyBunny Studio</strong> · application Windows non officielle pour Suno</p>
+<p align="center"><strong>Galaxy Studio</strong> · application Windows non officielle pour Suno</p>
 
 <p align="center">
-  Lecteur personnalisé, mini-lecteur, égaliseur, thèmes GalaxyBunny.<br>
+  Lecteur personnalisé, mini-lecteur, égaliseur, thèmes Galaxy.<br>
   Projet indépendant — non affilié à Suno.
 </p>
 
@@ -57,28 +53,18 @@
   <a href="https://github.com/HanaCherry/SunoApp/releases/latest">Dernière release</a>
 </p>
 
-<p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp — GalaxyBunny Studio" width="900">
-</p>
-
 ## Suno, dans une fenêtre Windows
 
 SunoApp enveloppe Suno dans une **application de bureau** : lecteur personnalisé, mini-lecteur toujours visible, égaliseur 10 bandes, thèmes (Nuit, Clair, Cherry, Aurore, Glass Apple, Aero, Musique), interface en 31 langues.
 
-Projet **indépendant**, développé par **Flora Cherry** / GalaxyBunny Studio. Non affilié, non approuvé par Suno.
-
-## Aperçu
-
-<p align="center">
-  <img src="docs/assets/dashboard.png" alt="SunoApp sur Windows" width="900">
-</p>
+Projet **indépendant**, développé par **SunoApp Maintainers** / Galaxy Studio. Non affilié, non approuvé par Suno.
 
 ## Fonctions
 
 - **Lecteur personnalisé** — pochette, progression, forme d’onde, couleurs dynamiques
 - **Mini-lecteur** — toujours visible, bas droite
 - **Égaliseur** — 10 bandes, spectre, réverbe, écho
-- **Thèmes GalaxyBunny** — Nuit, Clair, Cherry, Aurore, Glass Apple, Aero, Musique
+- **Thèmes Galaxy** — Nuit, Clair, Cherry, Aurore, Glass Apple, Aero, Musique
 - **Windows** — contrôles multimédias dans la barre des tâches, session conservée
 - **31 langues** dans l’application
 
@@ -113,4 +99,4 @@ SunoApp est un projet indépendant et non officiel. Suno appartient à ses déte
 
 ## Licence
 
-Projet GalaxyBunny Studio / Flora Cherry.
+Projet Galaxy Studio / SunoApp Maintainers.

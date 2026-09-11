@@ -1,8 +1,8 @@
 {
   "name": "sunoapp",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Application Windows non officielle pour utiliser Suno avec un lecteur personnalisé, un mini-lecteur et des contrôles multimédias",
-  "author": "Flora Cherry",
+  "author": "SunoApp Maintainers",
   "homepage": "https://github.com/HanaCherry/SunoApp",
   "main": "main.js",
   "scripts": {
@@ -19,11 +19,11 @@
     "electron-builder": "^26.15.3"
   },
   "build": {
-    "appId": "com.flora.sunoapp",
+    "appId": "app.sunoapp.desktop",
     "productName": "SunoApp",
     "win": {
       "target": "nsis",
-      "icon": "icone_flora.ico"
+      "icon": "app-icon.ico"
     },
     "directories": {
       "output": "dist"
@@ -58,7 +58,7 @@
       "sunoapp-enh-5.js",
       "sunoapp-enh-6.js",
       "package.json",
-      "icone_flora.ico",
+      "app-icon.ico",
       "like.png",
       "prec.png",
       "play.png",
@@ -70,7 +70,7 @@
     ],
     "extraMetadata": {
       "name": "sunoapp",
-      "version": "1.0.15"
+      "version": "1.0.16"
     }
   }
 }

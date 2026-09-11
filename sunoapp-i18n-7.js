@@ -39,7 +39,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "뮤직",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "파형을 숨겼습니다.",
         "statusWaveOn": "파형 켜짐: 재생 중 자동으로 나타납니다.",
         "statusCustomOff": "사용자 지정 플레이어가 꺼졌습니다.",
@@ -89,11 +89,11 @@
         "waveformCanvas": "음악 파형",
         "autoPanAria": "오토팬 속도",
         "echoTimeAria": "에코 시간",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "정보",
         "unofficial": "이것은 공식 Suno 앱이 아닙니다.",
-        "unaffiliated": "GalaxyBunny Studio는 Suno와 제휴되어 있지 않고, Suno와 협력하지 않으며, Suno의 승인을 받지 않았습니다.",
-        "madeBy": "GalaxyBunny Studio에서 독립적으로 만들었습니다."
+        "unaffiliated": "Galaxy Studio는 Suno와 제휴되어 있지 않고, Suno와 협력하지 않으며, Suno의 승인을 받지 않았습니다.",
+        "madeBy": "Galaxy Studio에서 독립적으로 만들었습니다."
     },
     "zh-CN": {
         "settings": "设置",
@@ -156,7 +156,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "音乐",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "已隐藏波形。",
         "statusWaveOn": "波形已开启：播放时会自动出现。",
         "statusCustomOff": "自定义播放器已关闭。",
@@ -206,11 +206,11 @@
         "waveformCanvas": "音乐波形",
         "autoPanAria": "自动声像速度",
         "echoTimeAria": "回声时间",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "关于",
         "unofficial": "这不是官方的 Suno 应用程序。",
-        "unaffiliated": "GalaxyBunny Studio 与 Suno 没有任何隶属关系，不与 Suno 合作，也未获得 Suno 认可。",
-        "madeBy": "由 GalaxyBunny Studio 独立制作。"
+        "unaffiliated": "Galaxy Studio 与 Suno 没有任何隶属关系，不与 Suno 合作，也未获得 Suno 认可。",
+        "madeBy": "由 Galaxy Studio 独立制作。"
     },
     "zh-TW": {
         "settings": "設定",
@@ -273,7 +273,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "音樂",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "已隱藏波形。",
         "statusWaveOn": "波形已開啟：播放時會自動出現。",
         "statusCustomOff": "自訂播放器已關閉。",
@@ -323,11 +323,11 @@
         "waveformCanvas": "音樂波形",
         "autoPanAria": "自動聲像速度",
         "echoTimeAria": "回聲時間",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "關於",
         "unofficial": "這不是官方的 Suno 應用程式。",
-        "unaffiliated": "GalaxyBunny Studio 與 Suno 沒有任何隸屬關係，不與 Suno 合作，也未獲得 Suno 認可。",
-        "madeBy": "由 GalaxyBunny Studio 獨立製作。"
+        "unaffiliated": "Galaxy Studio 與 Suno 沒有任何隸屬關係，不與 Suno 合作，也未獲得 Suno 認可。",
+        "madeBy": "由 Galaxy Studio 獨立製作。"
     },
     "th": {
         "settings": "การตั้งค่า",

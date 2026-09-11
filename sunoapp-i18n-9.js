@@ -26,7 +26,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musik",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Bentuk gelombang disembunyikan.",
         "statusWaveOn": "Bentuk gelombang aktif: muncul otomatis saat diputar.",
         "statusCustomOff": "Pemutar kustom dimatikan.",
@@ -76,11 +76,11 @@
         "waveformCanvas": "Bentuk gelombang musik",
         "autoPanAria": "Kecepatan auto-pan",
         "echoTimeAria": "Waktu gema",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Tentang",
         "unofficial": "Ini bukan aplikasi resmi Suno.",
-        "unaffiliated": "GalaxyBunny Studio tidak terafiliasi dengan Suno, tidak bekerja dengan Suno, dan tidak didukung oleh Suno.",
-        "madeBy": "Dibuat secara independen oleh GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio tidak terafiliasi dengan Suno, tidak bekerja dengan Suno, dan tidak didukung oleh Suno.",
+        "madeBy": "Dibuat secara independen oleh Galaxy Studio."
     },
     "ms": {
         "settings": "Tetapan",
@@ -143,7 +143,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Muzik",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Bentuk gelombang disembunyikan.",
         "statusWaveOn": "Bentuk gelombang aktif: muncul secara automatik semasa main.",
         "statusCustomOff": "Pemain tersuai dimatikan.",
@@ -193,11 +193,11 @@
         "waveformCanvas": "Bentuk gelombang muzik",
         "autoPanAria": "Kelajuan auto-pan",
         "echoTimeAria": "Masa gema",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Perihal",
         "unofficial": "Ini bukan aplikasi rasmi Suno.",
-        "unaffiliated": "GalaxyBunny Studio tidak berafiliasi dengan Suno, tidak bekerja dengan Suno, dan tidak disokong oleh Suno.",
-        "madeBy": "Dibuat secara bebas oleh GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio tidak berafiliasi dengan Suno, tidak bekerja dengan Suno, dan tidak disokong oleh Suno.",
+        "madeBy": "Dibuat secara bebas oleh Galaxy Studio."
     },
     "fil": {
         "settings": "Mga setting",
@@ -260,7 +260,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musika",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Nakatago ang waveform.",
         "statusWaveOn": "Naka-on ang waveform: kusang lumalabas habang tumutugtog.",
         "statusCustomOff": "Naka-off ang custom player.",
@@ -310,11 +310,11 @@
         "waveformCanvas": "Waveform ng musika",
         "autoPanAria": "Bilis ng auto-pan",
         "echoTimeAria": "Oras ng echo",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Tungkol",
         "unofficial": "Hindi ito ang opisyal na app ng Suno.",
-        "unaffiliated": "Ang GalaxyBunny Studio ay hindi kaugnay ng Suno, hindi nagtatrabaho sa Suno, at hindi ineendorso ng Suno.",
-        "madeBy": "Ginawa nang independently ng GalaxyBunny Studio."
+        "unaffiliated": "Ang Galaxy Studio ay hindi kaugnay ng Suno, hindi nagtatrabaho sa Suno, at hindi ineendorso ng Suno.",
+        "madeBy": "Ginawa nang independently ng Galaxy Studio."
     },
     "sv": {
         "settings": "Inställningar",

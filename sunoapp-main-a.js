@@ -30,7 +30,7 @@ const openTranslationWindow = (text, targetLang = 'fr') => {
         title: 'SunoApp - Traduction',
         autoHideMenuBar: true,
         backgroundColor: '#121212',
-        icon: path.join(__dirname, 'icone_flora.ico'),
+        icon: path.join(__dirname, 'app-icon.ico'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -202,7 +202,7 @@ app.whenReady().then(() => {
         minHeight: 600,
         frame: false,
         autoHideMenuBar: true,
-        icon: path.join(__dirname, 'icone_flora.ico'),
+        icon: path.join(__dirname, 'app-icon.ico'),
         backgroundColor: '#121212',
         show: false,
         webPreferences: {
@@ -330,7 +330,7 @@ app.whenReady().then(() => {
             alwaysOnTop: true,
             skipTaskbar: false,
             backgroundColor: '#00000000',
-            icon: path.join(__dirname, 'icone_flora.ico'),
+            icon: path.join(__dirname, 'app-icon.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'mini-preload.js'),
                 nodeIntegration: false,
@@ -373,7 +373,7 @@ app.whenReady().then(() => {
             alwaysOnTop: true,
             skipTaskbar: false,
             backgroundColor: '#00000000',
-            icon: path.join(__dirname, 'icone_flora.ico'),
+            icon: path.join(__dirname, 'app-icon.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'spectrum-preload.js'),
                 nodeIntegration: false,

@@ -93,7 +93,7 @@
         } catch (_) {}
     };
     const applyUiTheme = (id) => {
-        const theme = ['nuit', 'clair', 'cherry', 'aurore', 'glass', 'aero', 'musique', 'galaxybunny'].includes(id) ? id : 'nuit';
+        const theme = ['nuit', 'clair', 'cherry', 'aurore', 'glass', 'aero', 'musique', 'galaxy'].includes(id) ? id : 'nuit';
         state.uiTheme = theme;
         document.documentElement.dataset.sunoappTheme = theme;
         document.body.dataset.sunoappTheme = theme;
@@ -102,7 +102,7 @@
         document.querySelectorAll('.sa-theme[data-theme]').forEach((button) => {
             button.classList.toggle('active', button.dataset.theme === theme);
         });
-        mountGalaxySky(theme === 'galaxybunny');
+        mountGalaxySky(theme === 'galaxy');
         syncMusicTheme();
     };
     applyUiTheme(state.uiTheme);
@@ -121,7 +121,11 @@
     const placeRail = () => {
         const box = document.getElementById('sunoapp-rail-tools');
         if (!box) return;
-        const profile = sidebarText(/^floracherry$/i);
+        const profile = Array.from(document.querySelectorAll('a, button, [role="link"], [role="button"]')).find((element) => {
+            if (element.closest('#sunoapp-rail-tools, #sunoapp-titlebar, #sunoapp-settings-overlay, #sunoapp-top-menu')) return false;
+            const rect = element.getBoundingClientRect();
+            return rect.width >= 8 && rect.left < 280 && !!element.querySelector('img, [data-testid*="avatar" i]');
+        });
         const earn = sidebarText(/earn credits|gagner des cr/i);
         const create = Array.from(document.querySelectorAll('a[href]')).find((a) => /\/create(?:\/|$)/i.test(a.getAttribute('href') || '') && a.getBoundingClientRect().left < 280);
         const pr = profile ? profile.getBoundingClientRect() : null;

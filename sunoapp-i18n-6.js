@@ -1,5 +1,5 @@
-        "unaffiliated": "GalaxyBunny Studio אינה קשורה ל-Suno, אינה עובדת עם Suno ואינה מאושרת על ידי Suno.",
-        "madeBy": "נוצר באופן עצמאי על ידי GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio אינה קשורה ל-Suno, אינה עובדת עם Suno ואינה מאושרת על ידי Suno.",
+        "madeBy": "נוצר באופן עצמאי על ידי Galaxy Studio."
     },
     "hi": {
         "settings": "सेटिंग्स",
@@ -62,7 +62,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "संगीत",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "तरंग छिपी हुई है.",
         "statusWaveOn": "तरंग चालू: प्लेबैक के दौरान अपने आप दिखाई देती है.",
         "statusCustomOff": "कस्टम प्लेयर बंद है.",
@@ -112,11 +112,11 @@
         "waveformCanvas": "संगीत तरंग",
         "autoPanAria": "ऑटो-पैन गति",
         "echoTimeAria": "इको समय",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "परिचय",
         "unofficial": "यह Suno का आधिकारिक ऐप नहीं है।",
-        "unaffiliated": "GalaxyBunny Studio का Suno से कोई संबंध नहीं है, वह Suno के साथ काम नहीं करती और Suno द्वारा समर्थित नहीं है।",
-        "madeBy": "GalaxyBunny Studio द्वारा स्वतंत्र रूप से बनाया गया।"
+        "unaffiliated": "Galaxy Studio का Suno से कोई संबंध नहीं है, वह Suno के साथ काम नहीं करती और Suno द्वारा समर्थित नहीं है।",
+        "madeBy": "Galaxy Studio द्वारा स्वतंत्र रूप से बनाया गया।"
     },
     "ja": {
         "settings": "設定",
@@ -179,7 +179,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "ミュージック",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "波形を非表示にしました。",
         "statusWaveOn": "波形オン: 再生中に自動で表示されます。",
         "statusCustomOff": "カスタムプレーヤーをオフにしました。",
@@ -229,11 +229,11 @@
         "waveformCanvas": "音楽の波形",
         "autoPanAria": "オートパン速度",
         "echoTimeAria": "エコー時間",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "このアプリについて",
         "unofficial": "これはSuno公式アプリではありません。",
-        "unaffiliated": "GalaxyBunny StudioはSunoと提携しておらず、Sunoと協力しておらず、Sunoの承認も受けていません。",
-        "madeBy": "GalaxyBunny Studioが独自に制作しています。"
+        "unaffiliated": "Galaxy StudioはSunoと提携しておらず、Sunoと協力しておらず、Sunoの承認も受けていません。",
+        "madeBy": "Galaxy Studioが独自に制作しています。"
     },
     "ko": {
         "settings": "설정",

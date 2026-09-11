@@ -4,13 +4,13 @@
 
 ### Nouveautés
 
-- Thème **Galaxy Bunny** : ciel étoilé animé, nébuleuses, étoile filante et pétales sakura
+- Thème **Galaxy** : ciel étoilé animé, nébuleuses, étoile filante et pétales sakura
 
 ## 1.0.11 — 2 septembre 2026
 
 ### Important
 
-- Application indépendante de **GalaxyBunny Studio**. Ce n’est pas l’app officielle de Suno : le studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.
+- Application indépendante de **Galaxy Studio**. Ce n’est pas l’app officielle de Suno : le studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.
 
 ### Nouveautés
 

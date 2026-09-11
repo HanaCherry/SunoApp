@@ -99,7 +99,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Music",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Waveform hidden.",
         "statusWaveOn": "Waveform on: it appears automatically during playback.",
         "statusCustomOff": "Custom player disabled.",
@@ -149,11 +149,11 @@
         "waveformCanvas": "Music waveform",
         "autoPanAria": "Auto-pan speed",
         "echoTimeAria": "Echo time",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "About",
         "unofficial": "This is not the official Suno application.",
-        "unaffiliated": "GalaxyBunny Studio is not affiliated with Suno, does not work with Suno, and is not endorsed by Suno.",
-        "madeBy": "Made independently by GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio is not affiliated with Suno, does not work with Suno, and is not endorsed by Suno.",
+        "madeBy": "Made independently by Galaxy Studio."
     },
     "fr": {
         "settings": "Paramètres",
@@ -216,7 +216,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Musique",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Forme d'onde masquée.",
         "statusWaveOn": "Forme d'onde active : elle apparaît automatiquement pendant la lecture.",
         "statusCustomOff": "Lecteur personnalisé désactivé.",
@@ -266,11 +266,11 @@
         "waveformCanvas": "Forme d'onde de la musique",
         "autoPanAria": "Vitesse auto-pan",
         "echoTimeAria": "Temps écho",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "À propos",
         "unofficial": "Ceci n’est pas l’application officielle de Suno.",
-        "unaffiliated": "GalaxyBunny Studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.",
-        "madeBy": "Créé de façon indépendante par GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.",
+        "madeBy": "Créé de façon indépendante par Galaxy Studio."
     },
     "es": {
         "settings": "Ajustes",
@@ -333,7 +333,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Música",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Forma de onda oculta.",
         "statusWaveOn": "Forma de onda activa: aparece automáticamente durante la reproducción.",
         "statusCustomOff": "Reproductor personalizado desactivado.",

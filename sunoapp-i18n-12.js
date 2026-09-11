@@ -10,11 +10,11 @@
         "waveformCanvas": "Zene hullámformája",
         "autoPanAria": "Auto-pan sebesség",
         "echoTimeAria": "Echoidő",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Névjegy",
         "unofficial": "Ez nem a hivatalos Suno alkalmazás.",
-        "unaffiliated": "A GalaxyBunny Studio nem áll kapcsolatban a Sunóval, nem dolgozik a Sunóval, és a Suno nem támogatja.",
-        "madeBy": "Függetlenül készítette a GalaxyBunny Studio."
+        "unaffiliated": "A Galaxy Studio nem áll kapcsolatban a Sunóval, nem dolgozik a Sunóval, és a Suno nem támogatja.",
+        "madeBy": "Függetlenül készítette a Galaxy Studio."
     },
     "ro": {
         "settings": "Setări",
@@ -77,7 +77,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Muzică",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Formă de undă ascunsă.",
         "statusWaveOn": "Formă de undă activă: apare automat în timpul redării.",
         "statusCustomOff": "Player personalizat dezactivat.",
@@ -127,11 +127,11 @@
         "waveformCanvas": "Forma de undă a muzicii",
         "autoPanAria": "Viteză auto-pan",
         "echoTimeAria": "Timp eco",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Despre",
         "unofficial": "Aceasta nu este aplicația oficială Suno.",
-        "unaffiliated": "GalaxyBunny Studio nu este afiliat cu Suno, nu lucrează cu Suno și nu este susținut de Suno.",
-        "madeBy": "Creat independent de GalaxyBunny Studio."
+        "unaffiliated": "Galaxy Studio nu este afiliat cu Suno, nu lucrează cu Suno și nu este susținut de Suno.",
+        "madeBy": "Creat independent de Galaxy Studio."
     },
     "el": {
         "settings": "Ρυθμίσεις",
@@ -194,7 +194,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Μουσική",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Η κυματομορφή αποκρύφθηκε.",
         "statusWaveOn": "Κυματομορφή ενεργή: εμφανίζεται αυτόματα κατά την αναπαραγωγή.",
         "statusCustomOff": "Ο προσαρμοσμένος αναπαραγωγέας απενεργοποιήθηκε.",
@@ -244,11 +244,11 @@
         "waveformCanvas": "Κυματομορφή μουσικής",
         "autoPanAria": "Ταχύτητα auto-pan",
         "echoTimeAria": "Χρόνος ηχούς",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Σχετικά",
         "unofficial": "Αυτή δεν είναι η επίσημη εφαρμογή της Suno.",
-        "unaffiliated": "Το GalaxyBunny Studio δεν συνδέεται με τη Suno, δεν συνεργάζεται με τη Suno και δεν έχει την έγκριση της Suno.",
-        "madeBy": "Δημιουργήθηκε ανεξάρτητα από το GalaxyBunny Studio."
+        "unaffiliated": "Το Galaxy Studio δεν συνδέεται με τη Suno, δεν συνεργάζεται με τη Suno και δεν έχει την έγκριση της Suno.",
+        "madeBy": "Δημιουργήθηκε ανεξάρτητα από το Galaxy Studio."
     }
 };
     return {

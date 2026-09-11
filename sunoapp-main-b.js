@@ -330,7 +330,7 @@
                     }
                 }).catch(() => {});
             }
-        }, 500);
+        }, 1200);
     });
 
     globalShortcut.register('CommandOrControl+Space', () => { controlSuno('playpause'); });

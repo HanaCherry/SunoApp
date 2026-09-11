@@ -147,7 +147,7 @@
             --sa-card: linear-gradient(145deg, rgba(40,40,48,.9), rgba(12,12,16,.92));
             --sa-btn: rgba(255,255,255,.1);
         }
-        html[data-sunoapp-theme="galaxybunny"], body[data-sunoapp-theme="galaxybunny"] {
+        html[data-sunoapp-theme="galaxy"], body[data-sunoapp-theme="galaxy"] {
             --sa-bg: #070513;
             --sa-titlebar: rgba(24, 16, 48, .92);
             --sa-text: #f4f6fb;
@@ -178,14 +178,14 @@
         .sa-theme[data-theme="glass"]::before { background: linear-gradient(90deg, rgba(255,255,255,.55), #7eb8ff 60%, rgba(255,255,255,.2)); }
         .sa-theme[data-theme="aero"]::before { background: linear-gradient(90deg, #7ec8ff, #1a5aa8 55%, #eaf6ff); }
         .sa-theme[data-theme="musique"]::before { background: linear-gradient(90deg, #ff5474, #8a5cff, #3ec6c9, #f0c36a); }
-        .sa-theme[data-theme="galaxybunny"]::before { background: linear-gradient(90deg, #070513, #382079 40%, #8670ef 70%, #ff9ac8); }
+        .sa-theme[data-theme="galaxy"]::before { background: linear-gradient(90deg, #070513, #382079 40%, #8670ef 70%, #ff9ac8); }
 
 
         html[data-sunoapp-theme] { background: var(--sa-bg); }
         html[data-sunoapp-theme="clair"] { color-scheme: light; }
         html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"],
         html[data-sunoapp-theme="glass"], html[data-sunoapp-theme="aero"], html[data-sunoapp-theme="musique"],
-        html[data-sunoapp-theme="galaxybunny"] { color-scheme: dark; }
+        html[data-sunoapp-theme="galaxy"] { color-scheme: dark; }
         html[data-sunoapp-theme="glass"] #sunoapp-titlebar,
         html[data-sunoapp-theme="musique"] #sunoapp-titlebar {
             background: var(--sa-titlebar) !important;
@@ -197,18 +197,18 @@
             backdrop-filter: blur(16px) saturate(170%) !important;
             border-bottom: 1px solid rgba(255,255,255,.35) !important;
         }
-        html[data-sunoapp-theme="galaxybunny"] #sunoapp-titlebar {
+        html[data-sunoapp-theme="galaxy"] #sunoapp-titlebar {
             background: rgba(16, 12, 32, .9) !important;
             backdrop-filter: blur(16px) saturate(150%) !important;
             border-bottom: 1px solid rgba(201, 188, 255, .16) !important;
         }
-        html[data-sunoapp-theme="galaxybunny"] #sunoapp-settings-overlay .sa-settings-card {
+        html[data-sunoapp-theme="galaxy"] #sunoapp-settings-overlay .sa-settings-card {
             background: linear-gradient(160deg, rgba(56, 32, 121, .55), rgba(12, 8, 28, .94)) !important;
             backdrop-filter: blur(28px) saturate(160%) !important;
             border: 1px solid rgba(201, 188, 255, .2) !important;
         }
-        html[data-sunoapp-theme="galaxybunny"] #sunoapp-rail-tools .sa-rail-item:hover,
-        html[data-sunoapp-theme="galaxybunny"] #sunoapp-rail-tools .sa-rail-item.active {
+        html[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item:hover,
+        html[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item.active {
             background: rgba(134, 112, 239, .22);
             border: 1px solid rgba(201, 188, 255, .28);
         }

@@ -56,7 +56,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "ดนตรี",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "ซ่อนคลื่นเสียงแล้ว",
         "statusWaveOn": "คลื่นเสียงเปิด: แสดงอัตโนมัติขณะเล่น",
         "statusCustomOff": "ปิดเครื่องเล่นกำหนดเองแล้ว",
@@ -106,11 +106,11 @@
         "waveformCanvas": "คลื่นเสียงเพลง",
         "autoPanAria": "ความเร็วออโต้แพน",
         "echoTimeAria": "เวลาเอคโค่",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "เกี่ยวกับ",
         "unofficial": "นี่ไม่ใช่แอปอย่างเป็นทางการของ Suno",
-        "unaffiliated": "GalaxyBunny Studio ไม่ได้สังกัด Suno ไม่ได้ร่วมงานกับ Suno และไม่ได้รับการรับรองจาก Suno",
-        "madeBy": "สร้างขึ้นอย่างอิสระโดย GalaxyBunny Studio"
+        "unaffiliated": "Galaxy Studio ไม่ได้สังกัด Suno ไม่ได้ร่วมงานกับ Suno และไม่ได้รับการรับรองจาก Suno",
+        "madeBy": "สร้างขึ้นอย่างอิสระโดย Galaxy Studio"
     },
     "vi": {
         "settings": "Cài đặt",
@@ -173,7 +173,7 @@
         "themeGlass": "Glass Apple",
         "themeAero": "Aero",
         "themeMusique": "Nhạc",
-        "themeGalaxyBunny": "Galaxy Bunny",
+        "themeGalaxy": "Galaxy",
         "statusWaveOff": "Đã ẩn dạng sóng.",
         "statusWaveOn": "Dạng sóng bật: hiện tự động khi phát.",
         "statusCustomOff": "Đã tắt trình phát tùy chỉnh.",
@@ -223,11 +223,11 @@
         "waveformCanvas": "Dạng sóng nhạc",
         "autoPanAria": "Tốc độ auto-pan",
         "echoTimeAria": "Thời gian echo",
-        "studioName": "GalaxyBunny Studio",
+        "studioName": "Galaxy Studio",
         "aboutTitle": "Giới thiệu",
         "unofficial": "Đây không phải ứng dụng chính thức của Suno.",
-        "unaffiliated": "GalaxyBunny Studio không liên kết với Suno, không hợp tác với Suno và không được Suno chứng nhận.",
-        "madeBy": "Được GalaxyBunny Studio tạo độc lập."
+        "unaffiliated": "Galaxy Studio không liên kết với Suno, không hợp tác với Suno và không được Suno chứng nhận.",
+        "madeBy": "Được Galaxy Studio tạo độc lập."
     },
     "id": {
         "settings": "Pengaturan",

@@ -139,8 +139,12 @@
     document.body.appendChild(titlebar);
 
     let mountSidebarTools = () => {};
+    let lastPageModeKey = '';
 
     const refreshPageMode = () => {
+        const pageModeKey = `${location.pathname}|${document.body.children.length}`;
+        if (pageModeKey === lastPageModeKey) return;
+        lastPageModeKey = pageModeKey;
         const isStudio = /^\/studio(?:\/|$)/i.test(location.pathname);
         const isCreate = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
         document.body.classList.toggle('sunoapp-studio', isStudio);
@@ -163,7 +167,7 @@
     };
 
     refreshPageMode();
-    window.__sunoAppPageModeTimer = setInterval(refreshPageMode, 700);
+    window.__sunoAppPageModeTimer = setInterval(refreshPageMode, 2000);
 
     const menu = document.createElement('div');
     menu.id = 'sunoapp-top-menu';

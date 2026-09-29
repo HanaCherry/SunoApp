@@ -15,6 +15,13 @@ const sanitizeSelection = (text = '') => text.replace(/\s+/g, ' ').trim();
 
 const openExternalSearch = (url) => {
     if (!url) return;
+    // Validate URL format
+    try {
+        new URL(url);
+    } catch (e) {
+        console.error('URL invalide:', url);
+        return;
+    }
     shell.openExternal(url).catch((error) => {
         console.error('Erreur ouverture lien externe:', error);
     });
@@ -177,7 +184,7 @@ const buildContextMenu = (params) => {
             click: () => mainWindow.webContents.goForward()
         },
         {
-            label: 'Copier l’adresse de la page',
+            label: 'Copier l'adresse de la page',
             enabled: !!currentUrl,
             click: () => clipboard.writeText(currentUrl)
         }
@@ -258,10 +265,19 @@ app.whenReady().then(() => {
                 const target = new URL(url);
                 const x = Number(target.searchParams.get('x'));
                 const y = Number(target.searchParams.get('y'));
-                if (Number.isFinite(x) && Number.isFinite(y) && x >= 0 && y >= 0) {
+                
+                // FIX: Validate coordinates are finite numbers and within screen bounds
+                const display = screen.getPrimaryDisplay();
+                const { width: screenWidth, height: screenHeight } = display.bounds;
+                
+                if (Number.isFinite(x) && Number.isFinite(y) && 
+                    x >= 0 && y >= 0 && 
+                    x <= screenWidth && y <= screenHeight) {
                     mainWindow.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(x), y: Math.round(y) });
                     mainWindow.webContents.sendInputEvent({ type: 'mouseDown', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
                     mainWindow.webContents.sendInputEvent({ type: 'mouseUp', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
+                } else {
+                    console.warn('Coordinates invalides:', { x, y, screenWidth, screenHeight });
                 }
             } catch (error) {
                 console.error('Erreur raccourci Suno:', error);
@@ -480,4 +496,3 @@ app.whenReady().then(() => {
                     fullscreenButton.addEventListener('click', () => window.open('sunoapp://fullscreen', '_blank'));
                     anchorButton.parentElement.insertBefore(fullscreenButton, anchorButton);
                 };
-

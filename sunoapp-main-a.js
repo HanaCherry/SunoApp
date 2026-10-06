@@ -13,7 +13,7 @@ let spectrumWindow;
 let spectrumTimer = null;
 let isPlaying = false;
 
-const sanitizeSelection = (text = '') => text.replace(/\s+/g, ' ').trim();
+const sanitizeSelection = (text = '') => String(text ?? '').replace(/\s+/g, ' ').trim();
 
 const openExternalSearch = (url) => {
     if (!isExternalUrl(url)) return;
@@ -40,12 +40,13 @@ const openTranslationWindow = (text, targetLang = 'fr') => {
         }
     });
 
+    const safeTarget = /^[a-z-]{2,5}$/i.test(String(targetLang || '')) ? String(targetLang) : 'fr';
     const encodedText = encodeURIComponent(selectedText);
     translateWindow.webContents.setWindowOpenHandler(({ url }) => {
         openExternalSearch(url);
         return { action: 'deny' };
     });
-    translateWindow.loadURL(`https://translate.google.com/?sl=auto&tl=${targetLang}&text=${encodedText}&op=translate`);
+    translateWindow.loadURL(`https://translate.google.com/?sl=auto&tl=${safeTarget}&text=${encodedText}&op=translate`);
 };
 
 // Local controls must never become remote browsers.
@@ -56,7 +57,7 @@ const lockLocalWindow = (window) => {
     window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 };
 
-const buildContextMenu = (params) => {
+const buildContextMenu = (params = {}) => {
     const selectedText = sanitizeSelection(params.selectionText || '');
     const hasSelection = selectedText.length > 0;
     const editFlags = params.editFlags || {};
@@ -145,7 +146,7 @@ const buildContextMenu = (params) => {
         );
     }
 
-    if (params.linkURL) {
+    if (params.linkURL && isExternalUrl(params.linkURL)) {
         template.push(
             { type: 'separator' },
             {
@@ -159,7 +160,7 @@ const buildContextMenu = (params) => {
         );
     }
 
-    if (params.srcURL) {
+    if (params.srcURL && isExternalUrl(params.srcURL)) {
         template.push(
             { type: 'separator' },
             {

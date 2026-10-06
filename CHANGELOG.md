@@ -1,5 +1,13 @@
 # Historique des versions
 
+## 1.0.17 — 6 octobre 2026
+
+- Correction des débordements, thèmes et menus de langues.
+- Choix de la langue native de Suno, indépendant de SunoApp.
+- Étoiles à quatre pointes réactives aux basses, changement de direction, taille réglable et fondu des couleurs.
+- Validation des liens externes et des commandes du mini-lecteur.
+- Retrait des exemples personnels et exclusion des profils locaux de la distribution.
+
 ## 1.0.12 — 6 septembre 2026
 
 ### Nouveautés

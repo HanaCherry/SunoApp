@@ -6,6 +6,10 @@
   "homepage": "https://github.com/HanaCherry/SunoApp",
   "main": "main.js",
   "scripts": {
+    "test": "node --test tests/*.test.js",
+    "prestart": "node scripts/build-i18n.cjs",
+    "prebuild": "node scripts/build-i18n.cjs",
+    "predist": "node scripts/build-i18n.cjs",
     "start": "electron .",
     "build": "electron-builder",
     "dist": "electron-builder --win nsis"
@@ -30,6 +34,10 @@
     },
     "files": [
       "main.js",
+      "sunoapp-security.js",
+      "sunoapp-site-language.js",
+      "sunoapp-theme.js",
+      "sunoapp-i18n-browser.js",
       "sunoapp-main-a.js",
       "sunoapp-main-b.js",
       "mini-preload.js",

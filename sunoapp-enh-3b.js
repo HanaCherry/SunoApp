@@ -48,10 +48,23 @@
         overlay.classList.toggle('open', open);
         document.getElementById('sunoapp-rail-settings')?.classList.toggle('active', open);
     };
+    window.__sunoAppOpenSettings = () => setSettingsOpen(true);
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') setSettingsOpen(false); });
     document.getElementById('sunoapp-close-settings').addEventListener('click', () => setSettingsOpen(false));
     document.getElementById('sunoapp-open-mini').addEventListener('click', () => window.open('sunoapp://mini', '_blank'));
 
     let syncMusicTheme = () => {};
+    const starSizeInput = document.getElementById('sunoapp-star-size');
+    const applyStarSize = (value) => {
+        const number = Number(value);
+        const size = Number.isFinite(number) && number >= 50 && number <= 300 ? Math.round(number / 10) * 10 : 100;
+        document.documentElement.style.setProperty('--sunoapp-star-scale', String(size / 100));
+        starSizeInput.value = String(size);
+        document.getElementById('sunoapp-star-size-out').textContent = `${size} %`;
+        localStorage.setItem('sunoapp-star-size', String(size));
+    };
+    applyStarSize(localStorage.getItem('sunoapp-star-size') || 100);
+    starSizeInput.addEventListener('input', () => applyStarSize(starSizeInput.value));
     const mountGalaxySky = (on) => {
         try {
             let sky = document.getElementById('sunoapp-galaxy-sky');
@@ -70,11 +83,12 @@
                 for (let i = 0; i < 90; i += 1) {
                     const star = document.createElement('i');
                     const size = Math.random() > 0.82 ? 3 : 2;
-                    star.style.width = `${size}px`;
-                    star.style.height = `${size}px`;
+                    star.style.width = `calc(${size}px * var(--sunoapp-star-scale, 1))`;
+                    star.style.height = `calc(${size}px * var(--sunoapp-star-scale, 1))`;
                     star.style.left = `${Math.random() * 100}%`;
                     star.style.top = `${Math.random() * 100}%`;
                     star.style.animationDelay = `${-Math.random() * 2.8}s`;
+                    star.style.setProperty('--rain-delay', `${-Math.random() * 25}s`);
                     star.style.animationDuration = `${2.2 + Math.random() * 2.4}s`;
                     if (Math.random() > 0.7) star.style.background = '#c9bcff';
                     starBox.appendChild(star);
@@ -95,14 +109,15 @@
     const applyUiTheme = (id) => {
         const theme = ['nuit', 'clair', 'cherry', 'aurore', 'glass', 'aero', 'musique', 'galaxy'].includes(id) ? id : 'nuit';
         state.uiTheme = theme;
-        document.documentElement.dataset.sunoappTheme = theme;
-        document.body.dataset.sunoappTheme = theme;
-        document.documentElement.style.colorScheme = theme === 'clair' ? 'light' : 'dark';
+        overlay.dataset.sunoappTheme = theme;
+        window.__SUNO_APP_THEME?.apply(theme);
+
+        overlay.style.colorScheme = theme === 'clair' ? 'light' : 'dark';
         localStorage.setItem('sunoapp-ui-theme', theme);
         document.querySelectorAll('.sa-theme[data-theme]').forEach((button) => {
             button.classList.toggle('active', button.dataset.theme === theme);
         });
-        mountGalaxySky(theme === 'galaxy');
+        mountGalaxySky(theme === 'galaxy' || theme === 'musique');
         syncMusicTheme();
     };
     applyUiTheme(state.uiTheme);
@@ -111,68 +126,8 @@
         if (themeButton) applyUiTheme(themeButton.dataset.theme);
     });
 
-    const sidebarText = (re) => Array.from(document.querySelectorAll('a, button, [role="link"], [role="button"]')).find((el) => {
-        if (el.closest('#sunoapp-rail-tools, #sunoapp-titlebar, #sunoapp-settings-overlay, #sunoapp-top-menu')) return false;
-        const rect = el.getBoundingClientRect();
-        if (rect.width < 8 || rect.left > 280) return false;
-        return re.test((el.textContent || '').replace(/\s+/g, ' ').trim());
-    });
-
-    const placeRail = () => {
-        const box = document.getElementById('sunoapp-rail-tools');
-        if (!box) return;
-        const profile = Array.from(document.querySelectorAll('a, button, [role="link"], [role="button"]')).find((element) => {
-            if (element.closest('#sunoapp-rail-tools, #sunoapp-titlebar, #sunoapp-settings-overlay, #sunoapp-top-menu')) return false;
-            const rect = element.getBoundingClientRect();
-            return rect.width >= 8 && rect.left < 280 && !!element.querySelector('img, [data-testid*="avatar" i]');
-        });
-        const earn = sidebarText(/earn credits|gagner des cr/i);
-        const create = Array.from(document.querySelectorAll('a[href]')).find((a) => /\/create(?:\/|$)/i.test(a.getAttribute('href') || '') && a.getBoundingClientRect().left < 280);
-        const pr = profile ? profile.getBoundingClientRect() : null;
-        const profileVisible = pr && pr.height >= 12 && pr.top >= 40 && pr.bottom < window.innerHeight - 80;
-        if (!profileVisible || !earn) {
-            box.style.display = 'none';
-            return;
-        }
-        box.style.display = 'flex';
-        const col = (create || earn || profile).getBoundingClientRect();
-        const left = Math.round(col.left);
-        const width = Math.round(col.width);
-        const top = Math.round(pr.bottom + 4);
-        let maxH = 44;
-        if (earn) {
-            const gap = Math.round(earn.getBoundingClientRect().top - 6 - top);
-            maxH = Math.max(36, Math.min(48, gap));
-        }
-        box.style.left = left + 'px';
-        box.style.width = width + 'px';
-        box.style.top = top + 'px';
-        box.style.maxHeight = maxH + 'px';
-        box.style.overflow = 'hidden';
-    };
-
-    mountSidebarTools = () => {
-        let box = document.getElementById('sunoapp-rail-tools');
-        if (!box) {
-            box = document.createElement('div');
-            box.id = 'sunoapp-rail-tools';
-            box.innerHTML = `
-                <button type="button" class="sa-rail-item" id="sunoapp-rail-settings">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
-                    Paramètres
-                </button>
-            `;
-            document.body.appendChild(box);
-            box.querySelector('#sunoapp-rail-settings').addEventListener('click', (event) => {
-                event.preventDefault();
-                setSettingsOpen(true);
-            });
-        }
-        placeRail();
-    };
-    mountSidebarTools();
+    // Settings are reached through the native application menu.
     applyI18n();
-    window.addEventListener('resize', placeRail);
 
     const status = document.getElementById('sunoapp-audio-status');
     const sliders = Array.from(document.querySelectorAll('.sa-band input'));

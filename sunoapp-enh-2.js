@@ -1,14 +1,29 @@
             position: fixed; inset: 0; z-index: 2147483647; display: none; place-items: center;
-            padding: 28px; background: rgba(3,3,6,.46); backdrop-filter: blur(14px);
+            box-sizing: border-box; padding: 20px; background: rgba(3,3,6,.46); backdrop-filter: blur(14px);
         }
         #sunoapp-settings-overlay.open { display: grid; }
         .sa-settings-card {
-            width: min(820px, 96vw); max-height: min(780px, 92vh); overflow: auto; padding: 25px;
+            box-sizing: border-box; width: min(820px, 100%); max-height: 100%; min-height: 0; overflow: auto; padding: 25px;
             border: 1px solid var(--sa-border, rgba(255,255,255,.14)); border-radius: 26px;
             color: var(--sa-text, #fff); background: var(--sa-card, linear-gradient(145deg, rgba(34,34,40,.94), rgba(11,11,15,.93)));
             box-shadow: inset 0 1px rgba(255,255,255,.12), 0 28px 80px rgba(0,0,0,.6);
         }
-        .sa-settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        #sunoapp-settings-overlay { font-family: "Segoe UI", sans-serif; font-size: 14px; line-height: 1.45; }
+        #sunoapp-settings-overlay .sa-settings-head { position: static; inset: auto; width: auto; height: auto; z-index: auto; background: transparent; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        #sunoapp-settings-overlay .sa-mode:not(.active),
+        #sunoapp-settings-overlay .sa-band label,
+        #sunoapp-settings-overlay .sa-preset-row input,
+        #sunoapp-settings-overlay .sa-preset-row button,
+        #sunoapp-settings-overlay .sa-user-preset,
+        #sunoapp-settings-overlay .sa-ab:not(.on) { color: var(--sa-text); background: var(--sa-btn); border-color: var(--sa-border); }
+        #sunoapp-settings-overlay .sa-about p,
+        #sunoapp-settings-overlay .sa-eq-note,
+        #sunoapp-settings-overlay .sa-band output,
+        #sunoapp-settings-overlay .sa-option-copy span,
+        #sunoapp-settings-overlay .sa-preamp output,
+        #sunoapp-settings-overlay #sunoapp-audio-status { color: var(--sa-muted); }
+        #sunoapp-settings-overlay[data-sunoapp-theme="clair"] .sa-about-unofficial { color: #9a2747 !important; }
+        #sunoapp-settings-overlay[data-sunoapp-theme="clair"] .sa-about-studio { color: #805b00; }
         .sa-about {
             margin: 0 0 18px; padding: 14px 16px;
             border: 1px solid rgba(244,197,66,.38); border-radius: 16px;
@@ -39,10 +54,34 @@
         #sunoapp-spectrum { display: block; width: 100%; height: 76px; margin-top: 10px; border-radius: 12px; background: rgba(0,0,0,.38); }
         .sa-preset-row { display: flex; gap: 8px; margin-top: 10px; }
         .sa-preset-row input { flex: 1; min-height: 40px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #fff; background: rgba(255,255,255,.06); font-size: 13px; }
-        #sunoapp-lang {
+        #sunoapp-lang, #sunoapp-site-lang {
             width: 100%; min-height: 40px; margin-top: 4px; padding: 0 12px;
             border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
             color: inherit; background: rgba(255,255,255,.06); font-size: 13px; font-weight: 650;
+        }
+        /* Native Windows popups need opaque option colors, not inherited glass. */
+        #sunoapp-settings-overlay :is(#sunoapp-lang, #sunoapp-site-lang) {
+            color-scheme: dark;
+            color: #f4f4f8;
+            background-color: #211b32;
+            border-color: #797185;
+        }
+        #sunoapp-settings-overlay :is(#sunoapp-lang, #sunoapp-site-lang) option {
+            color: #f4f4f8;
+            background-color: #211b32;
+        }
+        #sunoapp-settings-overlay[data-sunoapp-theme="clair"] :is(#sunoapp-lang, #sunoapp-site-lang),
+        #sunoapp-settings-overlay[data-sunoapp-theme="clair"] :is(#sunoapp-lang, #sunoapp-site-lang) option {
+            color-scheme: light;
+            color: #211e25;
+            background-color: #ffffff;
+        }
+        @media (forced-colors: active) {
+            #sunoapp-settings-overlay :is(#sunoapp-lang, #sunoapp-site-lang),
+            #sunoapp-settings-overlay :is(#sunoapp-lang, #sunoapp-site-lang) option {
+                color: CanvasText;
+                background-color: Canvas;
+            }
         }
         .sa-preset-row button, .sa-user-preset { min-height: 40px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #fff; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 700; cursor: pointer; }
         #sunoapp-user-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -112,9 +151,10 @@
             .sa-modes { grid-template-columns: repeat(2, 1fr); }
         }
     `;
+    style.textContent += '\n#sunoapp-titlebar, #sunoapp-top-menu, #sunoapp-rail-tools { display: none !important; }';
     document.head.appendChild(style);
 
-    document.body.classList.add('sunoapp-frameless');
+    // Native window chrome reserves its own space outside the Suno document.
     const favicon = document.querySelector('link[rel*="icon"]')?.href || '';
     const titlebar = document.createElement('header');
     titlebar.id = 'sunoapp-titlebar';
@@ -149,18 +189,6 @@
         const isCreate = /^\/(studio|create)(?:\/|$)/i.test(location.pathname);
         document.body.classList.toggle('sunoapp-studio', isStudio);
         document.documentElement.classList.toggle('sunoapp-studio', isStudio);
-        const candidates = Array.from(document.body.children)
-            .filter((element) => !element.id?.startsWith('sunoapp-') && element.tagName !== 'SCRIPT' && element.tagName !== 'STYLE');
-        candidates.forEach((element) => {
-            element.classList.toggle('sunoapp-studio-root', isStudio);
-            element.style.removeProperty('--sunoapp-studio-scale-y');
-            if (!isStudio) {
-                element.style.removeProperty('height');
-                element.style.removeProperty('max-height');
-                element.style.removeProperty('min-height');
-                element.style.removeProperty('overflow');
-            }
-        });
         const title = document.querySelector('.sa-title-center');
         if (title) title.textContent = isCreate ? 'Suno • Création' : 'Suno • Lecteur musical';
         mountSidebarTools();

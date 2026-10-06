@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title></title>
-<script src="sunoapp-i18n.js"></script>
+<script src="sunoapp-i18n-browser.js"></script>
 <style>
   html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font-family: Inter, "SF Pro Display", "Segoe UI", sans-serif; }
   #shell {
@@ -101,7 +101,7 @@
       else el.textContent = value;
     });
   };
-  const mini = window.sunoMini || { onState() {}, control() {} };
+  const mini = window.sunoMini || { onPlayerState() {}, control() {} };
   const playBtn = document.getElementById('play');
   const titleEl = document.getElementById('title');
   const artistEl = document.getElementById('artist');
@@ -146,17 +146,22 @@
     document.getElementById('alwaysOnTop').onchange = (event) => mini.control('always-on-top', event.target.checked);
     document.getElementById('glassColor').oninput = applyGlass;
     document.getElementById('glassOpacity').oninput = applyGlass;
-    if (typeof mini.onState === 'function') {
-      mini.onState((state) => {
+    if (typeof mini.onPlayerState === 'function') {
+      mini.onPlayerState((state) => {
         if (!state) return;
         playing = !!state.playing;
         paintPlay();
         titleEl.textContent = state.title || '';
         artistEl.textContent = state.artist || '';
-        if (state.cover) coverEl.src = state.cover;
-        if (state.cover && coverEl.naturalWidth) {
-          mini.control('resize-to-artwork', { width: coverEl.naturalWidth, height: coverEl.naturalHeight });
-        }
+        if (state.cover) {
+          try {
+            const coverUrl = new URL(state.cover);
+            if (['https:', 'http:'].includes(coverUrl.protocol)) {
+              if (coverEl.src !== coverUrl.href) coverEl.src = coverUrl.href;
+            }
+            else coverEl.removeAttribute('src');
+          } catch { coverEl.removeAttribute('src'); }
+        } else coverEl.removeAttribute('src');
       });
     }
     coverEl.addEventListener('load', () => {

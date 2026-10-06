@@ -1,3 +1,20 @@
 ﻿node_modules
 dist
 SunoFini
+
+# Local credentials, user profiles and generated artifacts
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.log
+profile/
+userData/
+Cookies
+Cookies-journal
+Local Storage/
+Session Storage/
+outputs/
+work/

@@ -23,8 +23,13 @@
                 <p data-i18n="unaffiliated">Galaxy Studio n’est pas affilié à Suno, ne travaille pas avec Suno et n’est pas approuvé par Suno.</p>
                 <p data-i18n="madeBy">Créé de façon indépendante par Galaxy Studio.</p>
             </div>
-            <div class="sa-section-title" data-i18n="language">Langue</div>
+            <label for="sunoapp-lang" class="sa-section-title" data-i18n="appLanguage" style="display:block">Langue de SunoApp</label>
             <select id="sunoapp-lang" aria-label="Language"></select>
+            <label for="sunoapp-site-lang" class="sa-section-title" data-i18n="sunoLanguage" style="display:block">Langue de Suno</label>
+            <select id="sunoapp-site-lang"></select>
+            <p class="sa-eq-note" data-i18n="sunoLanguageHelp"></p>
+            <button type="button" class="sa-ab" id="sunoapp-site-lang-apply" data-i18n="sunoLanguageApply" style="margin-top:10px">Appliquer et recharger Suno</button>
+            <p id="sunoapp-site-lang-error" role="status" class="sa-eq-note"></p>
             <div class="sa-section-title" data-i18n="soundQuality">Qualité et mode sonore</div>
             <div class="sa-modes">
                 <button class="sa-mode" data-mode="flat" data-i18n="modeFlat">Neutre</button>
@@ -128,14 +133,20 @@
                 <button class="sa-theme" type="button" data-theme="musique" data-i18n="themeMusique">Musique</button>
                 <button class="sa-theme" type="button" data-theme="galaxy" data-i18n="themeGalaxy">Galaxy</button>
             </div>
+            <div class="sa-preamp">
+                <label for="sunoapp-star-size" data-i18n="starSize">Taille des étoiles</label>
+                <input id="sunoapp-star-size" type="range" min="50" max="300" step="10" value="100">
+                <output id="sunoapp-star-size-out" for="sunoapp-star-size">100 %</output>
+            </div>
             <div id="sunoapp-audio-status" data-i18n="statusPickMode">Sélectionnez un mode pour activer le traitement audio.</div>
         </section>
     `;
     document.body.appendChild(overlay);
+    window.__SUNO_SITE_LANGUAGE?.mount(document, window.location, i18n);
 
     const applyI18n = () => {
         const loc = i18n.resolve();
-        document.documentElement.setAttribute('lang', loc);
+        overlay.setAttribute('lang', loc);
         overlay.dir = (loc === 'ar' || loc === 'he') ? 'rtl' : 'ltr';
         const fill = (root) => {
             root.querySelectorAll('[data-i18n]').forEach((el) => {

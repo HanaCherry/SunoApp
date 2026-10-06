@@ -2,6 +2,8 @@ const { app, BrowserWindow, globalShortcut, nativeImage, session, Menu, shell, c
 const path = require('path');
 const fs = require('fs');
 const sunoI18n = require('./sunoapp-i18n.js');
+const { isExternalUrl, isSunoUrl, isLocalSender, validMiniAction, nativeClickPoint } = require('./sunoapp-security.js');
+const siteLanguage = require('./sunoapp-site-language.js');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
@@ -14,8 +16,8 @@ let isPlaying = false;
 const sanitizeSelection = (text = '') => text.replace(/\s+/g, ' ').trim();
 
 const openExternalSearch = (url) => {
-    if (!url) return;
-    shell.openExternal(url).catch((error) => {
+    if (!isExternalUrl(url)) return;
+    shell.openExternal(new URL(url).href).catch((error) => {
         console.error('Erreur ouverture lien externe:', error);
     });
 };
@@ -39,7 +41,19 @@ const openTranslationWindow = (text, targetLang = 'fr') => {
     });
 
     const encodedText = encodeURIComponent(selectedText);
+    translateWindow.webContents.setWindowOpenHandler(({ url }) => {
+        openExternalSearch(url);
+        return { action: 'deny' };
+    });
     translateWindow.loadURL(`https://translate.google.com/?sl=auto&tl=${targetLang}&text=${encodedText}&op=translate`);
+};
+
+// Local controls must never become remote browsers.
+const lockLocalWindow = (window) => {
+    window.webContents.on('will-navigate', event => event.preventDefault());
+    window.webContents.on('will-frame-navigate', event => event.preventDefault());
+    window.webContents.on('will-redirect', event => event.preventDefault());
+    window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 };
 
 const buildContextMenu = (params) => {
@@ -200,8 +214,8 @@ app.whenReady().then(() => {
         height: 800,
         minWidth: 900,
         minHeight: 600,
-        frame: false,
-        autoHideMenuBar: true,
+        frame: true,
+        autoHideMenuBar: false,
         icon: path.join(__dirname, 'app-icon.ico'),
         backgroundColor: '#121212',
         show: false,
@@ -215,7 +229,14 @@ app.whenReady().then(() => {
         }
     });
 
-    mainWindow.loadURL('https://suno.com');
+    customSession.cookies.get({ url: 'https://suno.com', name: 'i18next' }).then(cookies => {
+        if (!mainWindow || mainWindow.isDestroyed()) return;
+        const locale = cookies.find(cookie => siteLanguage.supported(cookie.value))?.value || 'auto';
+        return mainWindow.loadURL(siteLanguage.targetUrl('https://suno.com/', locale));
+    }).catch(error => {
+        console.error('Erreur chargement langue Suno:', error);
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadURL('https://suno.com');
+    });
 
     mainWindow.webContents.on('context-menu', (event, params) => {
         try {
@@ -226,6 +247,8 @@ app.whenReady().then(() => {
     });
 
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        if (!mainWindow || mainWindow.isDestroyed()) return { action: 'deny' };
+        if (url.startsWith('sunoapp:') && !isSunoUrl(mainWindow.webContents.getURL())) return { action: 'deny' };
         if (url === 'sunoapp://mini') {
             toggleMiniPlayer();
             return { action: 'deny' };
@@ -255,10 +278,10 @@ app.whenReady().then(() => {
         }
         if (url.startsWith('sunoapp://native-click')) {
             try {
-                const target = new URL(url);
-                const x = Number(target.searchParams.get('x'));
-                const y = Number(target.searchParams.get('y'));
-                if (Number.isFinite(x) && Number.isFinite(y) && x >= 0 && y >= 0) {
+                const [width, height] = mainWindow.getContentSize();
+                const point = nativeClickPoint(url, width, height, mainWindow.webContents.getZoomFactor());
+                if (point) {
+                    const { x, y } = point;
                     mainWindow.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(x), y: Math.round(y) });
                     mainWindow.webContents.sendInputEvent({ type: 'mouseDown', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
                     mainWindow.webContents.sendInputEvent({ type: 'mouseUp', x: Math.round(x), y: Math.round(y), button: 'left', clickCount: 1 });
@@ -339,6 +362,7 @@ app.whenReady().then(() => {
             }
         });
 
+        lockLocalWindow(miniWindow);
         miniWindow.loadFile(path.join(__dirname, 'mini-player.html'));
         placeMiniPlayerBottomRight(400, 540);
         miniWindow.setAlwaysOnTop(true, 'screen-saver');
@@ -382,6 +406,7 @@ app.whenReady().then(() => {
             }
         });
 
+        lockLocalWindow(spectrumWindow);
         spectrumWindow.loadFile(path.join(__dirname, 'spectrum.html'));
         spectrumWindow.setAlwaysOnTop(true, 'screen-saver');
         spectrumWindow.moveTop();

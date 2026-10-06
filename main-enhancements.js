@@ -24,7 +24,7 @@
         profileSource: null,
         mode: localStorage.getItem('sunoapp-sound-mode') || 'flat',
         waveformEnabled: localStorage.getItem('sunoapp-waveform-enabled') !== 'false',
-        customPlayerEnabled: localStorage.getItem('sunoapp-custom-player-enabled') !== 'false',
+        customPlayerEnabled: localStorage.getItem('sunoapp-custom-player-layout-v2') === 'true',
         uiTheme: localStorage.getItem('sunoapp-ui-theme') || 'nuit'
     };
 
@@ -63,7 +63,7 @@
     const style = document.createElement('style');
     style.id = 'sunoapp-enhancements-style';
     style.textContent = `
-        :root, html, body.sunoapp-frameless {
+        #sunoapp-settings-overlay {
             --sa-bg: #0b0c10;
             --sa-titlebar: rgba(16,18,23,.96);
             --sa-text: rgba(255,255,255,.88);
@@ -75,7 +75,7 @@
             --sa-card: linear-gradient(145deg, rgba(34,34,40,.96), rgba(11,11,15,.94));
             --sa-btn: rgba(255,255,255,.08);
         }
-        html[data-sunoapp-theme="clair"], body[data-sunoapp-theme="clair"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="clair"], #sunoapp-settings-overlay[data-sunoapp-theme="clair"] {
             --sa-bg: #f3f1ec;
             --sa-titlebar: rgba(255,252,248,.96);
             --sa-text: rgba(28,24,22,.92);
@@ -87,7 +87,7 @@
             --sa-card: linear-gradient(145deg, #fff, #f6f1ea);
             --sa-btn: rgba(28,24,22,.07);
         }
-        html[data-sunoapp-theme="cherry"], body[data-sunoapp-theme="cherry"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="cherry"], #sunoapp-settings-overlay[data-sunoapp-theme="cherry"] {
             --sa-bg: #1a0d14;
             --sa-titlebar: rgba(42,14,28,.96);
             --sa-text: rgba(255,232,240,.94);
@@ -99,7 +99,7 @@
             --sa-card: linear-gradient(145deg, rgba(64,18,40,.96), rgba(22,8,16,.94));
             --sa-btn: rgba(255,120,160,.12);
         }
-        html[data-sunoapp-theme="aurore"], body[data-sunoapp-theme="aurore"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="aurore"], #sunoapp-settings-overlay[data-sunoapp-theme="aurore"] {
             --sa-bg: #07141a;
             --sa-titlebar: rgba(8,28,36,.96);
             --sa-text: rgba(230,248,250,.94);
@@ -111,7 +111,7 @@
             --sa-card: linear-gradient(145deg, rgba(12,48,56,.96), rgba(8,22,28,.94));
             --sa-btn: rgba(62,198,201,.12);
         }
-        html[data-sunoapp-theme="glass"], body[data-sunoapp-theme="glass"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="glass"], #sunoapp-settings-overlay[data-sunoapp-theme="glass"] {
             --sa-bg: #12141a;
             --sa-titlebar: rgba(255,255,255,.14);
             --sa-text: rgba(255,255,255,.94);
@@ -123,7 +123,7 @@
             --sa-card: linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.06));
             --sa-btn: rgba(255,255,255,.12);
         }
-        html[data-sunoapp-theme="aero"], body[data-sunoapp-theme="aero"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="aero"], #sunoapp-settings-overlay[data-sunoapp-theme="aero"] {
             --sa-bg: #0a2a4a;
             --sa-titlebar: rgba(120,190,255,.28);
             --sa-text: rgba(245,252,255,.96);
@@ -135,7 +135,7 @@
             --sa-card: linear-gradient(180deg, rgba(200,230,255,.35), rgba(20,70,140,.45));
             --sa-btn: rgba(160,210,255,.18);
         }
-        html[data-sunoapp-theme="musique"], body[data-sunoapp-theme="musique"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="musique"], #sunoapp-settings-overlay[data-sunoapp-theme="musique"] {
             --sa-bg: #0c0c10;
             --sa-titlebar: rgba(20,20,24,.8);
             --sa-text: rgba(255,255,255,.94);
@@ -147,7 +147,7 @@
             --sa-card: linear-gradient(145deg, rgba(40,40,48,.9), rgba(12,12,16,.92));
             --sa-btn: rgba(255,255,255,.1);
         }
-        html[data-sunoapp-theme="galaxy"], body[data-sunoapp-theme="galaxy"] {
+        #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"], #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"] {
             --sa-bg: #070513;
             --sa-titlebar: rgba(24, 16, 48, .92);
             --sa-text: #f4f6fb;
@@ -181,40 +181,71 @@
         .sa-theme[data-theme="galaxy"]::before { background: linear-gradient(90deg, #070513, #382079 40%, #8670ef 70%, #ff9ac8); }
 
 
-        html[data-sunoapp-theme] { background: var(--sa-bg); }
-        html[data-sunoapp-theme="clair"] { color-scheme: light; }
-        html[data-sunoapp-theme="nuit"], html[data-sunoapp-theme="cherry"], html[data-sunoapp-theme="aurore"],
-        html[data-sunoapp-theme="glass"], html[data-sunoapp-theme="aero"], html[data-sunoapp-theme="musique"],
-        html[data-sunoapp-theme="galaxy"] { color-scheme: dark; }
-        html[data-sunoapp-theme="glass"] #sunoapp-titlebar,
-        html[data-sunoapp-theme="musique"] #sunoapp-titlebar {
+        #sunoapp-settings-overlay[data-sunoapp-theme="glass"] #sunoapp-titlebar,
+        #sunoapp-settings-overlay[data-sunoapp-theme="musique"] #sunoapp-titlebar {
             background: var(--sa-titlebar) !important;
             backdrop-filter: blur(28px) saturate(180%) !important;
             border-bottom: 1px solid var(--sa-border) !important;
         }
-        html[data-sunoapp-theme="aero"] #sunoapp-titlebar {
+        #sunoapp-settings-overlay[data-sunoapp-theme="aero"] #sunoapp-titlebar {
             background: linear-gradient(180deg, rgba(220,240,255,.45), rgba(40,110,190,.38)) !important;
             backdrop-filter: blur(16px) saturate(170%) !important;
             border-bottom: 1px solid rgba(255,255,255,.35) !important;
         }
-        html[data-sunoapp-theme="galaxy"] #sunoapp-titlebar {
+        #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"] #sunoapp-titlebar {
             background: rgba(16, 12, 32, .9) !important;
             backdrop-filter: blur(16px) saturate(150%) !important;
             border-bottom: 1px solid rgba(201, 188, 255, .16) !important;
         }
-        html[data-sunoapp-theme="galaxy"] #sunoapp-settings-overlay .sa-settings-card {
+        #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"] .sa-settings-card {
             background: linear-gradient(160deg, rgba(56, 32, 121, .55), rgba(12, 8, 28, .94)) !important;
             backdrop-filter: blur(28px) saturate(160%) !important;
             border: 1px solid rgba(201, 188, 255, .2) !important;
         }
-        html[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item:hover,
-        html[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item.active {
+        #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item:hover,
+        #sunoapp-settings-overlay[data-sunoapp-theme="galaxy"] #sunoapp-rail-tools .sa-rail-item.active {
             background: rgba(134, 112, 239, .22);
             border: 1px solid rgba(201, 188, 255, .28);
         }
         #sunoapp-galaxy-sky {
             position: fixed; inset: 0; z-index: 8; pointer-events: none; overflow: hidden;
             background: transparent;
+        }
+        #sunoapp-galaxy-sky * { pointer-events: none; }
+        #sunoapp-galaxy-sky .sa-gb-nebula { transition: background-color 2.4s ease; }
+        #sunoapp-galaxy-sky[data-mode] .sa-gb-nebula.n1 { background-color: var(--sky-first, #6b2cff); }
+        #sunoapp-galaxy-sky[data-mode] .sa-gb-nebula.n3 { background-color: var(--sky-second, #c43dff); }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-nebula.n2 { background-color: var(--sky-second, #ff8a5c); }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-stars i {
+            background-color: var(--sky-first, #ff5474) !important;
+            box-shadow: 0 0 7px var(--sky-second, #ff8a5c);
+            transition: background-color 2.4s ease, box-shadow 2.4s ease;
+            animation: none !important;
+            width: calc(12px * var(--sunoapp-star-scale, 1)) !important;
+            height: calc(14px * var(--sunoapp-star-scale, 1)) !important;
+            border-radius: 0;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0C58 36 64 42 100 50C64 58 58 64 50 100C42 64 36 58 0 50C36 42 42 36 50 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
+            transform: translate3d(var(--star-x, 0px), var(--star-y, 0px), 0);
+        }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-stars i:nth-child(3n) { animation-duration: 25s !important; }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-stars i:nth-child(3n + 1) { animation-duration: 12s !important; }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-stars { opacity: var(--music-star-glow, .55); }
+        @keyframes saMusicRain {
+            0% { transform: translate3d(-8vw, -100vh, 0) scale(.7); opacity: 0; }
+            10%, 85% { opacity: .9; }
+            100% { transform: translate3d(8vw, 100vh, 0) scale(1.3); opacity: 0; }
+        }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-petals,
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-shoot { display: none; }
+        #sunoapp-galaxy-sky[data-mode="musique"] .sa-gb-nebula { animation: none; }
+        html[data-sunoapp-palette="musique"] body,
+        html[data-sunoapp-palette="musique"] :is(.bg-background-primary, .bg-background-base, .bg-background-secondary, .bg-background-tertiary) {
+            transition: background-color 2.4s ease, border-color 2.4s ease;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #sunoapp-galaxy-sky * { animation: none !important; transition: none !important; }
+            html[data-sunoapp-palette="musique"] body,
+            html[data-sunoapp-palette="musique"] :is(.bg-background-primary, .bg-background-base, .bg-background-secondary, .bg-background-tertiary) { transition: none; }
         }
         #sunoapp-galaxy-sky .sa-gb-nebula {
             position: absolute; border-radius: 50%; filter: blur(72px); opacity: .18;
@@ -258,82 +289,22 @@
             14% { opacity: .28; }
             100% { transform: translate3d(36px, 110vh, 0) rotate(220deg); opacity: 0; }
         }
-        html[data-sunoapp-theme="glass"] #sunoapp-settings-overlay .sa-settings-card,
-        html[data-sunoapp-theme="aero"] #sunoapp-settings-overlay .sa-settings-card,
-        html[data-sunoapp-theme="musique"] #sunoapp-settings-overlay .sa-settings-card {
+        #sunoapp-settings-overlay[data-sunoapp-theme="glass"] .sa-settings-card,
+        #sunoapp-settings-overlay[data-sunoapp-theme="aero"] .sa-settings-card,
+        #sunoapp-settings-overlay[data-sunoapp-theme="musique"] .sa-settings-card {
             background: var(--sa-card) !important;
             backdrop-filter: blur(32px) saturate(170%) !important;
             border: 1px solid var(--sa-border) !important;
         }
         #sunoapp-top-menu { display: none !important; }
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="sidebar" i],
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="SideNav"],
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] [class*="side-nav"],
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="sidebar" i],
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="SideNav"],
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] [class*="side-nav"] {
-            background: transparent !important;
-            background-color: transparent !important;
-            box-shadow: none !important;
-        }
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] nav,
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme] aside,
-        html[data-sunoapp-theme="glass"] body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
-            background: rgba(18,20,28,.42) !important;
-            background-color: rgba(18,20,28,.42) !important;
-            backdrop-filter: blur(40px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-            border-color: rgba(255,255,255,.12) !important;
-        }
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] nav,
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme] aside,
-        html[data-sunoapp-theme="aero"] body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
-            background: linear-gradient(180deg, rgba(190,225,255,.2), rgba(16,70,140,.28)) !important;
-            background-color: transparent !important;
-            backdrop-filter: blur(22px) saturate(165%) !important;
-            -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
-            border-color: rgba(180,230,255,.28) !important;
-        }
-        html[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item:hover,
-        html[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item.active,
-        html[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item:hover,
-        html[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item.active {
+        #sunoapp-settings-overlay[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item:hover,
+        #sunoapp-settings-overlay[data-sunoapp-theme="glass"] #sunoapp-rail-tools .sa-rail-item.active,
+        #sunoapp-settings-overlay[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item:hover,
+        #sunoapp-settings-overlay[data-sunoapp-theme="aero"] #sunoapp-rail-tools .sa-rail-item.active {
             background: rgba(255,255,255,.12);
             border: 1px solid rgba(255,255,255,.16);
             backdrop-filter: blur(18px) saturate(160%);
         }
-        body[data-sunoapp-theme] { background: var(--sa-bg) !important; }
-        body[data-sunoapp-theme] nav,
-        body[data-sunoapp-theme] aside,
-        body[data-sunoapp-theme] [class*="sidebar" i],
-        body[data-sunoapp-theme] [class*="SideNav"],
-        body[data-sunoapp-theme] [class*="side-nav"] {
-            background: var(--sa-titlebar) !important;
-            color: var(--sa-text) !important;
-            border-color: var(--sa-border) !important;
-        }
-        body[data-sunoapp-theme] .sunoapp-studio-root {
-            background: var(--sa-bg) !important;
-        }
-        body[data-sunoapp-theme]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
-            background-color: var(--sa-bg) !important;
-        }
-        body[data-sunoapp-theme] a, body[data-sunoapp-theme] button, body[data-sunoapp-theme] [role="button"] {
-            accent-color: var(--sa-accent);
-        }
-        body[data-sunoapp-theme="clair"] .sunoapp-studio-root,
-        body[data-sunoapp-theme="clair"]:not(.sunoapp-studio) > div:not([id^="sunoapp-"]) {
-            filter: invert(1) hue-rotate(180deg);
-        }
-        body[data-sunoapp-theme="clair"] img,
-        body[data-sunoapp-theme="clair"] video,
-        body[data-sunoapp-theme="clair"] canvas {
-            filter: invert(1) hue-rotate(180deg);
-        }
-        a[data-sunoapp-nav].active, a[data-sunoapp-nav][aria-current="page"] {
-            color: var(--sa-accent) !important;
-        }
-        body.sunoapp-frameless { box-sizing: border-box !important; padding-top: 38px !important; }
         body.sunoapp-studio #sunoapp-titlebar {
             background: var(--sa-titlebar, #101217) !important;
             color: var(--sa-text, rgba(255,255,255,.88)) !important;

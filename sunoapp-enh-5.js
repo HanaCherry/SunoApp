@@ -256,7 +256,7 @@
     const customPlayerToggle = document.getElementById('sunoapp-custom-player-toggle');
     customPlayerToggle.addEventListener('change', () => {
         state.customPlayerEnabled = customPlayerToggle.checked;
-        localStorage.setItem('sunoapp-custom-player-enabled', String(state.customPlayerEnabled));
+        localStorage.setItem('sunoapp-custom-player-layout-v2', String(state.customPlayerEnabled));
         if (!state.customPlayerEnabled) {
             state.activeTrackRow?.classList.remove('sunoapp-source-row-hidden');
             nowCard.classList.remove('sunoapp-now-overlay');
@@ -303,10 +303,71 @@
         }
     };
 
+    let musicRainFrame = 0;
+    let musicBass = 0;
+    let musicBins;
+    let musicRainTime = 0;
+    let musicBeatArmed = true;
+    let musicDirection = 0;
+    let musicLastBeat = 0;
+    const musicPositions = new WeakMap();
+    const animateMusicRain = (time) => {
+        musicRainFrame = 0;
+        const sky = document.getElementById('sunoapp-galaxy-sky');
+        if (state.uiTheme !== 'musique' || !sky) { musicBass = 0; return; }
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (time - musicRainTime >= 32) {
+            const dt = Math.min(.065, (time - musicRainTime) / 1000);
+            musicRainTime = time;
+            let bass = 0;
+            if (!document.hidden && !reduced && state.analyser && state.audioElement && !state.audioElement.paused && !state.audioElement.muted) {
+                if (musicBins?.length !== state.analyser.frequencyBinCount) musicBins = new Uint8Array(state.analyser.frequencyBinCount);
+                state.analyser.getByteFrequencyData(musicBins);
+                const hzPerBin = state.audioContext.sampleRate / state.analyser.fftSize;
+                const low = Math.max(1, Math.ceil(35 / hzPerBin));
+                const high = Math.min(musicBins.length - 1, Math.floor(180 / hzPerBin));
+                for (let index = low; index <= high; index++) bass += musicBins[index] / 255;
+                bass /= Math.max(1, high - low + 1);
+            }
+            musicBass += (bass - musicBass) * (bass > musicBass ? .5 : .12);
+            if (bass < .18) musicBeatArmed = true;
+            if (bass > .3 && time - musicLastBeat > 220 && (musicBeatArmed || bass > musicBass + .08)) {
+                musicDirection += Math.PI * (.65 + Math.random() * .7);
+                musicLastBeat = time;
+                musicBeatArmed = false;
+            }
+            sky.style.setProperty('--music-star-glow', String(.45 + musicBass * .5));
+            const energy = bass > .12 ? musicBass : 0;
+            for (const [index, star] of [...sky.querySelectorAll('.sa-gb-stars i')].entries()) {
+                const position = musicPositions.get(star) || { x: 0, y: 0 };
+                const angle = musicDirection + (index % 7 - 3) * .13;
+                position.x += Math.cos(angle) * energy * dt * (28 + index % 5 * 8);
+                position.y += Math.sin(angle) * energy * dt * (28 + index % 5 * 8);
+                const left = parseFloat(star.style.left) / 100 * innerWidth;
+                const top = parseFloat(star.style.top) / 100 * innerHeight;
+                if (left + position.x > innerWidth + 30) position.x -= innerWidth + 60;
+                if (left + position.x < -30) position.x += innerWidth + 60;
+                if (top + position.y > innerHeight + 30) position.y -= innerHeight + 60;
+                if (top + position.y < -30) position.y += innerHeight + 60;
+                star.style.setProperty('--star-x', `${position.x}px`);
+                star.style.setProperty('--star-y', `${position.y}px`);
+                musicPositions.set(star, position);
+            }
+        }
+        musicRainFrame = requestAnimationFrame(animateMusicRain);
+    };
     const watchMedia = () => {
-        if (!state.waveformEnabled) return;
+        if (state.uiTheme === 'musique') {
+            if (!musicRainFrame) musicRainFrame = requestAnimationFrame(animateMusicRain);
+            const metadata = navigator.mediaSession?.metadata;
+            const cover = metadata?.artwork?.slice(-1)[0]?.src;
+            if (cover) applyCoverTheme(cover, metadata?.title || '');
+        }
+        if (!state.waveformEnabled && state.uiTheme !== 'musique') return;
         const media = Array.from(document.querySelectorAll('audio, video')).find((candidate) => candidate.src || candidate.currentSrc);
         if (media && media !== state.audioElement) connectAudio().catch(() => {});
-        if (media) analyseWholeTrack(media);
-        attachWaveformToLoadedSong();
+        if (state.waveformEnabled) {
+            if (media) analyseWholeTrack(media);
+            attachWaveformToLoadedSong();
+        }
     };

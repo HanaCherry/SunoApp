@@ -56,7 +56,8 @@
     };
     const MUSIC_VARS = ['--sa-bg', '--sa-titlebar', '--sa-accent', '--sa-accent-2', '--sa-border', '--sa-surface', '--sa-btn'];
     syncMusicTheme = () => {
-        const roots = [document.documentElement, document.body];
+        window.__SUNO_APP_THEME?.apply(state.uiTheme, [state.themeStart, state.themeEnd]);
+        const roots = [overlay];
         if (state.uiTheme !== 'musique') {
             roots.forEach((el) => MUSIC_VARS.forEach((name) => el.style.removeProperty(name)));
             return;

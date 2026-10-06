@@ -67,6 +67,8 @@
             'sunoapp-i18n-11.js',
             'sunoapp-i18n-12.js',
             'sunoapp-i18n-13.js',
+            'sunoapp-site-language.js',
+            'sunoapp-theme.js',
             'main-enhancements.js',
             'sunoapp-enh-2.js',
             'sunoapp-enh-3.js',
@@ -103,6 +105,15 @@
     // of those transitions destroys the JavaScript context and used to leave the
     // custom UI missing. Wait for the final DOM and retry once the page settles.
     let integrationTimer = null;
+    let playerPollTimer = null;
+    mainWindow.on('closed', () => {
+        clearTimeout(integrationTimer);
+        clearInterval(playerPollTimer);
+        stopSpectrumPump();
+        if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close();
+        if (spectrumWindow && !spectrumWindow.isDestroyed()) spectrumWindow.close();
+        mainWindow = null;
+    });
     let studioMode = false;
     let windowBoundsBeforeStudio = null;
     const syncStudioWindow = () => {
@@ -129,8 +140,7 @@
         integrationTimer = setTimeout(() => {
             if (!mainWindow || mainWindow.isDestroyed()) return;
             const currentUrl = mainWindow.webContents.getURL();
-            if (!/^https:\/\/(?:www\.)?suno\.com(?:\/|$)/i.test(currentUrl)) return;
-            installMiniPlayerButton();
+            if (!isSunoUrl(currentUrl)) return;
             installSunoAppEnhancements();
         }, 900);
     };
@@ -139,7 +149,11 @@
     mainWindow.webContents.on('did-navigate-in-page', installSunoIntegration);
 
     ipcMain.removeHandler('mini-control');
-    ipcMain.handle('mini-control', (_event, action, value) => {
+    ipcMain.handle('mini-control', (event, action, value) => {
+        const authorized = action === 'close-spectrum'
+            ? value === undefined && isLocalSender(event, spectrumWindow, path.join(__dirname, 'spectrum.html'))
+            : validMiniAction(action, value) && isLocalSender(event, miniWindow, path.join(__dirname, 'mini-player.html'));
+        if (!authorized) return;
         if (action === 'close-mini') {
             if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close();
             return;
@@ -177,9 +191,8 @@
 
                 const artworkWidth = windowWidth - 64;
                 const artworkHeight = Math.max(220, Math.min(520, artworkWidth / ratio));
-                const windowHeight = Math.round(Math.max(430, Math.min(760, artworkHeight + 204)));
+                const windowHeight = Math.round(Math.max(460, Math.min(760, artworkHeight + 204)));
                 placeMiniPlayerBottomRight(windowWidth, windowHeight);
-                miniWindow.setAlwaysOnTop(true, 'screen-saver');
             }
             return;
         }
@@ -190,6 +203,7 @@
 
     const controlSuno = (action) => {
         if (!mainWindow || mainWindow.isDestroyed()) return;
+        if (!isSunoUrl(mainWindow.webContents.getURL())) return;
 
         mainWindow.webContents.executeJavaScript(`
             try {
@@ -266,8 +280,8 @@
             `).catch(() => {});
         }
 
-        setInterval(() => {
-            if (mainWindow && !mainWindow.isDestroyed()) {
+        playerPollTimer = setInterval(() => {
+            if (mainWindow && !mainWindow.isDestroyed() && isSunoUrl(mainWindow.webContents.getURL())) {
                 mainWindow.webContents.executeJavaScript(`
                     (function() {
                         const visible = (element) => {
@@ -321,6 +335,7 @@
                         };
                     })()
                 `).then((playerState) => {
+                    if (!mainWindow || mainWindow.isDestroyed() || !isSunoUrl(mainWindow.webContents.getURL())) return;
                     if (playerState.playing !== isPlaying) {
                         isPlaying = playerState.playing;
                         updateThumbar();
@@ -333,6 +348,24 @@
         }, 1200);
     });
 
+    mainWindow.setMenu(Menu.buildFromTemplate([
+        { label: 'SunoApp', submenu: [
+            { label: 'Réglages audio et apparence', accelerator: 'CmdOrCtrl+,', click: () => {
+                if (!mainWindow || mainWindow.isDestroyed() || !isSunoUrl(mainWindow.webContents.getURL())) return;
+                mainWindow.webContents.executeJavaScript('window.__sunoAppOpenSettings?.()').catch(console.error);
+            } },
+            { label: 'Mini-lecteur', click: toggleMiniPlayer },
+            { label: 'Spectre audio', click: toggleSpectrumWindow },
+            { type: 'separator' }, { role: 'quit', label: 'Quitter' }
+        ] },
+        { label: 'Affichage', submenu: [
+            { role: 'reload', label: 'Recharger' },
+            { role: 'resetZoom', label: 'Taille réelle' },
+            { role: 'zoomIn', label: 'Agrandir' },
+            { role: 'zoomOut', label: 'Réduire' },
+            { role: 'togglefullscreen', label: 'Plein écran' }
+        ] }
+    ]));
     globalShortcut.register('CommandOrControl+Space', () => { controlSuno('playpause'); });
     globalShortcut.register('CommandOrControl+Shift+M', () => { toggleMiniPlayer(); });
 });

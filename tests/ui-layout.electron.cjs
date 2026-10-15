@@ -41,6 +41,9 @@ app.whenReady().then(async () => {
         const testSession = session.fromPartition('ui-layout-test');
         await testSession.protocol.handle('https', () => new Response(fixture, { headers: { 'content-type': 'text/html' } }));
         const win = new BrowserWindow({ show: false, width: 1280, height: 800, webPreferences: { offscreen: true, session: testSession, sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
+        // Hosted desktops may disable motion. Exercise animations explicitly in this isolated test.
+        win.webContents.debugger.attach('1.3');
+        await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
         win.webContents.on('console-message', event => { if (event.level === 'error') errors.push(event.message); });
         const snapshot = `(() => {
             const rect = element => { const r=element.getBoundingClientRect();return [r.x,r.y,r.width,r.height]; };

@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     strategy:
@@ -18,6 +21,7 @@ jobs:
           - os: macos-15
             target: mac
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

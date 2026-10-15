@@ -1,3 +1,7 @@
+## Windows, Linux and macOS
+
+Version 1.0.18 adds a Windows EXE installer, Linux x64 AppImage/DEB, and Intel/Apple Silicon macOS DMG/ZIP packages. See [installation details and compatibility limitations](INSTALLATION.md). macOS builds are not signed or notarized.
+
 <h1 align="center">SunoApp</h1>
 <p align="center"><strong>Galaxy Studio</strong> · unofficial Windows app for Suno</p>
 

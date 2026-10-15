@@ -1,3 +1,7 @@
+## Windows, Linux et macOS
+
+À partir de la version 1.0.18 : installateur Windows EXE, Linux x64 AppImage/DEB, Mac Intel et Apple Silicon DMG/ZIP. Voir [les instructions et limites de compatibilité](INSTALLATION.md).
+
 <h1 align="center">SunoApp</h1>
 <p align="center"><strong>Galaxy Studio</strong> · application Windows non officielle pour Suno</p>
 

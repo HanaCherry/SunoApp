@@ -1,7 +1,7 @@
 {
   "name": "sunoapp",
-  "version": "1.0.17",
-  "description": "Application Windows non officielle pour utiliser Suno avec un lecteur personnalisé, un mini-lecteur et des contrôles multimédias",
+  "version": "1.0.18",
+  "description": "Application de bureau non officielle pour Suno, avec thèmes et contrôles multimédias",
   "author": "SunoApp Maintainers",
   "homepage": "https://github.com/HanaCherry/SunoApp",
   "main": "main.js",
@@ -12,7 +12,10 @@
     "predist": "node scripts/build-i18n.cjs",
     "start": "electron .",
     "build": "electron-builder",
-    "dist": "electron-builder --win nsis"
+    "dist": "electron-builder --win nsis",
+    "dist:win": "npm run prebuild && electron-builder --win nsis --x64 --publish never",
+    "dist:linux": "npm run prebuild && electron-builder --linux AppImage deb --x64 --publish never",
+    "dist:mac": "npm run prebuild && electron-builder --mac dmg zip --x64 --arm64 --publish never"
   },
   "engines": {
     "node": ">=22.12.0",
@@ -75,11 +78,37 @@
       "suiv.png",
       "mini.png",
       "startup.mp3",
-      "LICENSE"
+      "LICENSE",
+      "app-icon.png"
     ],
     "extraMetadata": {
       "name": "sunoapp",
-      "version": "1.0.17"
+      "version": "1.0.18"
+    },
+    "artifactName": "SunoApp-${version}-${os}-${arch}.${ext}",
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "app-icon.png",
+      "category": "AudioVideo",
+      "maintainer": "SunoApp Maintainers <213934282+HanaCherry@users.noreply.github.com>"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "app-icon.icns",
+      "category": "public.app-category.music",
+      "identity": null
     }
   },
   "license": "SEE LICENSE IN LICENSE"

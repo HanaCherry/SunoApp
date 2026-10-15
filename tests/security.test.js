@@ -18,7 +18,7 @@ test('browser translations match the source parts and run without Node privilege
     assert.equal(window.__SUNO_I18N.t('play', null, 'fr'), require('../sunoapp-i18n').t('play', null, 'fr'));
 });
 
-async function boot(cookieLocale) {
+async function boot(cookieLocale, platform = process.platform) {
     const windows = [], external = [], intervals = new Map(), timeouts = new Map();
     const handlers = new Map();
     class Window extends EventEmitter {
@@ -54,13 +54,13 @@ async function boot(cookieLocale) {
         globalShortcut: { register() {}, unregisterAll() {} },
         nativeImage: { createFromPath: () => ({ resize: () => ({}) }) },
         session: { fromPartition: () => ({ setSpellCheckerLanguages() {}, cookies: { get: () => Promise.resolve(cookieLocale ? [{ name: 'i18next', value: cookieLocale }] : []) } }) },
-        Menu: { buildFromTemplate: template => ({ popup() {}, template }) },
+        Menu: { buildFromTemplate: template => ({ popup() {}, template }), setApplicationMenu(menu) { this.applicationMenu = menu; } },
         shell: { openExternal: url => { external.push(url); return Promise.resolve(); } }, clipboard: {},
         ipcMain: { removeHandler() {}, handle: (name, fn) => handlers.set(name, fn) },
         screen: { getCursorScreenPoint: () => ({}), getDisplayNearestPoint: () => ({ workArea: { x: 0, y: 0, width: 1920, height: 1080 } }) },
     };
     const context = {
-        console, URL, process, __dirname: root,
+        console, URL, process: { ...process, platform }, __dirname: root,
         require: name => name === 'electron' ? electron : name.startsWith('.') ? require(path.join(root, name)) : require(name),
         setInterval(fn, ms) { const key = {}; intervals.set(key, { fn, ms }); return key; },
         clearInterval(key) { intervals.delete(key); },
@@ -70,8 +70,22 @@ async function boot(cookieLocale) {
     vm.runInNewContext(['sunoapp-main-a.js', 'sunoapp-main-b.js'].map(f => fs.readFileSync(path.join(root, f), 'utf8')).join(''), context);
     await Promise.resolve();
     await Promise.resolve();
-    return { windows, external, intervals, timeouts, invoke: handlers.get('mini-control') };
+    return { windows, external, intervals, timeouts, app, menu: electron.Menu, invoke: handlers.get('mini-control') };
 }
+test('desktop startup and macOS Dock reopening preserve native menus and icons', async () => {
+    for (const platform of ['win32', 'linux', 'darwin']) {
+        const instance = await boot('fr', platform);
+        assert.ok(instance.windows[0].options.icon.endsWith(platform === 'win32' ? '.ico' : '.png'));
+        if (platform === 'darwin') {
+            assert.equal(instance.menu.applicationMenu.template[0].role, 'appMenu');
+            instance.windows[0].close();
+            instance.app.emit('activate');
+            await Promise.resolve();
+            assert.equal(instance.windows.length, 2);
+            assert.equal(instance.windows[1].webContents.getURL(), 'https://suno.com/fr');
+        }
+    }
+});
 const sender = window => ({ sender: window.webContents, senderFrame: window.webContents.mainFrame });
 
 test('application startup restores the native Suno language without translating text', async () => {

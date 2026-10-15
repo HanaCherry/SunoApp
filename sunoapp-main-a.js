@@ -4,6 +4,7 @@ const fs = require('fs');
 const sunoI18n = require('./sunoapp-i18n.js');
 const { isExternalUrl, isSunoUrl, isLocalSender, validMiniAction, nativeClickPoint } = require('./sunoapp-security.js');
 const siteLanguage = require('./sunoapp-site-language.js');
+const appIcon = path.join(__dirname, process.platform === 'win32' ? 'app-icon.ico' : 'app-icon.png');
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
@@ -32,7 +33,7 @@ const openTranslationWindow = (text, targetLang = 'fr') => {
         title: 'SunoApp - Traduction',
         autoHideMenuBar: true,
         backgroundColor: '#121212',
-        icon: path.join(__dirname, 'app-icon.ico'),
+        icon: appIcon,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -201,7 +202,7 @@ const buildContextMenu = (params = {}) => {
     return Menu.buildFromTemplate(template);
 };
 
-app.whenReady().then(() => {
+const createMainWindow = () => {
     const customSession = session.fromPartition('persist:sunoCache');
 
     try {
@@ -217,7 +218,7 @@ app.whenReady().then(() => {
         minHeight: 600,
         frame: true,
         autoHideMenuBar: false,
-        icon: path.join(__dirname, 'app-icon.ico'),
+        icon: appIcon,
         backgroundColor: '#121212',
         show: false,
         webPreferences: {
@@ -307,6 +308,7 @@ app.whenReady().then(() => {
     const tt = (key) => sunoI18n.t(key, null, sunoI18n.resolve(app.getLocale()));
 
     const updateThumbar = () => {
+        if (process.platform !== 'win32') return;
         if (!mainWindow || mainWindow.isDestroyed()) return;
         mainWindow.setThumbarButtons([
             { tooltip: tt('like'), icon: iconLike, click() { controlSuno('like'); } },
@@ -354,7 +356,7 @@ app.whenReady().then(() => {
             alwaysOnTop: true,
             skipTaskbar: false,
             backgroundColor: '#00000000',
-            icon: path.join(__dirname, 'app-icon.ico'),
+            icon: appIcon,
             webPreferences: {
                 preload: path.join(__dirname, 'mini-preload.js'),
                 nodeIntegration: false,
@@ -398,7 +400,7 @@ app.whenReady().then(() => {
             alwaysOnTop: true,
             skipTaskbar: false,
             backgroundColor: '#00000000',
-            icon: path.join(__dirname, 'app-icon.ico'),
+            icon: appIcon,
             webPreferences: {
                 preload: path.join(__dirname, 'spectrum-preload.js'),
                 nodeIntegration: false,

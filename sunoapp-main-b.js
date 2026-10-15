@@ -113,6 +113,7 @@
         if (miniWindow && !miniWindow.isDestroyed()) miniWindow.close();
         if (spectrumWindow && !spectrumWindow.isDestroyed()) spectrumWindow.close();
         mainWindow = null;
+        globalShortcut.unregisterAll();
     });
     let studioMode = false;
     let windowBoundsBeforeStudio = null;
@@ -348,7 +349,8 @@
         }, 1200);
     });
 
-    mainWindow.setMenu(Menu.buildFromTemplate([
+    const applicationMenu = Menu.buildFromTemplate([
+        ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
         { label: 'SunoApp', submenu: [
             { label: 'Réglages audio et apparence', accelerator: 'CmdOrCtrl+,', click: () => {
                 if (!mainWindow || mainWindow.isDestroyed() || !isSunoUrl(mainWindow.webContents.getURL())) return;
@@ -365,9 +367,17 @@
             { role: 'zoomOut', label: 'Réduire' },
             { role: 'togglefullscreen', label: 'Plein écran' }
         ] }
-    ]));
+    ]);
+    if (process.platform === 'darwin') Menu.setApplicationMenu(applicationMenu);
+    else mainWindow.setMenu(applicationMenu);
     globalShortcut.register('CommandOrControl+Space', () => { controlSuno('playpause'); });
     globalShortcut.register('CommandOrControl+Shift+M', () => { toggleMiniPlayer(); });
+};
+
+app.whenReady().then(createMainWindow);
+app.on('activate', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) createMainWindow();
+    else { mainWindow.show(); mainWindow.focus(); }
 });
 
 app.on('window-all-closed', () => {

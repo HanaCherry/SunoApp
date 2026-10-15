@@ -43,7 +43,7 @@ app.whenReady().then(async () => {
         const win = new BrowserWindow({ show: false, width: 1280, height: 800, webPreferences: { offscreen: true, session: testSession, sandbox: true, contextIsolation: true, nodeIntegration: false, backgroundThrottling: false } });
         // Hosted desktops may disable motion. Exercise animations explicitly in this isolated test.
         win.webContents.debugger.attach('1.3');
-        await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
+
         win.webContents.on('console-message', event => { if (event.level === 'error') errors.push(event.message); });
         const snapshot = `(() => {
             const rect = element => { const r=element.getBoundingClientRect();return [r.x,r.y,r.width,r.height]; };
@@ -56,6 +56,7 @@ app.whenReady().then(async () => {
         for (const [width, height, theme, route] of [[1280,800,'nuit','/'],[900,600,'clair','/create'],[1100,700,'glass','/studio']]) {
             win.setContentSize(width,height);
             await win.loadURL('https://suno.com'+route);
+            await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
             await win.webContents.executeJavaScript(`localStorage.clear();localStorage.setItem('sunoapp-ui-theme',${JSON.stringify(theme)});localStorage.setItem('sunoapp-custom-player-enabled','true');`);
             const before = await win.webContents.executeJavaScript(snapshot);
             await win.webContents.executeJavaScript(source);
